@@ -144,10 +144,10 @@ def resolve_handler(request, view_handlers):
 
     handlers = method_handlers[verb]
     vary = set()
-    # TODO only add Accept if len(handler) > 1, also do the same check for
-    # 'accepts' and add 'Content-Type' to vary if required.
-    if any(h for h in handlers if h.provides is not None):
+    if len(set(h.provides for h in handlers if h.provides is not None)) > 1:
         vary.add('Accept')
+    if len(set(h.accepts for h in handlers if h.accepts != '*/*')) > 1:
+        vary.add('Content-Type')
 
     content_type = request.content_type
     if content_type:

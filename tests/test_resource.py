@@ -7,7 +7,6 @@ from rhino.request import Request
 from rhino.resource import Resource, negotiate_content_type, negotiate_accept, \
         resolve_handler, make_response, request_handler, dispatch_request
 from rhino.response import Response
-from rhino.urls import request_context
 
 
 def make_request_handler(fn=None, verb=None, view=None, accepts='*/*', provides=None):
@@ -70,28 +69,43 @@ def test_resolve_handler():
                 make_request_handler(verb='POST', accepts='text/plain', provides='text/plain'),
                 make_request_handler(verb='POST', accepts='text/plain', provides='image/png'),
             ],
+            'PUT': [
+                make_request_handler(verb='PUT', accepts='text/plain'),
+                make_request_handler(verb='PUT', accepts='application/json'),
+            ],
         },
+        'test': {
+            'POST': [
+                make_request_handler(verb='POST', accepts='text/plain', provides='text/plain'),
+                make_request_handler(verb='POST', accepts='application/xml', provides='image/png'),
+            ],
+        }
     }
     get_handlers = handlers[None]['GET']
     post_handlers = handlers[None]['POST']
+    put_handlers = handlers[None]['PUT']
+    post_handlers_test_view = handlers['test']['POST']
+    no_vary = set()
     vary_accept = set(['Accept'])
+    vary_content_type = set(['Content-Type'])
+    vary_both = vary_accept | vary_content_type
 
     rv = resolve_handler(Request({'REQUEST_METHOD': 'GET'}), handlers)
-    assert rv == (get_handlers[0], vary_accept)
+    assert rv == (get_handlers[0], no_vary)
 
     rv = resolve_handler(Request({'REQUEST_METHOD': 'HEAD'}), handlers)
-    assert rv == (get_handlers[0], vary_accept)
+    assert rv == (get_handlers[0], no_vary)
 
     rv = resolve_handler(Request({'REQUEST_METHOD': 'OPTIONS'}), handlers)
     assert rv[0].verb == 'OPTIONS'
     assert rv[1] == set()
 
     assert_raises(MethodNotAllowed, resolve_handler, Request(
-        {'REQUEST_METHOD': 'PUT'}), handlers)
+        {'REQUEST_METHOD': 'DELETE'}), handlers)
 
     rv = resolve_handler(Request(
         {'REQUEST_METHOD': 'GET', 'HTTP_ACCEPT': 'text/html'}), handlers)
-    assert rv == (get_handlers[0], vary_accept)
+    assert rv == (get_handlers[0], no_vary)
 
     assert_raises(NotAcceptable, resolve_handler, Request(
         {'REQUEST_METHOD': 'GET', 'HTTP_ACCEPT': 'text/plain'}), handlers)
@@ -118,6 +132,16 @@ def test_resolve_handler():
         {'REQUEST_METHOD': 'POST',
          'CONTENT_TYPE': 'text/plain',
          'HTTP_ACCEPT': 'application/json'}), handlers)
+
+    rv = resolve_handler(Request(
+        {'REQUEST_METHOD': 'PUT',
+         'CONTENT_TYPE': 'application/json'}), handlers)
+    assert rv == (put_handlers[1], vary_content_type)
+
+    req = Request({'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': 'application/xml'})
+    req._add_context(root=None, mapper=None, route=Route('/', None, view='test'))
+    rv = resolve_handler(req, handlers)
+    assert rv == (post_handlers_test_view[1], vary_both)
 
 
 def test_dispatch_request():
