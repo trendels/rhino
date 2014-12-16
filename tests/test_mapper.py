@@ -20,22 +20,22 @@ class Test(unittest.TestCase):
     def _start_response(self, status, response_headers, exc_info=None):
         self.status = status
 
-    def _app(self, request):
+    def _app(self, request, ctx):
         self.called = True
         self.environ = request.environ.copy()
         return Response(200, [], '')
 
-    def _app1(self, request):
+    def _app1(self, request, ctx):
         self.app_number = 1
-        return self._app(request)
+        return self._app(request, ctx)
 
-    def _app2(self, request):
+    def _app2(self, request, ctx):
         self.app_number = 2
-        return self._app(request)
+        return self._app(request, ctx)
 
-    def _app3(self, request):
+    def _app3(self, request, ctx):
         self.app_number = 3
-        return self._app(request)
+        return self._app(request, ctx)
 
     def test_happy_path(self):
         d = Dispatcher()

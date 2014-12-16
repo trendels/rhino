@@ -17,9 +17,9 @@ def _make_handler_decorator(verb, view=None, accepts='*/*', provides=None):
     def decorator(fn):
         handler = request_handler(fn, verb, view, accepts, provides)
         @functools.wraps(fn)
-        def wrapper(request):
+        def wrapper(request, ctx):
             handler_dict = {view: {verb: [handler]}}
-            return dispatch_request(request, handler_dict, request.routing_args)
+            return dispatch_request(request, ctx, handler_dict, request.routing_args)
         return wrapper
     return decorator
 
@@ -83,12 +83,12 @@ def make_response(obj):
     return Response(200, body=obj)
 
 
-def dispatch_request(request, view_handlers, (args, kw)):
+def dispatch_request(request, ctx, view_handlers, (args, kw)):
     """Given a list of handlers, resolve a matching handler and produce either
     a Response instance, or raise an appropriate HTTPException."""
     handler, vary = resolve_handler(request, view_handlers)
     request._run_callbacks('enter', request)
-    response = make_response(handler.fn(request, *args, **kw))
+    response = make_response(handler.fn(request, ctx, *args, **kw))
     request._run_callbacks('leave', request, response)
 
     if handler.provides:
@@ -212,11 +212,11 @@ class Resource():
         self._handlers = defaultdict(lambda: defaultdict(list))
         self._from_url = None
 
-    def __call__(self, request):
+    def __call__(self, request, ctx):
         args, kw = request.routing_args
         if self._from_url:
             kw = self._from_url(reqest, *args, **kw)
-        return dispatch_request(request, self._handlers, (args, kw))
+        return dispatch_request(request, ctx, self._handlers, (args, kw))
 
     def _make_decorator(self, verb, view=None, accepts='*/*', provides=None):
         def decorator(fn):

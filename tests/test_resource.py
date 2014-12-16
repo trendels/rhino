@@ -145,8 +145,8 @@ def test_resolve_handler():
 
 
 def test_dispatch_request():
-    fn1 = lambda req: Response(200, headers=[('Vary', 'User-Agent')], body='test')
-    fn2 = lambda req: Response(200, body='test')
+    fn1 = lambda r, c: Response(200, headers=[('Vary', 'User-Agent')], body='test')
+    fn2 = lambda r, c: Response(200, body='test')
     handlers = {
         None: {
             'GET': [
@@ -158,21 +158,22 @@ def test_dispatch_request():
             ],
         },
     }
+    ctx = None
     routing_args = ([], {})
 
-    res = dispatch_request(Request({'REQUEST_METHOD': 'GET'}),
+    res = dispatch_request(Request({'REQUEST_METHOD': 'GET'}), ctx,
             handlers, routing_args)
     assert res.headers['Content-Type'] == 'text/plain'
     assert res.headers['Vary'] == 'Accept, User-Agent'
 
     res = dispatch_request(Request(
-        {'REQUEST_METHOD': 'GET', 'HTTP_ACCEPT': 'text/html'}),
+        {'REQUEST_METHOD': 'GET', 'HTTP_ACCEPT': 'text/html'}), ctx,
         handlers, routing_args)
     assert res.headers['Content-Type'] == 'text/html'
     assert res.headers['Vary'] == 'Accept'
 
     res = dispatch_request(Request(
-        {'REQUEST_METHOD': 'POST', 'HTTP_ACCEPT': 'text/html'}),
+        {'REQUEST_METHOD': 'POST', 'HTTP_ACCEPT': 'text/html'}), ctx,
         handlers, routing_args)
     assert 'Content-Type' not in res.headers
     assert 'Vary' not in res.headers
@@ -193,4 +194,5 @@ def test_make_response():
 def test_resource_dispatch_empty():
     r = Resource()
     req = Request({'REQUEST_METHOD': 'GET'})
-    assert_raises(NotFound, r, req)
+    ctx = None
+    assert_raises(NotFound, r, req, ctx)
