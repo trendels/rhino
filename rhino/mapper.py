@@ -280,6 +280,29 @@ def template2path(template, params, ranges=None):
     return "".join(stack[0])
 
 
+class Context(object):
+    def __init__(self, request=None):
+        self.request = request
+        self.__properties = {}
+
+    def add_property(self, name, fn, cached=True):
+        if name in self.__properties:
+            raise KeyError("Trying to add a property '%s' that already exists on this %s instance." % (name, self.__class__.__name__))
+        self.__properties[name] = (fn, cached)
+        if not callable(fn):
+            setattr(self, name, fn)
+
+    def __getattr__(self, name):
+        if name not in self.__properties:
+            raise AttributeError("'%s' object has no attribute '%s'"
+                    % (self.__class__.__name__, name))
+        fn, cached = self.__properties[name]
+        value = fn(self)
+        if cached:
+            setattr(self, name, value)
+        return value
+
+
 class Route(object):
     """
     A Route links a URL template with an optional name and view to a resource.
@@ -308,7 +331,7 @@ class Route(object):
         """Build URL path fragment for this route."""
         return template2path(self.template, params, self.ranges)
 
-    def __call__(self, request):
+    def __call__(self, request, ctx):
         """Try to dispatch a request.
 
         If the route matches the request URI, returns the result of calling
@@ -329,7 +352,7 @@ class Route(object):
                 script_name = request.script_name + path[:match.end()]
                 environ['SCRIPT_NAME'] = script_name.encode('utf-8')
                 environ['PATH_INFO'] = extra_path.encode('utf-8')
-            return self.resource(request)
+            return self.resource(request, ctx)
         return None
 
 
@@ -352,6 +375,7 @@ class Mapper(object):
             self.ranges.update(ranges)
         self.routes = []
         self.named_routes = {}
+        self._ctx_properties = {}
 
     def add(self, template, resource, name=None, view=None):
         """Add a resource to the mapper under a URL template.
@@ -371,6 +395,11 @@ class Mapper(object):
                         % (name, self.__class__.__name__))
             self.named_routes[name] = route
         self.routes.append(route)
+
+    def add_ctx_property(self, name, fn, cached=True):
+        if name in self._ctx_properties:
+            raise InvalidArgumentError("A context property name '%s' already exists." % name)
+        self._ctx_properties[name] = (fn, cached)
 
     def path(self, target, params):
         """Build URL path fragment for a resource or route of this mapper."""
@@ -428,11 +457,15 @@ class Mapper(object):
         finally:
             exc_info = None  # Clear traceback to avoid circular reference
 
-    def __call__(self, request):
+    def __call__(self, request, ctx=None):
+        if ctx is None:
+            ctx = Context(request=request)
+        for name, (fn, cached) in self._ctx_properties.items():
+            ctx.add_property(name, fn, cached=cached)
         # TODO here is were we would have to prepend self.root
         request._add_context(root=request.script_name, mapper=self, route=None)
         for route in self.routes:
-            rv = route(request)
+            rv = route(request, ctx)
             if rv is not None:
                 return rv
         raise NotFound
