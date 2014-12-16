@@ -18,7 +18,8 @@ def _make_handler_decorator(verb, view=None, accepts='*/*', provides=None):
         handler = request_handler(fn, verb, view, accepts, provides)
         @functools.wraps(fn)
         def wrapper(request):
-            return dispatch_request(request, {view: {verb: [handler]}})
+            handler_dict = {view: {verb: [handler]}}
+            return dispatch_request(request, handler_dict, request.routing_args)
         return wrapper
     return decorator
 
@@ -82,7 +83,36 @@ def make_response(obj):
     return Response(200, body=obj)
 
 
-def dispatch_request(request, view_handlers, wrapper=None):
+def dispatch_request(request, view_handlers, (args, kw)):
+    """Given a list of handlers, resolve a matching handler and produce either
+    a Response instance, or raise an appropriate HTTPException."""
+    handler, vary = resolve_handler(request, view_handlers)
+    response = make_response(handler.fn(request, *args, **kw))
+
+    if handler.provides:
+        response.headers.setdefault('Content-Type', handler.provides)
+
+    if vary:
+        vary_header = response.headers.get('Vary', '')
+        vary_items = set(filter(None, [s.strip()
+                                       for s in vary_header.split(',')]))
+        vary_items.update(vary)
+        response.headers['Vary'] = ', '.join(sorted(vary_items))
+
+    return response
+
+
+def resolve_handler(request, view_handlers):
+    """Select a suitable handler to handle the request.
+
+    Returns a tuple of (handler, vary), where handler is a request_handler
+    tuple and vary is a set containing header names that were used during
+    content-negotiation and that have to be included in the 'Vary' header of
+    the outgoing response.
+
+    When no suitable handler exists, raises NotFound, MethodNotAllowed,
+    UnsupportedMediaType or NotAcceptable.
+    """
     view = None
     if request._context:  # Allow context to be missing for easier testing
         view = request._context[-1].route.view
@@ -103,12 +133,21 @@ def dispatch_request(request, view_handlers, wrapper=None):
             allowed_methods.add('OPTIONS')
             allow = ', '.join(sorted(allowed_methods))
             if verb == 'OPTIONS':
-                return Response(200, headers=[('Allow', allow)])
+                def handle_options(request, *args, **kw):
+                    """Default OPTIONS handler."""
+                    return Response(200, headers=[('Allow', allow)])
+                return (request_handler(
+                            handle_options, 'OPTIONS', view, '*/*', None),
+                        set([]))
             else:
                 raise MethodNotAllowed(allow=allow)
 
     handlers = method_handlers[verb]
-    can_vary = any(h for h in handlers if h.provides is not None)
+    vary = set()
+    # TODO only add Accept if len(handler) > 1, also do the same check for
+    # 'accepts' and add 'Content-Type' to vary if required.
+    if any(h for h in handlers if h.provides is not None):
+        vary.add('Accept')
 
     content_type = request.content_type
     if content_type:
@@ -123,20 +162,7 @@ def dispatch_request(request, view_handlers, wrapper=None):
             raise NotAcceptable
 
     handler = handlers[0]
-    args, kw = request.routing_args
-    fn = wrapper(handler.fn) if wrapper else handler.fn
-    response = make_response(fn(request, *args, **kw))
-
-    if handler.provides:
-        response.headers.setdefault('Content-Type', handler.provides)
-
-    if can_vary:
-        vary_header = response.headers.get('Vary', '')
-        vary = set(filter(None, [s.strip() for s in vary_header.split(',')]))
-        vary.add('Accept')
-        response.headers['Vary'] = ', '.join(sorted(vary))
-
-    return response
+    return handler, vary
 
 
 def negotiate_content_type(content_type, handlers):
@@ -182,10 +208,13 @@ def negotiate_accept(accept, handlers):
 class Resource():
     def __init__(self):
         self._handlers = defaultdict(lambda: defaultdict(list))
-        self._wrapper = None
+        self._from_url = None
 
     def __call__(self, request):
-        return dispatch_request(request, self._handlers, wrapper=self._wrapper)
+        args, kw = request.routing_args
+        if self._from_url:
+            kw = self._from_url(reqest, *args, **kw)
+        return dispatch_request(request, self._handlers, (args, kw))
 
     def _make_decorator(self, verb, view=None, accepts='*/*', provides=None):
         def decorator(fn):
@@ -225,10 +254,5 @@ class Resource():
         return self._make_decorator('OPTIONS', *args, **kw)
 
     def from_url(self, fn):
-        def wrapper(handler):
-            def wrapped(request, *args, **kw):
-                new_kw = fn(request, *args, **kw)
-                return handler(request, *args, **new_kw)
-            return _wrapper
-        self._wrapper = wrapper
+        self._from_url = fn
         return fn

@@ -5,7 +5,7 @@ from rhino.errors import NotFound, MethodNotAllowed, UnsupportedMediaType, \
 from rhino.mapper import Route
 from rhino.request import Request
 from rhino.resource import Resource, negotiate_content_type, negotiate_accept, \
-        dispatch_request, make_response, request_handler
+        resolve_handler, make_response, request_handler, dispatch_request
 from rhino.response import Response
 from rhino.urls import request_context
 
@@ -58,59 +58,100 @@ def add_handler(handler_dict, fn, verb, view=None, accepts='*/*', provides=None)
     handler_dict[view][verb].append(handler)
 
 
+def test_resolve_handler():
+    assert_raises(NotFound, resolve_handler, Request({}), {})
+
+    handlers = {
+        None: {
+            'GET': [
+                make_request_handler(verb='GET', provides='text/html')
+            ],
+            'POST': [
+                make_request_handler(verb='POST', accepts='text/plain', provides='text/plain'),
+                make_request_handler(verb='POST', accepts='text/plain', provides='image/png'),
+            ],
+        },
+    }
+    get_handlers = handlers[None]['GET']
+    post_handlers = handlers[None]['POST']
+    vary_accept = set(['Accept'])
+
+    rv = resolve_handler(Request({'REQUEST_METHOD': 'GET'}), handlers)
+    assert rv == (get_handlers[0], vary_accept)
+
+    rv = resolve_handler(Request({'REQUEST_METHOD': 'HEAD'}), handlers)
+    assert rv == (get_handlers[0], vary_accept)
+
+    rv = resolve_handler(Request({'REQUEST_METHOD': 'OPTIONS'}), handlers)
+    assert rv[0].verb == 'OPTIONS'
+    assert rv[1] == set()
+
+    assert_raises(MethodNotAllowed, resolve_handler, Request(
+        {'REQUEST_METHOD': 'PUT'}), handlers)
+
+    rv = resolve_handler(Request(
+        {'REQUEST_METHOD': 'GET', 'HTTP_ACCEPT': 'text/html'}), handlers)
+    assert rv == (get_handlers[0], vary_accept)
+
+    assert_raises(NotAcceptable, resolve_handler, Request(
+        {'REQUEST_METHOD': 'GET', 'HTTP_ACCEPT': 'text/plain'}), handlers)
+
+    assert_raises(NotAcceptable, resolve_handler, Request(
+        {'REQUEST_METHOD': 'GET', 'HTTP_ACCEPT': 'text/plain'}), handlers)
+
+    assert_raises(UnsupportedMediaType, resolve_handler, Request(
+        {'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': 'text/html'}), handlers)
+
+    rv = resolve_handler(Request(
+        {'REQUEST_METHOD': 'POST',
+         'CONTENT_TYPE': 'text/plain',
+         'HTTP_ACCEPT': 'text/plain'}), handlers)
+    assert rv == (post_handlers[0], vary_accept)
+
+    rv = resolve_handler(Request(
+        {'REQUEST_METHOD': 'POST',
+         'CONTENT_TYPE': 'text/plain',
+         'HTTP_ACCEPT': 'image/png'}), handlers)
+    assert rv == (post_handlers[1], vary_accept)
+
+    assert_raises(NotAcceptable, resolve_handler, Request(
+        {'REQUEST_METHOD': 'POST',
+         'CONTENT_TYPE': 'text/plain',
+         'HTTP_ACCEPT': 'application/json'}), handlers)
+
+
 def test_dispatch_request():
-    assert_raises(NotFound, dispatch_request, Request({}), {})
+    fn1 = lambda req: Response(200, headers=[('Vary', 'User-Agent')], body='test')
+    fn2 = lambda req: Response(200, body='test')
+    handlers = {
+        None: {
+            'GET': [
+                make_request_handler(fn1, verb='GET', provides='text/plain'),
+                make_request_handler(fn2, verb='GET', provides='text/html'),
+            ],
+            'POST': [
+                make_request_handler(fn2, verb='POST')
+            ],
+        },
+    }
+    routing_args = ([], {})
 
-    handler_dict = make_handler_dict()
-    h = lambda req: 'ok'
-    add_handler(handler_dict, h, 'GET',  provides='text/html')
-    add_handler(handler_dict, h, 'POST', accepts='text/plain', provides='text/plain')
-    add_handler(handler_dict, h, 'POST', accepts='text/plain', provides='image/png')
-
-    res = dispatch_request(Request({'REQUEST_METHOD': 'GET'}), handler_dict)
-    assert res.headers['Vary'] == 'Accept'
-    assert res.headers['Content-Type'] == 'text/html'
-
-    res = dispatch_request(Request({'REQUEST_METHOD': 'HEAD'}), handler_dict)
-    assert res.headers['Vary'] == 'Accept'
-    assert res.headers['Content-Type'] == 'text/html'
-
-    res = dispatch_request(Request({'REQUEST_METHOD': 'OPTIONS'}), handler_dict)
-    assert res.headers['Allow'] == 'GET, HEAD, OPTIONS, POST'
-
-    assert_raises(MethodNotAllowed, dispatch_request, Request(
-        {'REQUEST_METHOD': 'PUT'}), handler_dict)
-
-    assert dispatch_request(Request(
-        {'REQUEST_METHOD': 'GET', 'HTTP_ACCEPT': 'text/html'}), handler_dict)
-
-    assert_raises(NotAcceptable, dispatch_request, Request(
-        {'REQUEST_METHOD': 'GET', 'HTTP_ACCEPT': 'text/plain'}), handler_dict)
-
-    assert_raises(NotAcceptable, dispatch_request, Request(
-        {'REQUEST_METHOD': 'GET', 'HTTP_ACCEPT': 'text/plain'}), handler_dict)
-
-    assert_raises(UnsupportedMediaType, dispatch_request, Request(
-        {'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': 'text/html'}), handler_dict)
-
-    res = dispatch_request(Request(
-        {'REQUEST_METHOD': 'POST',
-         'CONTENT_TYPE': 'text/plain',
-         'HTTP_ACCEPT': 'text/plain'}), handler_dict)
-    assert res.headers['Vary'] == 'Accept'
+    res = dispatch_request(Request({'REQUEST_METHOD': 'GET'}),
+            handlers, routing_args)
     assert res.headers['Content-Type'] == 'text/plain'
+    assert res.headers['Vary'] == 'Accept, User-Agent'
 
     res = dispatch_request(Request(
-        {'REQUEST_METHOD': 'POST',
-         'CONTENT_TYPE': 'text/plain',
-         'HTTP_ACCEPT': 'image/png'}), handler_dict)
+        {'REQUEST_METHOD': 'GET', 'HTTP_ACCEPT': 'text/html'}),
+        handlers, routing_args)
+    assert res.headers['Content-Type'] == 'text/html'
     assert res.headers['Vary'] == 'Accept'
-    assert res.headers['Content-Type'] == 'image/png'
 
-    assert_raises(NotAcceptable, dispatch_request, Request(
-        {'REQUEST_METHOD': 'POST',
-         'CONTENT_TYPE': 'text/plain',
-         'HTTP_ACCEPT': 'application/json'}), handler_dict)
+    res = dispatch_request(Request(
+        {'REQUEST_METHOD': 'POST', 'HTTP_ACCEPT': 'text/html'}),
+        handlers, routing_args)
+    assert 'Content-Type' not in res.headers
+    assert 'Vary' not in res.headers
 
 
 def test_make_response():
