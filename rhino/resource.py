@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import functools
+import inspect
 from collections import defaultdict, namedtuple
 
 from .errors import NotFound, MethodNotAllowed, UnsupportedMediaType, \
@@ -88,7 +89,10 @@ def dispatch_request(request, ctx, view_handlers, (args, kw)):
     a Response instance, or raise an appropriate HTTPException."""
     handler, vary = resolve_handler(request, view_handlers)
     request._run_callbacks('enter', request)
-    response = make_response(handler.fn(request, ctx, *args, **kw))
+    if 'ctx' in inspect.getargspec(handler.fn).args:
+        response = make_response(handler.fn(request, ctx, *args, **kw))
+    else:
+        response = make_response(handler.fn(request, *args, **kw))
     request._run_callbacks('leave', request, response)
 
     if handler.provides:

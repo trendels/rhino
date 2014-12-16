@@ -145,8 +145,8 @@ def test_resolve_handler():
 
 
 def test_dispatch_request():
-    fn1 = lambda r, c: Response(200, headers=[('Vary', 'User-Agent')], body='test')
-    fn2 = lambda r, c: Response(200, body='test')
+    fn1 = lambda r: Response(200, headers=[('Vary', 'User-Agent')], body='test')
+    fn2 = lambda r: Response(200, body='test')
     handlers = {
         None: {
             'GET': [

@@ -1,7 +1,7 @@
 from rhino import Mapper, get, ok
 
 @get
-def hello(request, ctx):
+def hello(request):
     return ok("Hello, world!")
 
 app = Mapper()

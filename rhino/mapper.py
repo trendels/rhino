@@ -43,6 +43,7 @@ Templates understand three special kinds of markup:
 """
 from __future__ import absolute_import
 
+import inspect
 import re
 import sys
 import urllib
@@ -352,7 +353,10 @@ class Route(object):
                 script_name = request.script_name + path[:match.end()]
                 environ['SCRIPT_NAME'] = script_name.encode('utf-8')
                 environ['PATH_INFO'] = extra_path.encode('utf-8')
-            return self.resource(request, ctx)
+            if 'ctx' in inspect.getargspec(self.resource).args:
+                return self.resource(request, ctx)
+            else:
+                return self.resource(request)
         return None
 
 
