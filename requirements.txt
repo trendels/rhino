@@ -1,0 +1,6 @@
+# Install Rhino itself
+-e .
+
+# Install development requirements
+mock
+pytest
