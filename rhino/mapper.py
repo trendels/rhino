@@ -411,7 +411,11 @@ class Mapper(object):
         except Exception:
             self.handle_error(request, sys.exc_info())
             response = InternalServerError().response
-        return response(environ, start_response)
+        response.add_callback(lambda: request._run_callbacks('close'))
+        request._run_callbacks('finalize', request, response)
+        wsgi_response = response(environ, start_response)
+        request._run_callbacks('teardown')
+        return wsgi_response
 
     # taken and adapted from wsgiref.handlers.BaseHandler
     def handle_error(self, request, exc_info):
