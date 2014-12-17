@@ -69,7 +69,7 @@ class TestClient(object):
         if environ is None:
             environ = {}
         if isinstance(body, dict):
-            body = urlencode(form)
+            body = urlencode(body)
             content_type = 'application/x-www-form-urlencoded'
         elif content_type is None:
             raise ValueError("Can't send data without content_type")
