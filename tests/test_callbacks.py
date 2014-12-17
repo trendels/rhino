@@ -15,14 +15,14 @@ class Wrapper(object):
         self.response = None
         self.cb = Mock()
 
-    def __call__(self, request):
+    def __call__(self, request, ctx):
         self.request = request
         request.add_callback('enter', partial(self.cb, 'enter'))
         request.add_callback('leave', partial(self.cb, 'leave'))
         request.add_callback('finalize', partial(self.cb, 'finalize'))
         request.add_callback('teardown', partial(self.cb, 'teardown'))
         request.add_callback('close', partial(self.cb, 'close'))
-        self.response = self.wrapped(request)
+        self.response = self.wrapped(request, ctx)
         return self.response
 
 

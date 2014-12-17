@@ -1,13 +1,12 @@
 from __future__ import absolute_import
 
 import functools
-import inspect
 from collections import defaultdict, namedtuple
 
 from .errors import NotFound, MethodNotAllowed, UnsupportedMediaType, \
         NotAcceptable
 from .response import Response
-from .util import dual_use_decorator, dual_use_decorator_method
+from .util import dual_use_decorator, dual_use_decorator_method, get_args
 from .vendor import mimeparse
 
 request_handler = namedtuple('request_handler', 'fn verb view accepts provides')
@@ -89,7 +88,7 @@ def dispatch_request(request, ctx, view_handlers, (args, kw)):
     a Response instance, or raise an appropriate HTTPException."""
     handler, vary = resolve_handler(request, view_handlers)
     request._run_callbacks('enter', request)
-    if 'ctx' in inspect.getargspec(handler.fn).args:
+    if 'ctx' in get_args(handler.fn):
         response = make_response(handler.fn(request, ctx, *args, **kw))
     else:
         response = make_response(handler.fn(request, *args, **kw))

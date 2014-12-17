@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import functools
+import inspect
 
 
 def dual_use_decorator(fn):
@@ -27,3 +28,16 @@ def dual_use_decorator_method(fn):
         else:
             return fn(*args, **kw)
     return decorator
+
+
+def get_args(obj):
+    if inspect.isfunction(obj):
+        return inspect.getargspec(obj).args
+    elif inspect.ismethod(obj):
+        return inspect.getargspec(obj).args[1:]
+    elif inspect.isclass(obj):
+        return inspect.getargspec(obj.__init__).args[1:]
+    elif hasattr(obj, '__call__'):
+        return inspect.getargspec(obj.__call__).args[1:]
+    else:
+        raise TypeError("Can't inspect signature of '%s' object." % obj)

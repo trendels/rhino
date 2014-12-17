@@ -43,13 +43,13 @@ Templates understand three special kinds of markup:
 """
 from __future__ import absolute_import
 
-import inspect
 import re
 import sys
 import urllib
 
 from .errors import HTTPException, InternalServerError, NotFound
 from .request import Request
+from .util import get_args
 
 # template2regex function taken from Joe Gregorio's wsgidispatcher.py
 # (https://code.google.com/p/robaccia/) with minor modifications.
@@ -353,7 +353,7 @@ class Route(object):
                 script_name = request.script_name + path[:match.end()]
                 environ['SCRIPT_NAME'] = script_name.encode('utf-8')
                 environ['PATH_INFO'] = extra_path.encode('utf-8')
-            if 'ctx' in inspect.getargspec(self.resource).args:
+            if 'ctx' in get_args(self.resource):
                 return self.resource(request, ctx)
             else:
                 return self.resource(request)
