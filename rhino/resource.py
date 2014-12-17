@@ -210,7 +210,7 @@ def negotiate_accept(accept, handlers):
         return [h for h in handlers if h.provides is None]
 
 
-class Resource():
+class Resource(object):
     def __init__(self):
         self._handlers = defaultdict(lambda: defaultdict(list))
         self._from_url = None
