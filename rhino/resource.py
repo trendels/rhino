@@ -14,14 +14,18 @@ class_types = (type, types.ClassType)  # new-style and old-style classes
 MIMEPARSE_NO_MATCH = (-1, 0)
 
 
-def _make_handler_decorator(verb, view=None, accepts='*/*', provides=None):
+def _add_handler_metadata(fn, verb, view=None, accepts='*/*', provides=None):
+    if hasattr(fn, '_rhino_meta'):
+        raise AttributeError("Decorated function already has a '_rhino_meta' attribute: %s" % fn._rhino_meta)
+    # Don't store a reference to the function at this time,
+    # to avoid circular references.
+    meta = request_handler(None, verb, view, accepts, provides)
+    fn._rhino_meta = meta
+
+
+def _make_handler_decorator(*args, **kw):
     def decorator(fn):
-        if hasattr(fn, '_rhino_meta'):
-            raise AttributeError("Decorated function already has a '_rhino_meta' attribute: %s" % fn._rhino_meta)
-        # Don't store a reference to the function at this time,
-        # to avoid circular references.
-        meta = request_handler(None, verb, view, accepts, provides)
-        fn._rhino_meta = meta
+        _add_handler_metadata(fn, *args, **kw)
         return fn
     return decorator
 
@@ -264,18 +268,12 @@ class Resource(object):
             request.routing_args[1].clear()
             request.routing_args[1].update(kw)
 
-    # TODO refactor to use _make_handler_decorator
-    def _make_decorator(self, verb, view=None, accepts='*/*', provides=None):
+    def _make_decorator(self, *args, **kw):
         def decorator(fn):
-            if hasattr(fn, '_rhino_meta'):
-                raise AttributeError("Decorated function already has a '_rhino_meta' attribute: %s" % fn._rhino_meta)
             name = fn.__name__
             if hasattr(self, name):
                 raise AttributeError("A property named '%s' already exists on this '%s' instance." % (name, self.__class__.__name__))
-            # Don't store a reference to the function at this time,
-            # to avoid circular references.
-            meta = request_handler(None, verb, view, accepts, provides)
-            fn._rhino_meta = meta
+            _add_handler_metadata(self, *args, **kw)
             setattr(self, name, fn)
             return fn
         return decorator
