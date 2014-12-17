@@ -49,6 +49,7 @@ import urllib
 
 from .errors import HTTPException, InternalServerError, NotFound
 from .request import Request
+from .resource import ResourceWrapper
 from .util import get_args
 
 # template2regex function taken from Joe Gregorio's wsgidispatcher.py
@@ -372,6 +373,7 @@ class Mapper(object):
     """
     default_encoding = None
     default_content_type = None
+    wrapper_class = ResourceWrapper
 
     # TODO 'root' parameter for manually specifying a URL prefix not reflected
     # in SCRIPT_NAME (e.g. when proxying).
@@ -393,6 +395,8 @@ class Mapper(object):
         The optional ``view`` can be used by resources to change how to respond
         to the request based on which route it came from.
         """
+        if not isinstance(resource, Mapper):
+            resource = self.wrapper_class(resource)
         route = Route(template, resource, name=name, view=view,
                 ranges=self.ranges)
         if name is not None:

@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-import functools
+import types
 from collections import defaultdict, namedtuple
 
 from .errors import NotFound, MethodNotAllowed, UnsupportedMediaType, \
@@ -10,17 +10,19 @@ from .util import dual_use_decorator, dual_use_decorator_method, get_args
 from .vendor import mimeparse
 
 request_handler = namedtuple('request_handler', 'fn verb view accepts provides')
+class_types = (type, types.ClassType)  # new-style and old-style classes
 MIMEPARSE_NO_MATCH = (-1, 0)
 
 
 def _make_handler_decorator(verb, view=None, accepts='*/*', provides=None):
     def decorator(fn):
-        handler = request_handler(fn, verb, view, accepts, provides)
-        @functools.wraps(fn)
-        def wrapper(request, ctx):
-            handler_dict = {view: {verb: [handler]}}
-            return dispatch_request(request, ctx, handler_dict, request.routing_args)
-        return wrapper
+        if hasattr(fn, '_rhino_meta'):
+            raise AttributeError("Decorated function already has a '_rhino_meta' attribute: %s" % fn._rhino_meta)
+        # Don't store a reference to the function at this time,
+        # to avoid circular references.
+        meta = request_handler(None, verb, view, accepts, provides)
+        fn._rhino_meta = meta
+        return fn
     return decorator
 
 
@@ -81,30 +83,6 @@ def make_response(obj):
     if isinstance(obj, Response):
         return obj
     return Response(200, body=obj)
-
-
-def dispatch_request(request, ctx, view_handlers, (args, kw)):
-    """Given a list of handlers, resolve a matching handler and produce either
-    a Response instance, or raise an appropriate HTTPException."""
-    handler, vary = resolve_handler(request, view_handlers)
-    request._run_callbacks('enter', request)
-    if 'ctx' in get_args(handler.fn):
-        response = make_response(handler.fn(request, ctx, *args, **kw))
-    else:
-        response = make_response(handler.fn(request, *args, **kw))
-    request._run_callbacks('leave', request, response)
-
-    if handler.provides:
-        response.headers.setdefault('Content-Type', handler.provides)
-
-    if vary:
-        vary_header = response.headers.get('Vary', '')
-        vary_items = set(filter(None, [s.strip()
-                                       for s in vary_header.split(',')]))
-        vary_items.update(vary)
-        response.headers['Vary'] = ', '.join(sorted(vary_items))
-
-    return response
 
 
 def resolve_handler(request, view_handlers):
@@ -210,21 +188,95 @@ def negotiate_accept(accept, handlers):
         return [h for h in handlers if h.provides is None]
 
 
+class ResourceWrapper(object):
+    def __init__(self, resource):
+        self.resource = resource
+        self.resource_is_handler = False
+        self.handlers = defaultdict(lambda: defaultdict(list))
+        if hasattr(resource, '_rhino_meta'):
+            meta = resource._rhino_meta._replace(fn=resource)
+            self.handlers[meta.view][meta.verb].append(meta)
+            self.resource_is_handler = True
+        else:
+            for name in dir(resource):
+                prop = getattr(resource, name)
+                if hasattr(prop, '_rhino_meta'):
+                    meta = prop._rhino_meta._replace(fn=prop)
+                    self.handlers[meta.view][meta.verb].append(meta)
+
+    def __call__(self, request, ctx):
+        resource = self.resource
+        if not self.handlers:
+            if 'ctx' in get_args(resource):
+                response = resource(request, ctx)
+            else:
+                response = resource(request)
+            if response is None:
+                raise NotFound
+            if not isinstance(response, Response):
+                raise TypeError("Calling resource '%s' returned '%s' which is not None or an instance of rhino.Response" % (resource, response))
+            return response
+        else:
+            handler, vary = resolve_handler(request, self.handlers)
+            if isinstance(self.resource, class_types):
+                resource = resource()
+            if not self.resource_is_handler:
+                if callable(resource):
+                    # TODO we could allow the resource to return a Response
+                    # instance here as a shortcut to abort further processing.
+                    if 'ctx' in get_args(resource):
+                        rv = resource(request, ctx)
+                    else:
+                        rv = resource(request)
+                    if rv is not None:
+                        raise ValueError("Calling '%s' for initialization returned a value: '%s'" % (resource, rv))
+            request._run_callbacks('enter', request)
+            args, kw = request.routing_args
+            if 'ctx' in get_args(handler.fn):
+                response = make_response(handler.fn(request, ctx, *args, **kw))
+            else:
+                response = make_response(handler.fn(request, *args, **kw))
+            request._run_callbacks('leave', request, response)
+
+            if handler.provides:
+                response.headers.setdefault('Content-Type', handler.provides)
+
+            if vary:
+                vary_header = response.headers.get('Vary', '')
+                vary_items = set(filter(
+                    None, [s.strip() for s in vary_header.split(',')]))
+                vary_items.update(vary)
+                response.headers['Vary'] = ', '.join(sorted(vary_items))
+            return response
+
+
 class Resource(object):
     def __init__(self):
-        self._handlers = defaultdict(lambda: defaultdict(list))
         self._from_url = None
 
     def __call__(self, request, ctx):
-        args, kw = request.routing_args
         if self._from_url:
-            kw = self._from_url(reqest, *args, **kw)
-        return dispatch_request(request, ctx, self._handlers, (args, kw))
+            args, kw = request.routing_args
+            if 'ctx' in get_args(self._from_url):
+                kw = self._from_url(request, ctx, *args, **kw)
+            else:
+                kw = self._from_url(request, *args, **kw)
+            request.routing_args[1].clear()
+            request.routing_args[1].update(kw)
 
+    # TODO refactor to use _make_handler_decorator
     def _make_decorator(self, verb, view=None, accepts='*/*', provides=None):
         def decorator(fn):
-            handler = request_handler(fn, verb, view, accepts, provides)
-            self._handlers[view][verb].append(handler)
+            if hasattr(fn, '_rhino_meta'):
+                raise AttributeError("Decorated function already has a '_rhino_meta' attribute: %s" % fn._rhino_meta)
+            name = fn.__name__
+            if hasattr(self, name):
+                raise AttributeError("A property named '%s' already exists on this '%s' instance." % (name, self.__class__.__name__))
+            # Don't store a reference to the function at this time,
+            # to avoid circular references.
+            meta = request_handler(None, verb, view, accepts, provides)
+            fn._rhino_meta = meta
+            setattr(self, name, fn)
             return fn
         return decorator
 
