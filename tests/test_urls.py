@@ -13,6 +13,7 @@ def test_build_url():
     assert build_url(context, 'foo')  == '/foo'
     assert build_url(context, '.foo') == '/foo'
     assert build_url(context, '/foo') == '/foo'
+    assert build_url(context, 1)      == '/foo'
 
 
 def test_build_url_nested():

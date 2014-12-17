@@ -11,7 +11,8 @@ def build_url(context, target, params=None):
         raise ValueError("No routing context present.")
     if params is None:
         params = {}
-    if type(target) in string_types and len(target) and target[0] == '/' or '.' in target:
+    if type(target) in string_types and len(target) \
+            and (target[0] == '/' or '.' in target):
         # Build URL for a relative or absolute route name
         if target == '.':  # The current route
             c = context[-1]
