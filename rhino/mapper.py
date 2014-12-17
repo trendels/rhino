@@ -437,6 +437,9 @@ class Mapper(object):
             for route in self.routes:
                 if route.resource is target:
                     return route.path(params)
+                elif isinstance(route.resource, ResourceWrapper):
+                    if route.resource.resource is target:
+                        return route.path(params)
             raise InvalidArgumentError("No Route found for target '%s' in this %s instance." % (target, self.__class__.__name__))
 
     def wsgi(self, environ, start_response):
