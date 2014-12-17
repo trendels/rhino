@@ -204,14 +204,17 @@ class ResourceWrapper(object):
     def __call__(self, request, ctx):
         resource = self.resource
         if not self.handlers:
-            if 'ctx' in get_args(resource):
-                response = resource(request, ctx)
+            if callable(resource):
+                if 'ctx' in get_args(resource):
+                    response = resource(request, ctx)
+                else:
+                    response = resource(request)
+                if response is None:
+                    raise NotFound
+                if not isinstance(response, Response):
+                    raise TypeError("Calling resource '%s' returned '%s' which is not None or an instance of rhino.Response" % (resource, response))
             else:
-                response = resource(request)
-            if response is None:
                 raise NotFound
-            if not isinstance(response, Response):
-                raise TypeError("Calling resource '%s' returned '%s' which is not None or an instance of rhino.Response" % (resource, response))
             return response
         else:
             try:

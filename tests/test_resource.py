@@ -4,7 +4,7 @@ from rhino.errors import NotFound, MethodNotAllowed, UnsupportedMediaType, \
         NotAcceptable
 from rhino.mapper import Route
 from rhino.request import Request
-from rhino.resource import negotiate_content_type, negotiate_accept, \
+from rhino.resource import Resource, negotiate_content_type, negotiate_accept, \
         resolve_handler, make_response, request_handler
 from rhino.response import Response
 from rhino.test import make_request_handler
@@ -147,3 +147,46 @@ def test_make_response():
     orig = Response(200, body='test')
     res = make_response(orig)
     assert res is orig
+
+
+def test_resource():
+    resource = Resource()
+    @resource.get
+    def foo(): pass
+    @resource.get('test')
+    def bar(): pass
+
+    assert resource.foo is foo
+    assert resource.bar is bar
+
+    assert resource.foo._rhino_meta.name == 'foo'
+    assert resource.bar._rhino_meta.name == 'bar'
+    assert resource.bar._rhino_meta.view == 'test'
+
+
+def test_resource_url_for():
+    resource1 = Resource()
+    resource1.get(None)
+    @resource1.from_url
+    def from_url_1(request, ctx, positional, a, b):
+        return {'x': 1, 'y': 2}
+
+    resource2 = Resource()
+    resource2.get(None)
+    @resource2.from_url
+    def from_url_2(request, positional, a, b):
+        return {'x': 3, 'y': 4}
+
+    req = Request({'REQUEST_METHOD': 'GET'})
+    req.routing_args[0].append('arg')
+    req.routing_args[1].update({'a': 1, 'b': 2})
+    ctx = None
+    assert resource1(req, ctx) is None
+    assert req.routing_args == (['arg'], {'x': 1, 'y': 2})
+
+    req = Request({'REQUEST_METHOD': 'GET'})
+    req.routing_args[0].append('arg')
+    req.routing_args[1].update({'a': 1, 'b': 2})
+    ctx = None
+    assert resource2(req, ctx) is None
+    assert req.routing_args == (['arg'], {'x': 3, 'y': 4})
