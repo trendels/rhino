@@ -93,10 +93,6 @@ def test_resolve_handler():
     rv = resolve_handler(Request({'REQUEST_METHOD': 'HEAD'}), handlers)
     assert rv == (get_handlers[0], no_vary)
 
-    rv = resolve_handler(Request({'REQUEST_METHOD': 'OPTIONS'}), handlers)
-    assert rv[0].verb == 'OPTIONS'
-    assert rv[1] == set()
-
     assert_raises(MethodNotAllowed, resolve_handler, Request(
         {'REQUEST_METHOD': 'DELETE'}), handlers)
 

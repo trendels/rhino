@@ -117,17 +117,8 @@ def resolve_handler(request, view_handlers):
             allowed_methods = set(method_handlers.keys())
             if 'HEAD' not in allowed_methods and 'GET' in allowed_methods:
                 allowed_methods.add('HEAD')
-            allowed_methods.add('OPTIONS')
             allow = ', '.join(sorted(allowed_methods))
-            if verb == 'OPTIONS':
-                def handle_options(request, *args, **kw):
-                    """Default OPTIONS handler."""
-                    return Response(200, headers=[('Allow', allow)])
-                return (request_handler(
-                            handle_options, 'OPTIONS', view, '*/*', None),
-                        set([]))
-            else:
-                raise MethodNotAllowed(allow=allow)
+            raise MethodNotAllowed(allow=allow)
 
     handlers = method_handlers[verb]
     vary = set()
@@ -221,8 +212,21 @@ class ResourceWrapper(object):
                 raise TypeError("Calling resource '%s' returned '%s' which is not None or an instance of rhino.Response" % (resource, response))
             return response
         else:
-            handler, vary = resolve_handler(request, self.handlers)
-            if isinstance(self.resource, class_types):
+            try:
+                handler, vary = resolve_handler(request, self.handlers)
+            except MethodNotAllowed as e:
+                # Handle 'OPTIONS' requests by default
+                allow = e.response.headers.get('Allow', '')
+                allowed_methods = set([s.strip() for s in allow.split(',')])
+                allowed_methods.add('OPTIONS')
+                allow = ', '.join(sorted(allowed_methods))
+                if request.method.upper() == 'OPTIONS':
+                    return Response(200, headers=[('Allow', allow)])
+                else:
+                    e.response.headers['Allow'] = allow
+                    raise
+
+            if isinstance(resource, class_types):
                 resource = resource()
             if not self.resource_is_handler:
                 if callable(resource):
