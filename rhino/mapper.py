@@ -370,6 +370,8 @@ class Mapper(object):
     ranges. Ranges passed as a dictionary will be merged into the default
     ranges, with those given in `ranges` taking precedence.
     """
+    default_encoding = None
+    default_content_type = None
 
     # TODO 'root' parameter for manually specifying a URL prefix not reflected
     # in SCRIPT_NAME (e.g. when proxying).
@@ -469,9 +471,13 @@ class Mapper(object):
         # TODO here is were we would have to prepend self.root
         request._add_context(root=request.script_name, mapper=self, route=None)
         for route in self.routes:
-            rv = route(request, ctx)
-            if rv is not None:
-                return rv
+            response = route(request, ctx)
+            if response is not None:
+                if self.default_encoding is not None:
+                    response.default_encoding = self.default_encoding
+                if self.default_content_type is not None:
+                    response.default_content_type = self.default_content_type
+                return response
         raise NotFound
 
     def start_server(self, host='localhost', port=9000, app=None):
