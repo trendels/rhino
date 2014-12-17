@@ -13,8 +13,8 @@ from wsgiref.validate import validator
 from .resource import request_handler
 
 
-def make_request_handler(fn=None, verb=None, view=None, accepts='*/*', provides=None):
-    return request_handler(fn=fn, verb=verb, view=view, accepts=accepts, provides=provides)
+def make_request_handler(name=None, verb=None, view=None, accepts='*/*', provides=None):
+    return request_handler(name=name, verb=verb, view=view, accepts=accepts, provides=provides)
 
 
 class wsgi_response(namedtuple('wsgi_response', 'status headers body')):

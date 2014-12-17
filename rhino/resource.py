@@ -9,7 +9,7 @@ from .response import Response
 from .util import dual_use_decorator, dual_use_decorator_method, get_args
 from .vendor import mimeparse
 
-request_handler = namedtuple('request_handler', 'fn verb view accepts provides')
+request_handler = namedtuple('request_handler', 'name verb view accepts provides')
 class_types = (type, types.ClassType)  # new-style and old-style classes
 MIMEPARSE_NO_MATCH = (-1, 0)
 
@@ -17,9 +17,7 @@ MIMEPARSE_NO_MATCH = (-1, 0)
 def _add_handler_metadata(fn, verb, view=None, accepts='*/*', provides=None):
     if hasattr(fn, '_rhino_meta'):
         raise AttributeError("Decorated function already has a '_rhino_meta' attribute: %s" % fn._rhino_meta)
-    # Don't store a reference to the function at this time,
-    # to avoid circular references.
-    meta = request_handler(None, verb, view, accepts, provides)
+    meta = request_handler(fn.__name__, verb, view, accepts, provides)
     fn._rhino_meta = meta
 
 
@@ -189,14 +187,18 @@ class ResourceWrapper(object):
         self.resource_is_handler = False
         self.handlers = defaultdict(lambda: defaultdict(list))
         if hasattr(resource, '_rhino_meta'):
-            meta = resource._rhino_meta._replace(fn=resource)
+            meta = resource._rhino_meta
             self.handlers[meta.view][meta.verb].append(meta)
             self.resource_is_handler = True
         else:
             for name in dir(resource):
                 prop = getattr(resource, name)
                 if hasattr(prop, '_rhino_meta'):
-                    meta = prop._rhino_meta._replace(fn=prop)
+                    # Make sure we store the actual property name which we can
+                    # use to retrieve it from the instance again later.
+                    # TODO we could also store a reference to the function
+                    # in the handler metadata, instead of looking it up later.
+                    meta = prop._rhino_meta._replace(name=name)
                     self.handlers[meta.view][meta.verb].append(meta)
 
     def __call__(self, request, ctx):
@@ -240,10 +242,14 @@ class ResourceWrapper(object):
                         raise ValueError("Calling '%s' for initialization returned a value: '%s'" % (resource, rv))
             request._run_callbacks('enter', request)
             args, kw = request.routing_args
-            if 'ctx' in get_args(handler.fn):
-                response = make_response(handler.fn(request, ctx, *args, **kw))
+            if self.resource_is_handler:
+                fn = resource
             else:
-                response = make_response(handler.fn(request, *args, **kw))
+                fn = getattr(resource, handler.name)
+            if 'ctx' in get_args(fn):
+                response = make_response(fn(request, ctx, *args, **kw))
+            else:
+                response = make_response(fn(request, *args, **kw))
             request._run_callbacks('leave', request, response)
 
             if handler.provides:
@@ -277,7 +283,7 @@ class Resource(object):
             name = fn.__name__
             if hasattr(self, name):
                 raise AttributeError("A property named '%s' already exists on this '%s' instance." % (name, self.__class__.__name__))
-            _add_handler_metadata(self, *args, **kw)
+            _add_handler_metadata(fn, *args, **kw)
             setattr(self, name, fn)
             return fn
         return decorator
