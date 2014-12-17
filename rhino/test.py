@@ -1,3 +1,6 @@
+"""
+Utilities for testing.
+"""
 from __future__ import absolute_import
 
 from collections import namedtuple
@@ -6,6 +9,12 @@ from urllib import urlencode
 from wsgiref.headers import Headers
 from wsgiref.util import setup_testing_defaults
 from wsgiref.validate import validator
+
+from .resource import request_handler
+
+
+def make_request_handler(fn=None, verb=None, view=None, accepts='*/*', provides=None):
+    return request_handler(fn=fn, verb=verb, view=view, accepts=accepts, provides=provides)
 
 
 class wsgi_response(namedtuple('wsgi_response', 'status headers body')):

@@ -4,14 +4,10 @@ from rhino.errors import NotFound, MethodNotAllowed, UnsupportedMediaType, \
         NotAcceptable
 from rhino.mapper import Route
 from rhino.request import Request
-from rhino.resource import Resource, ResourceWrapper, \
-        negotiate_content_type, negotiate_accept, resolve_handler, \
-        make_response, request_handler
+from rhino.resource import negotiate_content_type, negotiate_accept, \
+        resolve_handler, make_response, request_handler
 from rhino.response import Response
-
-
-def make_request_handler(fn=None, verb=None, view=None, accepts='*/*', provides=None):
-    return request_handler(fn=fn, verb=verb, view=view, accepts=accepts, provides=provides)
+from rhino.test import make_request_handler
 
 
 def test_negotiate_content_type():
@@ -145,36 +141,6 @@ def test_resolve_handler():
     assert rv == (post_handlers_test_view[1], vary_both)
 
 
-def test_resourcewrapper_call():
-    class TestResource(object):
-        pass
-
-    resource = TestResource()
-    resource.fn1 = lambda r: Response(200, headers=[('Vary', 'User-Agent')], body='test')
-    resource.fn1._rhino_meta = make_request_handler(None, verb='GET', provides='text/plain')
-    resource.fn2 = lambda r: Response(200, body='test')
-    resource.fn2._rhino_meta = make_request_handler(None, verb='GET', provides='text/html')
-    resource.fn3 = lambda r: Response(200, body='test')
-    resource.fn3._rhino_meta = make_request_handler(None, verb='POST')
-
-    ctx = None
-    wrapped = ResourceWrapper(resource)
-
-    res = wrapped(Request({'REQUEST_METHOD': 'GET'}), ctx)
-    assert res.headers['Content-Type'] == 'text/plain'
-    assert res.headers['Vary'] == 'Accept, User-Agent'
-
-    res = wrapped(Request(
-        {'REQUEST_METHOD': 'GET', 'HTTP_ACCEPT': 'text/html'}), ctx)
-    assert res.headers['Content-Type'] == 'text/html'
-    assert res.headers['Vary'] == 'Accept'
-
-    res = wrapped(Request(
-        {'REQUEST_METHOD': 'POST', 'HTTP_ACCEPT': 'text/html'}), ctx)
-    assert 'Content-Type' not in res.headers
-    assert 'Vary' not in res.headers
-
-
 def test_make_response():
     assert_raises(TypeError, make_response, None)
 
@@ -185,10 +151,3 @@ def test_make_response():
     orig = Response(200, body='test')
     res = make_response(orig)
     assert res is orig
-
-
-def test_resource_dispatch_empty():
-    r = ResourceWrapper(Resource())
-    req = Request({'REQUEST_METHOD': 'GET'})
-    ctx = None
-    assert_raises(NotFound, r, req, ctx)
