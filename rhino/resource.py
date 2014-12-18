@@ -206,7 +206,7 @@ class ResourceWrapper(object):
         if not self.handlers:
             if callable(resource):
                 if 'ctx' in get_args(resource):
-                    response = resource(request, ctx)
+                    response = resource(request, ctx=ctx)
                 else:
                     response = resource(request)
                 if response is None:
@@ -238,7 +238,7 @@ class ResourceWrapper(object):
                     # TODO we could allow the resource to return a Response
                     # instance here as a shortcut to abort further processing.
                     if 'ctx' in get_args(resource):
-                        rv = resource(request, ctx)
+                        rv = resource(request, ctx=ctx)
                     else:
                         rv = resource(request)
                     if rv is not None:
@@ -250,7 +250,7 @@ class ResourceWrapper(object):
             else:
                 fn = getattr(resource, handler.name)
             if 'ctx' in get_args(fn):
-                response = make_response(fn(request, ctx, **kw))
+                response = make_response(fn(request, ctx=ctx, **kw))
             else:
                 response = make_response(fn(request, **kw))
             request._run_callbacks('leave', request, response)
@@ -275,7 +275,7 @@ class Resource(object):
         if self._from_url:
             kw = request.routing_args[1]
             if 'ctx' in get_args(self._from_url):
-                kw = self._from_url(request, ctx, **kw)
+                kw = self._from_url(request, ctx=ctx, **kw)
             else:
                 kw = self._from_url(request, **kw)
             request.routing_args[1].clear()
