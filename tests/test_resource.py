@@ -168,25 +168,23 @@ def test_resource_url_for():
     resource1 = Resource()
     resource1.get(None)
     @resource1.from_url
-    def from_url_1(request, ctx, positional, a, b):
+    def from_url_1(request, ctx, a, b):
         return {'x': 1, 'y': 2}
 
     resource2 = Resource()
     resource2.get(None)
     @resource2.from_url
-    def from_url_2(request, positional, a, b):
+    def from_url_2(request, a, b):
         return {'x': 3, 'y': 4}
 
     req = Request({'REQUEST_METHOD': 'GET'})
-    req.routing_args[0].append('arg')
     req.routing_args[1].update({'a': 1, 'b': 2})
     ctx = None
     assert resource1(req, ctx) is None
-    assert req.routing_args == (['arg'], {'x': 1, 'y': 2})
+    assert req.routing_args[1] == {'x': 1, 'y': 2}
 
     req = Request({'REQUEST_METHOD': 'GET'})
-    req.routing_args[0].append('arg')
     req.routing_args[1].update({'a': 1, 'b': 2})
     ctx = None
     assert resource2(req, ctx) is None
-    assert req.routing_args == (['arg'], {'x': 3, 'y': 4})
+    assert req.routing_args[1] == {'x': 3, 'y': 4}

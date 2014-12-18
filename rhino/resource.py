@@ -244,15 +244,15 @@ class ResourceWrapper(object):
                     if rv is not None:
                         raise ValueError("Calling '%s' for initialization returned a value: '%s'" % (resource, rv))
             request._run_callbacks('enter', request)
-            args, kw = request.routing_args
+            kw = request.routing_args[1]
             if self.resource_is_handler:
                 fn = resource
             else:
                 fn = getattr(resource, handler.name)
             if 'ctx' in get_args(fn):
-                response = make_response(fn(request, ctx, *args, **kw))
+                response = make_response(fn(request, ctx, **kw))
             else:
-                response = make_response(fn(request, *args, **kw))
+                response = make_response(fn(request, **kw))
             request._run_callbacks('leave', request, response)
 
             if handler.provides:
@@ -273,11 +273,11 @@ class Resource(object):
 
     def __call__(self, request, ctx):
         if self._from_url:
-            args, kw = request.routing_args
+            kw = request.routing_args[1]
             if 'ctx' in get_args(self._from_url):
-                kw = self._from_url(request, ctx, *args, **kw)
+                kw = self._from_url(request, ctx, **kw)
             else:
-                kw = self._from_url(request, *args, **kw)
+                kw = self._from_url(request, **kw)
             request.routing_args[1].clear()
             request.routing_args[1].update(kw)
 
