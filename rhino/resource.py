@@ -87,12 +87,12 @@ def dispatch_request(request, ctx, view_handlers, (args, kw)):
     """Given a list of handlers, resolve a matching handler and produce either
     a Response instance, or raise an appropriate HTTPException."""
     handler, vary = resolve_handler(request, view_handlers)
-    request._run_callbacks('enter', request)
+    ctx._run_callbacks('enter', request)
     if 'ctx' in get_args(handler.fn):
         response = make_response(handler.fn(request, ctx=ctx, *args, **kw))
     else:
         response = make_response(handler.fn(request, *args, **kw))
-    request._run_callbacks('leave', request, response)
+    ctx._run_callbacks('leave', request, response)
 
     if handler.provides:
         response.headers.setdefault('Content-Type', handler.provides)

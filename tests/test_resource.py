@@ -2,7 +2,7 @@ from pytest import raises as assert_raises
 from collections import defaultdict
 from rhino.errors import NotFound, MethodNotAllowed, UnsupportedMediaType, \
         NotAcceptable
-from rhino.mapper import Route
+from rhino.mapper import Route, Context
 from rhino.request import Request
 from rhino.resource import Resource, negotiate_content_type, negotiate_accept, \
         resolve_handler, make_response, request_handler, dispatch_request
@@ -158,7 +158,7 @@ def test_dispatch_request():
             ],
         },
     }
-    ctx = None
+    ctx = Context()
     routing_args = ([], {})
 
     res = dispatch_request(Request({'REQUEST_METHOD': 'GET'}), ctx,
@@ -194,5 +194,5 @@ def test_make_response():
 def test_resource_dispatch_empty():
     r = Resource()
     req = Request({'REQUEST_METHOD': 'GET'})
-    ctx = None
+    ctx = Context()
     assert_raises(NotFound, r, req, ctx)

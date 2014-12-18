@@ -110,12 +110,6 @@ class QueryDict(object):
         return self._items[:]
 
 
-_callback_phases = ['enter', 'leave', 'finalize', 'teardown', 'close']
-
-def _callback_dict():
-    return dict((k, []) for k in _callback_phases)
-
-
 class Request(object):
     """Represents an HTTP request built from a WSGI environment."""
 
@@ -129,7 +123,6 @@ class Request(object):
         self._cookies = None
         self._context = []
         self._application_uri = None
-        self._callbacks = _callback_dict()
 
     def _add_context(self, **kw):
         self._context.append(request_context(**kw))
@@ -138,29 +131,6 @@ class Request(object):
         if not self._context:
             raise ValueError("No routing context present.")
         self._context[-1] = self._context[-1]._replace(**kw)
-
-    def add_callback(self, phase, fn):
-        """Add a callback to run in a specific phase.
-
-        Possible values for phase:
-
-            Phase       Callback arguments  Description of where and when it is called
-            =======================================================================================================
-            'enter'     request             In resource, after handler has been resolved but before it is run
-            'leave'     request, response   In resource, after handler has returned successfully
-            'finalize'  request, response   In mapper, before response body and headers are finalized
-            'teardown'  -                   In mapper, before WSGI response is returned
-            'close'     -                   In the WSGI server, when it calls close() on the WSGI response iterator
-
-        """
-        try:
-            self._callbacks[phase].append(fn)
-        except KeyError:
-            raise KeyError("Invalid callback phase '%s'. Must be one of %s" % (phase, _callback_phases))
-
-    def _run_callbacks(self, phase, *args):
-        for fn in self._callbacks[phase]:
-            fn(*args)
 
     def url_for(*args, **kw):
         """Build the URL for a target.

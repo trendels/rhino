@@ -281,10 +281,41 @@ def template2path(template, params, ranges=None):
     return "".join(stack[0])
 
 
+
+_callback_phases = ['enter', 'leave', 'finalize', 'teardown', 'close']
+
+def _callback_dict():
+    return dict((k, []) for k in _callback_phases)
+
+
 class Context(object):
     def __init__(self, request=None):
         self.request = request
         self.__properties = {}
+        self.__callbacks = _callback_dict()
+
+    def add_callback(self, phase, fn):
+        """Add a callback to run in a specific phase.
+
+        Possible values for phase:
+
+            Phase       Callback arguments  Description of where and when it is called
+            =======================================================================================================
+            'enter'     request             In resource, after handler has been resolved but before it is run
+            'leave'     request, response   In resource, after handler has returned successfully
+            'finalize'  request, response   In mapper, before response body and headers are finalized
+            'teardown'  -                   In mapper, before WSGI response is returned
+            'close'     -                   In the WSGI server, when it calls close() on the WSGI response iterator
+
+        """
+        try:
+            self.__callbacks[phase].append(fn)
+        except KeyError:
+            raise KeyError("Invalid callback phase '%s'. Must be one of %s" % (phase, _callback_phases))
+
+    def _run_callbacks(self, phase, *args):
+        for fn in self.__callbacks[phase]:
+            fn(*args)
 
     def add_property(self, name, fn, cached=True):
         if name in self.__properties:
@@ -438,18 +469,19 @@ class Mapper(object):
     def wsgi(self, environ, start_response):
         """This methods implements the mapper's WSGI interface."""
         request = Request(environ)
+        ctx = Context(request)
         try:
-            response = self(request)
+            response = self(request, ctx)
             response = response.conditional_to(request)
         except HTTPException as e:
             response = e.response
         except Exception:
             self.handle_error(request, sys.exc_info())
             response = InternalServerError().response
-        response.add_callback(lambda: request._run_callbacks('close'))
-        request._run_callbacks('finalize', request, response)
+        response.add_callback(lambda: ctx._run_callbacks('close'))
+        ctx._run_callbacks('finalize', request, response)
         wsgi_response = response(environ, start_response)
-        request._run_callbacks('teardown')
+        ctx._run_callbacks('teardown')
         return wsgi_response
 
     # taken and adapted from wsgiref.handlers.BaseHandler
