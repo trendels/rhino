@@ -89,7 +89,7 @@ def dispatch_request(request, ctx, view_handlers, (args, kw)):
     handler, vary = resolve_handler(request, view_handlers)
     request._run_callbacks('enter', request)
     if 'ctx' in get_args(handler.fn):
-        response = make_response(handler.fn(request, ctx, *args, **kw))
+        response = make_response(handler.fn(request, ctx=ctx, *args, **kw))
     else:
         response = make_response(handler.fn(request, *args, **kw))
     request._run_callbacks('leave', request, response)

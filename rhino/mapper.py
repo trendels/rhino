@@ -354,7 +354,7 @@ class Route(object):
                 environ['SCRIPT_NAME'] = script_name.encode('utf-8')
                 environ['PATH_INFO'] = extra_path.encode('utf-8')
             if 'ctx' in get_args(self.resource):
-                return self.resource(request, ctx)
+                return self.resource(request, ctx=ctx)
             else:
                 return self.resource(request)
         return None
