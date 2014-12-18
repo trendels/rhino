@@ -1,10 +1,12 @@
 from functools import partial
 
-from mock import Mock, call
+import mock
+from mock import call
 
 from rhino.errors import NotFound
 from rhino.mapper import Mapper
-from rhino.resource import get
+from rhino.resource import ResourceWrapper, get
+from rhino.response import ok
 from rhino.test import TestClient
 
 
@@ -13,7 +15,7 @@ class Wrapper(object):
         self.wrapped = wrapped
         self.request = None
         self.response = None
-        self.cb = Mock()
+        self.cb = mock.create_autospec(lambda *args, **kw: 1)
 
     def __call__(self, request, ctx):
         self.request = request
@@ -27,12 +29,11 @@ class Wrapper(object):
 
 
 def test_callbacks():
-
     @get
     def handler(request):
-        return 'test'
+        return ok('test')
 
-    wrapper = Wrapper(handler)
+    wrapper = Wrapper(ResourceWrapper(handler))
 
     app = Mapper()
     app.add('/', wrapper)
@@ -41,6 +42,7 @@ def test_callbacks():
     res = client.get('/')
     assert res.code == 200
 
+    print wrapper.cb.mock_calls
     assert wrapper.cb.mock_calls == [
         call('enter', wrapper.request),
         call('leave', wrapper.request, wrapper.response),
@@ -57,7 +59,7 @@ def test_callbacks_exception():
     def handler(request):
         raise not_found
 
-    wrapper = Wrapper(handler)
+    wrapper = Wrapper(ResourceWrapper(handler))
 
     app = Mapper()
     app.add('/', wrapper)

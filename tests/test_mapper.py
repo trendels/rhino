@@ -234,3 +234,11 @@ class TestTemplate2Path(unittest.TestCase):
         for template in cases:
             self.assertRaises(InvalidTemplateError,
                     template2path, template, {'x': 1})
+
+
+def test_path():
+    app = Mapper()
+    fn = lambda: None
+    app.add('/', fn, 'test')
+    assert app.path('test', {}) == '/'
+    assert app.path(fn, {}) == '/'

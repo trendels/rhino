@@ -5,12 +5,9 @@ from rhino.errors import NotFound, MethodNotAllowed, UnsupportedMediaType, \
 from rhino.mapper import Route, Context
 from rhino.request import Request
 from rhino.resource import Resource, negotiate_content_type, negotiate_accept, \
-        resolve_handler, make_response, request_handler, dispatch_request
+        resolve_handler, make_response, request_handler
 from rhino.response import Response
-
-
-def make_request_handler(fn=None, verb=None, view=None, accepts='*/*', provides=None):
-    return request_handler(fn=fn, verb=verb, view=view, accepts=accepts, provides=provides)
+from rhino.test import make_request_handler
 
 
 def test_negotiate_content_type():
@@ -96,10 +93,6 @@ def test_resolve_handler():
     rv = resolve_handler(Request({'REQUEST_METHOD': 'HEAD'}), handlers)
     assert rv == (get_handlers[0], no_vary)
 
-    rv = resolve_handler(Request({'REQUEST_METHOD': 'OPTIONS'}), handlers)
-    assert rv[0].verb == 'OPTIONS'
-    assert rv[1] == set()
-
     assert_raises(MethodNotAllowed, resolve_handler, Request(
         {'REQUEST_METHOD': 'DELETE'}), handlers)
 
@@ -144,41 +137,6 @@ def test_resolve_handler():
     assert rv == (post_handlers_test_view[1], vary_both)
 
 
-def test_dispatch_request():
-    fn1 = lambda r: Response(200, headers=[('Vary', 'User-Agent')], body='test')
-    fn2 = lambda r: Response(200, body='test')
-    handlers = {
-        None: {
-            'GET': [
-                make_request_handler(fn1, verb='GET', provides='text/plain'),
-                make_request_handler(fn2, verb='GET', provides='text/html'),
-            ],
-            'POST': [
-                make_request_handler(fn2, verb='POST')
-            ],
-        },
-    }
-    ctx = Context()
-    routing_args = ([], {})
-
-    res = dispatch_request(Request({'REQUEST_METHOD': 'GET'}), ctx,
-            handlers, routing_args)
-    assert res.headers['Content-Type'] == 'text/plain'
-    assert res.headers['Vary'] == 'Accept, User-Agent'
-
-    res = dispatch_request(Request(
-        {'REQUEST_METHOD': 'GET', 'HTTP_ACCEPT': 'text/html'}), ctx,
-        handlers, routing_args)
-    assert res.headers['Content-Type'] == 'text/html'
-    assert res.headers['Vary'] == 'Accept'
-
-    res = dispatch_request(Request(
-        {'REQUEST_METHOD': 'POST', 'HTTP_ACCEPT': 'text/html'}), ctx,
-        handlers, routing_args)
-    assert 'Content-Type' not in res.headers
-    assert 'Vary' not in res.headers
-
-
 def test_make_response():
     assert_raises(TypeError, make_response, None)
 
@@ -191,8 +149,42 @@ def test_make_response():
     assert res is orig
 
 
-def test_resource_dispatch_empty():
-    r = Resource()
+def test_resource():
+    resource = Resource()
+    @resource.get
+    def foo(): pass
+    @resource.get('test')
+    def bar(): pass
+
+    assert resource.foo is foo
+    assert resource.bar is bar
+
+    assert resource.foo._rhino_meta.name == 'foo'
+    assert resource.bar._rhino_meta.name == 'bar'
+    assert resource.bar._rhino_meta.view == 'test'
+
+
+def test_resource_url_for():
+    resource1 = Resource()
+    resource1.get(None)
+    @resource1.from_url
+    def from_url_1(request, ctx, a, b):
+        return {'x': 1, 'y': 2}
+
+    resource2 = Resource()
+    resource2.get(None)
+    @resource2.from_url
+    def from_url_2(request, a, b):
+        return {'x': 3, 'y': 4}
+
     req = Request({'REQUEST_METHOD': 'GET'})
+    req.routing_args[1].update({'a': 1, 'b': 2})
     ctx = Context()
-    assert_raises(NotFound, r, req, ctx)
+    assert resource1(req, ctx) is None
+    assert req.routing_args[1] == {'x': 1, 'y': 2}
+
+    req = Request({'REQUEST_METHOD': 'GET'})
+    req.routing_args[1].update({'a': 1, 'b': 2})
+    ctx = Context()
+    assert resource2(req, ctx) is None
+    assert req.routing_args[1] == {'x': 3, 'y': 4}
