@@ -156,11 +156,15 @@ def test_resource():
     @resource.get('test')
     def bar(): pass
 
-    assert resource.foo.wrapped is foo
-    assert resource.bar.wrapped is bar
+    assert resource.foo._wrapped is foo
+    assert resource.bar._wrapped is bar
 
-    assert resource.foo.wrapped._rhino_meta.view == None
-    assert resource.bar.wrapped._rhino_meta.view == 'test'
+    assert resource.foo._wrapped._rhino_meta.view == None
+    assert resource.bar._wrapped._rhino_meta.view == 'test'
+
+    def quux(): pass
+    quux.__name__ = 'bar'
+    assert_raises(AttributeError, resource.get, quux)
 
 
 def test_resource_from_url():

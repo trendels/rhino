@@ -184,27 +184,27 @@ def negotiate_accept(accept, handlers):
 
 class Resource(object):
     def __init__(self, wrapped=None):
-        self.wrapped = wrapped
-        self.handlers = defaultdict(lambda: defaultdict(list))
-        self.handler_lookup = {}
+        self._wrapped = wrapped
+        self._handlers = defaultdict(lambda: defaultdict(list))
+        self._handler_lookup = {}
         self._from_url = None
         if wrapped is not None:
             if hasattr(wrapped, '_rhino_meta'):
                 meta = wrapped._rhino_meta
-                self.handlers[meta.view][meta.verb].append(meta)
-                self.handler_lookup[meta] = wrapped
+                self._handlers[meta.view][meta.verb].append(meta)
+                self._handler_lookup[meta] = wrapped
             else:
                 for name in dir(wrapped):
                     prop = getattr(wrapped, name)
                     if hasattr(prop, '_rhino_meta'):
                         meta = prop._rhino_meta
-                        self.handlers[meta.view][meta.verb].append(meta)
-                        self.handler_lookup[meta] = prop
+                        self._handlers[meta.view][meta.verb].append(meta)
+                        self._handler_lookup[meta] = prop
 
     def __call__(self, request, ctx):
-        resource = self.wrapped
+        resource = self._wrapped
         try:
-            handler, vary = resolve_handler(request, self.handlers)
+            handler, vary = resolve_handler(request, self._handlers)
         except MethodNotAllowed as e:
             # Handle 'OPTIONS' requests by default
             allow = e.response.headers.get('Allow', '')
@@ -227,7 +227,7 @@ class Resource(object):
             else:
                 kw = url_args_filter(request, **kw)
 
-        fn = self.handler_lookup[handler]
+        fn = self._handler_lookup[handler]
         if 'ctx' in get_args(fn):
             response = make_response(fn(request, ctx=ctx, **kw))
         else:
@@ -253,8 +253,8 @@ class Resource(object):
                 raise AttributeError("A property named '%s' already exists on this '%s' instance." % (name, self.__class__.__name__))
             meta = _add_handler_metadata(fn, *args, **kw)
             setattr(self, name, self.__class__(fn))
-            self.handlers[meta.view][meta.verb].append(meta)
-            self.handler_lookup[meta] = fn
+            self._handlers[meta.view][meta.verb].append(meta)
+            self._handler_lookup[meta] = fn
             return fn
         return decorator
 
