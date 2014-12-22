@@ -15,6 +15,11 @@ class ClientError(HTTPException): pass
 class ServerError(HTTPException): pass
 
 
+class BadRequest(ClientError):
+    code = 400
+    message = 'The server could not understand the request.'
+
+
 class NotFound(ClientError):
     code = 404
     message = 'The requested resource could not be found.'
