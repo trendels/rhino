@@ -183,8 +183,11 @@ def negotiate_accept(accept, handlers):
 
 
 class Resource(object):
-    def __init__(self, wrapped=None):
+    def __init__(self, wrapped=None, container=False):
+        if (container and wrapped is not None):
+            raise ValueError("Container resource cannot be used as a wrapper")
         self._wrapped = wrapped
+        self._container = container
         self._handlers = defaultdict(lambda: defaultdict(list))
         self._handler_lookup = {}
         self._from_url = None
@@ -201,7 +204,13 @@ class Resource(object):
                         self._handlers[meta.view][meta.verb].append(meta)
                         self._handler_lookup[meta] = prop
 
+    @classmethod
+    def container(cls):
+        return cls(container=True)
+
     def __call__(self, request, ctx):
+        if self._container:
+            raise RuntimeError("Container resource cannot be called directly.")
         resource = self._wrapped
         try:
             handler, vary = resolve_handler(request, self._handlers)
@@ -252,9 +261,10 @@ class Resource(object):
             if hasattr(self, name):
                 raise AttributeError("A property named '%s' already exists on this '%s' instance." % (name, self.__class__.__name__))
             meta = _add_handler_metadata(fn, *args, **kw)
-            setattr(self, name, self.__class__(fn))
             self._handlers[meta.view][meta.verb].append(meta)
             self._handler_lookup[meta] = fn
+            if self._container:
+                setattr(self, name, self.__class__(fn))
             return fn
         return decorator
 

@@ -149,8 +149,8 @@ def test_make_response():
     assert res is orig
 
 
-def test_resource():
-    resource = Resource()
+def test_container():
+    resource = Resource.container()
     @resource.get
     def foo(): pass
     @resource.get('test')

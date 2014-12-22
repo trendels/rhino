@@ -3,9 +3,9 @@ import storage
 
 wiki = storage.Storage('contents')
 
-pages = Resource()
 edit_page = Resource()
 history_page = Resource()
+pages = Resource.container()
 
 @pages.get
 def index(request):
