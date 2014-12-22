@@ -4,3 +4,11 @@
 # Install development requirements
 mock
 pytest
+pytest-cov
+
+# Install requirements for examples
+html
+
+# Install requirements for extensions
+beaker
+jinja2
