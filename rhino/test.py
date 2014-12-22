@@ -10,11 +10,11 @@ from wsgiref.headers import Headers
 from wsgiref.util import setup_testing_defaults
 from wsgiref.validate import validator
 
-from .resource import request_handler
+from .resource import handler_metadata
 
 
-def make_request_handler(name=None, verb=None, view=None, accepts='*/*', provides=None):
-    return request_handler(name=name, verb=verb, view=view, accepts=accepts, provides=provides)
+def make_handler_metadata(verb=None, view=None, accepts='*/*', provides=None):
+    return handler_metadata(verb=verb, view=view, accepts=accepts, provides=provides)
 
 
 class wsgi_response(namedtuple('wsgi_response', 'status headers body')):

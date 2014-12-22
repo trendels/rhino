@@ -5,7 +5,7 @@ from mock import call
 
 from rhino.errors import NotFound
 from rhino.mapper import Mapper
-from rhino.resource import ResourceWrapper, get
+from rhino.resource import Resource, get
 from rhino.response import ok
 from rhino.test import TestClient
 
@@ -33,7 +33,7 @@ def test_callbacks():
     def handler(request):
         return ok('test')
 
-    wrapper = Wrapper(ResourceWrapper(handler))
+    wrapper = Wrapper(Resource(handler))
 
     app = Mapper()
     app.add('/', wrapper)
@@ -59,7 +59,7 @@ def test_callbacks_exception():
     def handler(request):
         raise not_found
 
-    wrapper = Wrapper(ResourceWrapper(handler))
+    wrapper = Wrapper(Resource(handler))
 
     app = Mapper()
     app.add('/', wrapper)

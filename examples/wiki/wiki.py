@@ -5,12 +5,13 @@ wiki = storage.Storage('contents')
 
 edit_page = Resource()
 history_page = Resource()
+pages = Resource.container()
 
-@get
+@pages.get
 def index(request):
     return redirect('/FrontPage')
 
-@get
+@pages.get
 def display(request, name):
     return wiki.render_page(name)
 
@@ -38,8 +39,8 @@ def revert(request, name):
 app = Mapper(ranges={'wikiname': storage.wikiname_re.pattern})
 app.default_content_type='text/html; charset=utf-8'
 
-app.add('/', index)
-app.add('/{name:wikiname}', display)
+app.add('/', pages.index)
+app.add('/{name:wikiname}', pages.display)
 app.add('/{name:wikiname}/edit', edit_page)
 app.add('/{name:wikiname}/history', history_page)
 

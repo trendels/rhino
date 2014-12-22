@@ -4,9 +4,9 @@ from pytest import raises as assert_raises
 from rhino.errors import NotFound
 from rhino.mapper import Context
 from rhino.request import Request
-from rhino.resource import ResourceWrapper, Resource, get, put, delete
+from rhino.resource import Resource, get, put, delete
 from rhino.response import Response, ok
-from rhino.test import make_request_handler
+from rhino.test import make_handler_metadata
 
 
 def test_call():
@@ -15,14 +15,14 @@ def test_call():
 
     resource = TestResource()
     resource.fn1 = lambda r: Response(200, headers=[('Vary', 'User-Agent')], body='test')
-    resource.fn1._rhino_meta = make_request_handler(None, verb='GET', provides='text/plain')
+    resource.fn1._rhino_meta = make_handler_metadata(verb='GET', provides='text/plain')
     resource.fn2 = lambda r: Response(200, body='test')
-    resource.fn2._rhino_meta = make_request_handler(None, verb='GET', provides='text/html')
+    resource.fn2._rhino_meta = make_handler_metadata(verb='GET', provides='text/html')
     resource.fn3 = lambda r: Response(200, body='test')
-    resource.fn3._rhino_meta = make_request_handler(None, verb='POST')
+    resource.fn3._rhino_meta = make_handler_metadata(verb='POST')
 
     ctx = Context()
-    wrapped = ResourceWrapper(resource)
+    wrapped = Resource(resource)
 
     res = wrapped(Request({'REQUEST_METHOD': 'GET'}), ctx)
     assert res.headers['Content-Type'] == 'text/plain'
@@ -40,27 +40,31 @@ def test_call():
 
 
 def test_resource_emtpy():
-    r = ResourceWrapper(None)
+    r = Resource(None)
     req = Request({'REQUEST_METHOD': 'GET'})
     ctx = Context()
     assert_raises(NotFound, r, req, ctx)
 
 
 def test_resource_fn():
-    r1 = ResourceWrapper(lambda req: ok())
-    r2 = ResourceWrapper(lambda req, ctx: ok())
-    r3 = ResourceWrapper(lambda req: None)
-    r4 = ResourceWrapper(lambda req: 'test')
+    @get
+    def handler1(request):
+        return ok()
+
+    @get
+    def handler2(request, ctx):
+        return ok()
+
+    r1 = Resource(handler1)
+    r2 = Resource(handler2)
     req = Request({'REQUEST_METHOD': 'GET'})
     ctx = Context()
     assert r1(req, ctx)
     assert r2(req, ctx)
-    assert_raises(NotFound, r3, req, ctx)
-    assert_raises(TypeError, r4, req, ctx)
 
 
 def test_resource_obj():
-    class Resource(object):
+    class MyResource(object):
         @get
         def handler1(self, request):
             return ok()
@@ -69,74 +73,52 @@ def test_resource_obj():
         def handler2(self, request, ctx):
             return ok()
 
-    resource = Resource()
+    resource = MyResource()
     resource.handler3 = delete(lambda req: ok())
 
-    r = ResourceWrapper(resource)
+    r = Resource(resource)
     ctx = Context()
     assert r(Request({'REQUEST_METHOD': 'GET'}), ctx)
     assert r(Request({'REQUEST_METHOD': 'PUT'}), ctx)
     assert r(Request({'REQUEST_METHOD': 'DELETE'}), ctx)
 
 
-def test_resource_obj_call():
-    class ResourceWithCall(object):
+def test_resource_from_url():
+    class ResourceWithUrlFor(object):
         def __init__(self):
             self.called = False
 
-        def __call__(self, request):
+        def from_url(self, request):
             self.called = True
+            return {}
 
-    class ResourceWithCallCtx(ResourceWithCall):
-        def __call__(self, request, ctx):
+    class ResourceWithUrlForCtx(ResourceWithUrlFor):
+        def from_url(self, request, ctx):
             self.called = True
+            return {}
 
-    class ResourceWithCallError(ResourceWithCall):
-        def __call__(self, request):
+    class ResourceWithUrlForError(ResourceWithUrlFor):
+        def from_url(self, request):
             self.called = True
             return 'test'
 
-    resource1 = ResourceWithCall()
+    resource1 = ResourceWithUrlFor()
     resource1.handler = get(lambda req: ok())
 
-    resource2 = ResourceWithCallCtx()
+    resource2 = ResourceWithUrlForCtx()
     resource2.handler = get(lambda req: ok())
 
-    resource3 = ResourceWithCallError()
+    resource3 = ResourceWithUrlForError()
     resource3.handler = get(lambda req: ok())
 
-    r1 = ResourceWrapper(resource1)
-    r2 = ResourceWrapper(resource2)
-    r3 = ResourceWrapper(resource3)
+    r1 = Resource(resource1)
+    r2 = Resource(resource2)
+    r3 = Resource(resource3)
     req = Request({'REQUEST_METHOD': 'GET'})
     ctx = Context()
     assert r1(req, ctx)
     assert resource1.called
     assert r2(req, ctx)
     assert resource2.called
-    assert_raises(ValueError, r3, req, ctx)
+    assert_raises(TypeError, r3, req, ctx)
     assert resource3.called
-
-
-def test_resource_class():
-    calls = defaultdict(list)
-
-    class Resource(object):
-        def __init__(self):
-            calls[self.__class__].append('__init__')
-
-        @get
-        def handler(self, request):
-            return ok()
-
-    class ResourceWithCall(Resource):
-        def __call__(self, request):
-            calls[self.__class__].append('__call__')
-
-    r1 = ResourceWrapper(Resource)
-    r2 = ResourceWrapper(ResourceWithCall)
-    ctx = Context()
-    assert r1(Request({'REQUEST_METHOD': 'GET'}), ctx)
-    assert calls[Resource] == ['__init__']
-    assert r2(Request({'REQUEST_METHOD': 'GET'}), ctx)
-    assert calls[ResourceWithCall] == ['__init__', '__call__']
