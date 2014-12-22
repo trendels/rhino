@@ -9,16 +9,17 @@ from .response import Response
 from .util import dual_use_decorator, dual_use_decorator_method, get_args
 from .vendor import mimeparse
 
-request_handler = namedtuple('request_handler', 'name verb view accepts provides')
+handler_metadata = namedtuple('handler_metadata', 'verb view accepts provides')
 class_types = (type, types.ClassType)  # new-style and old-style classes
 MIMEPARSE_NO_MATCH = (-1, 0)
 
 
 def _add_handler_metadata(fn, verb, view=None, accepts='*/*', provides=None):
     if hasattr(fn, '_rhino_meta'):
-        raise AttributeError("Decorated function already has a '_rhino_meta' attribute: %s" % fn._rhino_meta)
-    meta = request_handler(fn.__name__, verb, view, accepts, provides)
+        raise AttributeError("Decorated function already has a '_rhino_meta' attribute: %s" % (fn._rhino_meta,))
+    meta = handler_metadata(verb, view, accepts, provides)
     fn._rhino_meta = meta
+    return meta
 
 
 def _make_handler_decorator(*args, **kw):
@@ -90,7 +91,7 @@ def make_response(obj):
 def resolve_handler(request, view_handlers):
     """Select a suitable handler to handle the request.
 
-    Returns a tuple of (handler, vary), where handler is a request_handler
+    Returns a tuple of (handler, vary), where handler is a handler_metadata
     tuple and vary is a set containing header names that were used during
     content-negotiation and that have to be included in the 'Vary' header of
     the outgoing response.
@@ -181,113 +182,79 @@ def negotiate_accept(accept, handlers):
         return [h for h in handlers if h.provides is None]
 
 
-class ResourceWrapper(object):
-    def __init__(self, resource):
-        self.resource = resource
-        self.resource_is_handler = False
-        self.handlers = defaultdict(lambda: defaultdict(list))
-        if hasattr(resource, '_rhino_meta'):
-            meta = resource._rhino_meta
-            self.handlers[meta.view][meta.verb].append(meta)
-            self.resource_is_handler = True
-        else:
-            for name in dir(resource):
-                prop = getattr(resource, name)
-                if hasattr(prop, '_rhino_meta'):
-                    # Make sure we store the actual property name which we can
-                    # use to retrieve it from the instance again later.
-                    # TODO we could also store a reference to the function
-                    # in the handler metadata, instead of looking it up later.
-                    meta = prop._rhino_meta._replace(name=name)
-                    self.handlers[meta.view][meta.verb].append(meta)
-
-    def __call__(self, request, ctx):
-        resource = self.resource
-        if not self.handlers:
-            if callable(resource):
-                if 'ctx' in get_args(resource):
-                    response = resource(request, ctx=ctx)
-                else:
-                    response = resource(request)
-                if response is None:
-                    raise NotFound
-                if not isinstance(response, Response):
-                    raise TypeError("Calling resource '%s' returned '%s' which is not None or an instance of rhino.Response" % (resource, response))
-            else:
-                raise NotFound
-            return response
-        else:
-            try:
-                handler, vary = resolve_handler(request, self.handlers)
-            except MethodNotAllowed as e:
-                # Handle 'OPTIONS' requests by default
-                allow = e.response.headers.get('Allow', '')
-                allowed_methods = set([s.strip() for s in allow.split(',')])
-                allowed_methods.add('OPTIONS')
-                allow = ', '.join(sorted(allowed_methods))
-                if request.method.upper() == 'OPTIONS':
-                    return Response(200, headers=[('Allow', allow)])
-                else:
-                    e.response.headers['Allow'] = allow
-                    raise
-
-            if isinstance(resource, class_types):
-                resource = resource()
-            if not self.resource_is_handler:
-                if callable(resource):
-                    # TODO we could allow the resource to return a Response
-                    # instance here as a shortcut to abort further processing.
-                    if 'ctx' in get_args(resource):
-                        rv = resource(request, ctx=ctx)
-                    else:
-                        rv = resource(request)
-                    if rv is not None:
-                        raise ValueError("Calling '%s' for initialization returned a value: '%s'" % (resource, rv))
-            ctx._run_callbacks('enter', request)
-            kw = request.routing_args[1]
-            if self.resource_is_handler:
-                fn = resource
-            else:
-                fn = getattr(resource, handler.name)
-            if 'ctx' in get_args(fn):
-                response = make_response(fn(request, ctx=ctx, **kw))
-            else:
-                response = make_response(fn(request, **kw))
-            ctx._run_callbacks('leave', request, response)
-
-            if handler.provides:
-                response.headers.setdefault('Content-Type', handler.provides)
-
-            if vary:
-                vary_header = response.headers.get('Vary', '')
-                vary_items = set(filter(
-                    None, [s.strip() for s in vary_header.split(',')]))
-                vary_items.update(vary)
-                response.headers['Vary'] = ', '.join(sorted(vary_items))
-            return response
-
-
 class Resource(object):
-    def __init__(self):
+    def __init__(self, wrapped=None):
+        self.wrapped = wrapped
+        self.handlers = defaultdict(lambda: defaultdict(list))
+        self.handler_lookup = {}
         self._from_url = None
+        if wrapped is not None:
+            if hasattr(wrapped, '_rhino_meta'):
+                meta = wrapped._rhino_meta
+                self.handlers[meta.view][meta.verb].append(meta)
+                self.handler_lookup[meta] = wrapped
+            else:
+                for name in dir(wrapped):
+                    prop = getattr(wrapped, name)
+                    if hasattr(prop, '_rhino_meta'):
+                        meta = prop._rhino_meta
+                        self.handlers[meta.view][meta.verb].append(meta)
+                        self.handler_lookup[meta] = prop
 
     def __call__(self, request, ctx):
-        if self._from_url:
-            kw = request.routing_args[1]
-            if 'ctx' in get_args(self._from_url):
-                kw = self._from_url(request, ctx=ctx, **kw)
+        resource = self.wrapped
+        try:
+            handler, vary = resolve_handler(request, self.handlers)
+        except MethodNotAllowed as e:
+            # Handle 'OPTIONS' requests by default
+            allow = e.response.headers.get('Allow', '')
+            allowed_methods = set([s.strip() for s in allow.split(',')])
+            allowed_methods.add('OPTIONS')
+            allow = ', '.join(sorted(allowed_methods))
+            if request.method.upper() == 'OPTIONS':
+                return Response(200, headers=[('Allow', allow)])
             else:
-                kw = self._from_url(request, **kw)
-            request.routing_args[1].clear()
-            request.routing_args[1].update(kw)
+                e.response.headers['Allow'] = allow
+                raise
+
+        ctx._run_callbacks('enter', request)
+
+        url_args_filter = self._from_url or getattr(resource, 'from_url', None)
+        kw = request.routing_args[1]
+        if url_args_filter:
+            if 'ctx' in get_args(url_args_filter):
+                kw = url_args_filter(request, ctx=ctx, **kw)
+            else:
+                kw = url_args_filter(request, **kw)
+
+        fn = self.handler_lookup[handler]
+        if 'ctx' in get_args(fn):
+            response = make_response(fn(request, ctx=ctx, **kw))
+        else:
+            response = make_response(fn(request, **kw))
+
+        ctx._run_callbacks('leave', request, response)
+
+        if handler.provides:
+            response.headers.setdefault('Content-Type', handler.provides)
+
+        if vary:
+            vary_header = response.headers.get('Vary', '')
+            vary_items = set(filter(
+                None, [s.strip() for s in vary_header.split(',')]))
+            vary_items.update(vary)
+            response.headers['Vary'] = ', '.join(sorted(vary_items))
+        return response
 
     def _make_decorator(self, *args, **kw):
         def decorator(fn):
             name = fn.__name__
             if hasattr(self, name):
                 raise AttributeError("A property named '%s' already exists on this '%s' instance." % (name, self.__class__.__name__))
-            _add_handler_metadata(fn, *args, **kw)
-            setattr(self, name, fn)
+            meta = _add_handler_metadata(fn, *args, **kw)
+            setattr(self, name, self.__class__(fn))
+            self.handlers[meta.view][meta.verb].append(meta)
+            self.handler_lookup[meta] = fn
             return fn
         return decorator
 

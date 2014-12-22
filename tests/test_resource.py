@@ -5,20 +5,20 @@ from rhino.errors import NotFound, MethodNotAllowed, UnsupportedMediaType, \
 from rhino.mapper import Route, Context
 from rhino.request import Request
 from rhino.resource import Resource, negotiate_content_type, negotiate_accept, \
-        resolve_handler, make_response, request_handler
-from rhino.response import Response
-from rhino.test import make_request_handler
+        resolve_handler, make_response, handler_metadata
+from rhino.response import Response, ok
+from rhino.test import make_handler_metadata
 
 
 def test_negotiate_content_type():
     handlers = [
-        make_request_handler(accepts='*/*'),
-        make_request_handler(accepts='text/*'),
-        make_request_handler(accepts='text/plain'),
-        make_request_handler(accepts='text/plain'),
-        make_request_handler(accepts='application/json'),
-        make_request_handler(accepts='image/png;q=0.8'),
-        make_request_handler(accepts='image/png;q=0.9'),
+        make_handler_metadata(accepts='*/*'),
+        make_handler_metadata(accepts='text/*'),
+        make_handler_metadata(accepts='text/plain'),
+        make_handler_metadata(accepts='text/plain'),
+        make_handler_metadata(accepts='application/json'),
+        make_handler_metadata(accepts='image/png;q=0.8'),
+        make_handler_metadata(accepts='image/png;q=0.9'),
     ]
     assert negotiate_content_type('application/xml', handlers) == [handlers[0]]
     assert negotiate_content_type('text/html', handlers) == [handlers[1]]
@@ -29,17 +29,17 @@ def test_negotiate_content_type():
 
 def test_negotiate_accept():
     handlers = [
-        make_request_handler(provides='text/plain'),
-        make_request_handler(provides='text/html'),
-        make_request_handler(provides='application/json'),
+        make_handler_metadata(provides='text/plain'),
+        make_handler_metadata(provides='text/html'),
+        make_handler_metadata(provides='application/json'),
     ]
     assert negotiate_accept('text/*', handlers) == [handlers[0]]
     assert negotiate_accept('text/plain;q=0.1, text/html', handlers) == [handlers[1]]
     assert negotiate_accept('text/*, application/json', handlers) == [handlers[2]]
 
     handlers = [
-        make_request_handler(provides='text/plain'),
-        make_request_handler(provides=None),
+        make_handler_metadata(provides='text/plain'),
+        make_handler_metadata(provides=None),
     ]
     assert negotiate_accept('text/*', handlers) == [handlers[1]]
     assert negotiate_accept('text/plain', handlers) == [handlers[1]]
@@ -50,7 +50,7 @@ def make_handler_dict():
 
 
 def add_handler(handler_dict, fn, verb, view=None, accepts='*/*', provides=None):
-    handler = request_handler(fn, verb, view, accepts, provides)
+    handler = handler_metadata(fn, verb, view, accepts, provides)
     handler_dict[view][verb].append(handler)
 
 
@@ -60,21 +60,21 @@ def test_resolve_handler():
     handlers = {
         None: {
             'GET': [
-                make_request_handler(verb='GET', provides='text/html')
+                make_handler_metadata(verb='GET', provides='text/html')
             ],
             'POST': [
-                make_request_handler(verb='POST', accepts='text/plain', provides='text/plain'),
-                make_request_handler(verb='POST', accepts='text/plain', provides='image/png'),
+                make_handler_metadata(verb='POST', accepts='text/plain', provides='text/plain'),
+                make_handler_metadata(verb='POST', accepts='text/plain', provides='image/png'),
             ],
             'PUT': [
-                make_request_handler(verb='PUT', accepts='text/plain'),
-                make_request_handler(verb='PUT', accepts='application/json'),
+                make_handler_metadata(verb='PUT', accepts='text/plain'),
+                make_handler_metadata(verb='PUT', accepts='application/json'),
             ],
         },
         'test': {
             'POST': [
-                make_request_handler(verb='POST', accepts='text/plain', provides='text/plain'),
-                make_request_handler(verb='POST', accepts='application/xml', provides='image/png'),
+                make_handler_metadata(verb='POST', accepts='text/plain', provides='text/plain'),
+                make_handler_metadata(verb='POST', accepts='application/xml', provides='image/png'),
             ],
         }
     }
@@ -156,35 +156,45 @@ def test_resource():
     @resource.get('test')
     def bar(): pass
 
-    assert resource.foo is foo
-    assert resource.bar is bar
+    assert resource.foo.wrapped is foo
+    assert resource.bar.wrapped is bar
 
-    assert resource.foo._rhino_meta.name == 'foo'
-    assert resource.bar._rhino_meta.name == 'bar'
-    assert resource.bar._rhino_meta.view == 'test'
+    assert resource.foo.wrapped._rhino_meta.view == None
+    assert resource.bar.wrapped._rhino_meta.view == 'test'
 
 
-def test_resource_url_for():
+def test_resource_from_url():
     resource1 = Resource()
-    resource1.get(None)
+
     @resource1.from_url
     def from_url_1(request, ctx, a, b):
         return {'x': 1, 'y': 2}
 
+    @resource1.get
+    def handler1(request, x, y):
+        resource1.args = (x, y)
+        return ok()
+
     resource2 = Resource()
-    resource2.get(None)
+    resource2.get(lambda req, x, y: ok())
+
     @resource2.from_url
     def from_url_2(request, a, b):
         return {'x': 3, 'y': 4}
 
-    req = Request({'REQUEST_METHOD': 'GET'})
-    req.routing_args[1].update({'a': 1, 'b': 2})
-    ctx = Context()
-    assert resource1(req, ctx) is None
-    assert req.routing_args[1] == {'x': 1, 'y': 2}
+    @resource2.get
+    def handler2(request, x, y):
+        resource2.args = (x, y)
+        return ok()
 
     req = Request({'REQUEST_METHOD': 'GET'})
     req.routing_args[1].update({'a': 1, 'b': 2})
     ctx = Context()
-    assert resource2(req, ctx) is None
-    assert req.routing_args[1] == {'x': 3, 'y': 4}
+    resource1(req, ctx)
+    assert resource1.args == (1, 2)
+
+    req = Request({'REQUEST_METHOD': 'GET'})
+    req.routing_args[1].update({'a': 1, 'b': 2})
+    ctx = Context()
+    resource2(req, ctx)
+    assert resource2.args == (3, 4)
