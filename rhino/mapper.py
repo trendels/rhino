@@ -446,7 +446,7 @@ class Mapper(object):
                 prefix, rest = target.split('.', 1)
                 route = self.named_routes[prefix]
                 params_copy = params.copy()
-                prefix_params = {k: params_copy.pop(k) for k in route.params}
+                prefix_params = dict((k, params_copy.pop(k)) for k in route.params)
                 prefix_path = route.path(prefix_params)
                 next_mapper = route.resource
                 return prefix_path + next_mapper.path(rest, params_copy)
