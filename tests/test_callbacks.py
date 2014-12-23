@@ -42,7 +42,6 @@ def test_callbacks():
     res = client.get('/')
     assert res.code == 200
 
-    print wrapper.cb.mock_calls
     assert wrapper.cb.mock_calls == [
         call('enter', wrapper.request),
         call('leave', wrapper.request, wrapper.response),
