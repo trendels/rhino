@@ -78,25 +78,26 @@ class QueryDict(object):
     def __len__(self):
         return len(self._items)
 
-    def __contains__(self, name):
+    def __contains__(self, key):
         try:
-            self[name]
+            self[key]
         except KeyError:
             return False
         return True
 
-    def __getitem__(self, name):
-        v = self.get(name, _default)
+    def __getitem__(self, key):
+        v = self.get(key, _default)
         if v is _default:
-            raise KeyError(name)
+            raise KeyError(key)
         return v
 
-    def get_all(self, name):
-        return [v for k, v in self._items if k == name]
+    def get_all(self, key):
+        """Return a list of values for the given key."""
+        return [v for k, v in self._items if k == key]
 
-    def get(self, name, default=None):
+    def get(self, key, default=None):
         for k, v in self._items:
-            if k == name:
+            if k == key:
                 return v
         return default
 
