@@ -49,6 +49,7 @@ import urllib
 
 from .errors import HTTPException, InternalServerError, NotFound
 from .request import Request
+from .response import Response
 from .resource import Resource
 from .util import call_with_ctx
 
@@ -514,6 +515,8 @@ class Mapper(object):
         for route in self.routes:
             response = route(request, ctx)
             if response is not None:
+                if not isinstance(response, Response):
+                    raise TypeError("Not a rhino.Response instance: %s." % response)
                 if self.default_encoding is not None:
                     response.default_encoding = self.default_encoding
                 if self.default_content_type is not None:
