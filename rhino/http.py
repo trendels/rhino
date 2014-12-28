@@ -87,7 +87,7 @@ def httpdate_to_timestamp(s):
 def total_seconds(td):
     if hasattr(td, 'total_seconds'):  # Since Python 2.7
         return td.total_seconds()
-    else:
+    else:  # pragma: no cover
         return td.seconds + 60*60*24 * td.days + td.microseconds/1000000.0
 
 

@@ -14,6 +14,11 @@ def test_add_property():
     foo.assert_called_once_with(ctx)
 
 
+def test_invalid_property():
+    ctx = Context()
+    assert_raises(AttributeError, lambda: ctx.foo)
+
+
 def test_add_property_duplicate():
     ctx = Context()
     ctx.add_property('foo', 1)
@@ -55,3 +60,16 @@ def test_mapper_add_ctx_property_duplicate():
     mapper = Mapper()
     mapper.add_ctx_property('foo', 1)
     assert_raises(InvalidArgumentError, mapper.add_ctx_property, 'foo', 2)
+
+
+def test_callbacks():
+    ctx = Context()
+    cb = Mock()
+    ctx.add_callback('enter', cb)
+    ctx._run_callbacks('enter', 1, 2)
+    assert cb.mock_calls == [call(1, 2)]
+
+
+def test_invalid_callback():
+    ctx = Context()
+    assert_raises(KeyError, ctx.add_callback, 'invalid', lambda: None)

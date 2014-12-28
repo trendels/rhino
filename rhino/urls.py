@@ -7,8 +7,8 @@ string_types = (str, unicode)
 
 
 def build_url(context, target, params=None):
-    if not context:
-        raise ValueError("No routing context present.")
+    if not context:  # pragma: no cover
+        raise RuntimeError("No routing context present.")
     if params is None:
         params = {}
     if type(target) in string_types and len(target) \

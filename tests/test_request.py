@@ -2,6 +2,8 @@
 from StringIO import StringIO
 from wsgiref.util import setup_testing_defaults
 
+import rhino
+from mock import patch
 from pytest import raises as assert_raises
 from rhino.request import Request, QueryDict
 
@@ -27,7 +29,7 @@ environ = {
     'HTTP_COOKIE': 'x="\\342\\230\\203"; a=b',
     'CONTENT_TYPE': 'application/x-www-form-urlencoded',
     'CONTENT_LENGTH': str(len(body)),
-    'REMOTE_ADDR': '127.0.0.1',
+    'REMOTE_ADDR': '1.2.3.4',
     'REMOTE_PORT': '12345',
     'wsgi.input': StringIO(body),
 }
@@ -76,7 +78,7 @@ def test_accessors():
     assert req.form.items() == [('x', '1'), ('x', '2'), (u'★', u'☃')]
     assert req.cookies['x'] == u'☃'
     assert req.cookies['a'] == 'b'
-    assert req.remote_addr == '127.0.0.1'
+    assert req.remote_addr == '1.2.3.4'
     assert req.remote_port == 12345
     assert req.body == ''
 
@@ -144,3 +146,13 @@ def test_file_upload():
     assert req.form[u'★★'].filename == u'☃.txt'
     assert req.form[u'★★'].type == 'text/plain'
     assert req.form[u'★★'].file.read() == u'☃☃☃'.encode('utf-8')
+
+
+def test_url_for():
+    req = Request(environ)
+    with patch.object(rhino.request, 'build_url') as mock_url:
+        mock_url.return_value = '/'
+        assert req.url_for('/') == 'http://127.0.0.1/'
+        assert req.url_for('/', _query={'foo': 'bar'}) == 'http://127.0.0.1/?foo=bar'
+        assert req.url_for('/', _query=[('foo', 1), ('foo', 2)]) == 'http://127.0.0.1/?foo=1&foo=2'
+        assert req.url_for('/', _relative=True) == '/'

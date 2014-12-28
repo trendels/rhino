@@ -129,8 +129,8 @@ class Request(object):
         self._context.append(request_context(**kw))
 
     def _set_context(self, **kw):
-        if not self._context:
-            raise ValueError("No routing context present.")
+        if not self._context:  # pragma: no cover
+            raise RuntimeError("No routing context present.")
         self._context[-1] = self._context[-1]._replace(**kw)
 
     def url_for(*args, **kw):
