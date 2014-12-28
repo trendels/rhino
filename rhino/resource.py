@@ -9,22 +9,19 @@ from .response import Response
 from .util import dual_use_decorator, dual_use_decorator_method, get_args
 from .vendor import mimeparse
 
-handler_metadata = namedtuple('handler_metadata', 'verb view accepts provides')
 class_types = (type, types.ClassType)  # new-style and old-style classes
 MIMEPARSE_NO_MATCH = (-1, 0)
 
-
-def _add_handler_metadata(fn, verb, view=None, accepts='*/*', provides=None):
-    if hasattr(fn, '_rhino_meta'):
-        raise AttributeError("Decorated function already has a '_rhino_meta' attribute: %s" % (fn._rhino_meta,))
-    meta = handler_metadata(verb, view, accepts, provides)
-    fn._rhino_meta = meta
-    return meta
+class handler_metadata(namedtuple(
+        'handler_metadata', 'verb view accepts provides')):
+    @classmethod
+    def create(cls, verb, view=None, accepts='*/*', provides=None):
+        return cls(verb, view, accepts, provides)
 
 
 def _make_handler_decorator(*args, **kw):
     def decorator(fn):
-        _add_handler_metadata(fn, *args, **kw)
+        fn._rhino_meta = handler_metadata.create(*args, **kw)
         return fn
     return decorator
 
@@ -183,11 +180,8 @@ def negotiate_accept(accept, handlers):
 
 
 class Resource(object):
-    def __init__(self, wrapped=None, container=False):
-        if (container and wrapped is not None):
-            raise ValueError("Container resource cannot be used as a wrapper")
+    def __init__(self, wrapped=None):
         self._wrapped = wrapped
-        self._container = container
         self._handlers = defaultdict(lambda: defaultdict(list))
         self._handler_lookup = {}
         self._from_url = None
@@ -204,13 +198,7 @@ class Resource(object):
                         self._handlers[meta.view][meta.verb].append(meta)
                         self._handler_lookup[meta] = prop
 
-    @classmethod
-    def container(cls):
-        return cls(container=True)
-
     def __call__(self, request, ctx):
-        if self._container:
-            raise RuntimeError("Container resource cannot be called directly.")
         resource = self._wrapped
         try:
             handler, vary = resolve_handler(request, self._handlers)
@@ -260,11 +248,9 @@ class Resource(object):
             name = fn.__name__
             if hasattr(self, name):
                 raise AttributeError("A property named '%s' already exists on this '%s' instance." % (name, self.__class__.__name__))
-            meta = _add_handler_metadata(fn, *args, **kw)
+            meta = handler_metadata.create(*args, **kw)
             self._handlers[meta.view][meta.verb].append(meta)
             self._handler_lookup[meta] = fn
-            if self._container:
-                setattr(self, name, self.__class__(fn))
             return fn
         return decorator
 

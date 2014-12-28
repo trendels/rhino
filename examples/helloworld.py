@@ -1,13 +1,11 @@
-from rhino import Mapper, Resource, get, ok
+from rhino import Mapper, get, ok
 
-greeting = Resource()
-
-@greeting.get
+@get
 def hello(request):
     return ok("Hello, world!")
 
 app = Mapper()
-app.add('/', greeting)
+app.add('/', hello)
 
 if __name__ == '__main__':
     app.start_server()

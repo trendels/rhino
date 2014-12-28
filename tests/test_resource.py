@@ -149,24 +149,6 @@ def test_make_response():
     assert res is orig
 
 
-def test_container():
-    resource = Resource.container()
-    @resource.get
-    def foo(): pass
-    @resource.get('test')
-    def bar(): pass
-
-    assert resource.foo._wrapped is foo
-    assert resource.bar._wrapped is bar
-
-    assert resource.foo._wrapped._rhino_meta.view == None
-    assert resource.bar._wrapped._rhino_meta.view == 'test'
-
-    def quux(): pass
-    quux.__name__ = 'bar'
-    assert_raises(AttributeError, resource.get, quux)
-
-
 def test_resource_from_url():
     resource1 = Resource()
 

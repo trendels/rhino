@@ -13,8 +13,8 @@ from wsgiref.validate import validator
 from .resource import handler_metadata
 
 
-def make_handler_metadata(verb=None, view=None, accepts='*/*', provides=None):
-    return handler_metadata(verb=verb, view=view, accepts=accepts, provides=provides)
+def make_handler_metadata(verb=None, view=None, **kw):
+    return handler_metadata.create(verb=verb, view=view, **kw)
 
 
 class wsgi_response(namedtuple('wsgi_response', 'status headers body')):
