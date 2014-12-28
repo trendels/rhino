@@ -377,7 +377,7 @@ class Route(object):
             environ = request.environ
             match_vars = match.groupdict()
             if match_vars:
-                request.routing_args[1].update(
+                request.routing_args.update(
                         dict((k, v) for k, v in match_vars.items()
                              if v is not None))
             if not self.is_anchored:

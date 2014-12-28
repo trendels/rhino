@@ -51,7 +51,7 @@ class StaticDirectory(object):
 
     def __call__(self, request):
         # Normalize path_info to always start with a slash.
-        path_info = '/' + request.routing_args[1].get('path', '').lstrip('/')
+        path_info = '/' + request.routing_args.get('path', '').lstrip('/')
         # Interpret path_info as an OS path, resolve any non-leading '..', and
         # require resulting path to be absolute.
         # This is to prevent enumeration of directory names: If 'foo.txt' is

@@ -241,19 +241,9 @@ class Request(object):
 
     @property
     def routing_args(self):
-        """Contains variables extracted from the URL (wsgiorg.routing_args)
-
-        A pair of list/dict. The list is free for internal use by the
-        application, while the dict contains the variables extracted from
-        matching the request URL against the route template.
-        These are passed to request handlers as ``*args`` and ``**kwargs``,
-        respectively.
-        """
-        routing_args = self.environ.get('wsgiorg.routing_args')
-        if routing_args is None:
-            routing_args = ([], {})
-            self.environ['wsgiorg.routing_args'] = routing_args
-        return routing_args
+        """Returns named parameters extracted from the URL during routing."""
+        self.environ.setdefault('wsgiorg.routing_args', ([], {}))
+        return self.environ['wsgiorg.routing_args'][1]
 
     # TODO more CGI variables? See: <http://web.archive.org/web/20131002054457/http://ken.coar.org/cgi/draft-coar-cgi-v11-03.txt>
 

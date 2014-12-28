@@ -218,7 +218,7 @@ class Resource(object):
         ctx._run_callbacks('enter', request)
 
         url_args_filter = self._from_url or getattr(resource, 'from_url', None)
-        kw = request.routing_args[1]
+        kw = request.routing_args
         if url_args_filter:
             kw = call_with_ctx(url_args_filter, ctx, request, **kw)
 

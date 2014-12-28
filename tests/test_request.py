@@ -111,10 +111,9 @@ def test_request_headers():
 
 def test_mutable_routing_args():
     req = Request({})
-    assert req.routing_args == ([], {})
-    req.routing_args[0].append('foo')
-    req.routing_args[1]['bar'] = 1
-    assert req.routing_args == (['foo'], {'bar': 1})
+    assert req.routing_args == {}
+    req.routing_args['bar'] = 1
+    assert req.routing_args == {'bar': 1}
 
 
 def test_querydict():

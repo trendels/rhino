@@ -174,13 +174,13 @@ def test_resource_from_url():
         return ok()
 
     req = Request({'REQUEST_METHOD': 'GET'})
-    req.routing_args[1].update({'a': 1, 'b': 2})
+    req.routing_args.update({'a': 1, 'b': 2})
     ctx = Context()
     resource1(req, ctx)
     assert resource1.args == (1, 2)
 
     req = Request({'REQUEST_METHOD': 'GET'})
-    req.routing_args[1].update({'a': 1, 'b': 2})
+    req.routing_args.update({'a': 1, 'b': 2})
     ctx = Context()
     resource2(req, ctx)
     assert resource2.args == (3, 4)
