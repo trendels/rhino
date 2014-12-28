@@ -41,3 +41,10 @@ def get_args(obj):
         return inspect.getargspec(obj.__call__).args[1:]
     else:
         raise TypeError("Can't inspect signature of '%s' object." % obj)
+
+
+def call_with_ctx(fn, ctx, *args, **kw):
+    if 'ctx' in get_args(fn):
+        return fn(*args, ctx=ctx, **kw)
+    else:
+        return fn(*args, **kw)

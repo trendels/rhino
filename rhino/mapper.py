@@ -50,7 +50,7 @@ import urllib
 from .errors import HTTPException, InternalServerError, NotFound
 from .request import Request
 from .resource import Resource
-from .util import get_args
+from .util import call_with_ctx
 
 # template2regex function taken from Joe Gregorio's wsgidispatcher.py
 # (https://code.google.com/p/robaccia/) with minor modifications.
@@ -385,10 +385,7 @@ class Route(object):
                 script_name = request.script_name + path[:match.end()]
                 environ['SCRIPT_NAME'] = script_name.encode('utf-8')
                 environ['PATH_INFO'] = extra_path.encode('utf-8')
-            if 'ctx' in get_args(self.resource):
-                return self.resource(request, ctx=ctx)
-            else:
-                return self.resource(request)
+            return call_with_ctx(self.resource, ctx, request)
         return None
 
 

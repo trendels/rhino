@@ -6,7 +6,7 @@ from collections import defaultdict, namedtuple
 from .errors import NotFound, MethodNotAllowed, UnsupportedMediaType, \
         NotAcceptable
 from .response import Response
-from .util import dual_use_decorator, dual_use_decorator_method, get_args
+from .util import dual_use_decorator, dual_use_decorator_method, call_with_ctx
 from .vendor import mimeparse
 
 class_types = (type, types.ClassType)  # new-style and old-style classes
@@ -219,16 +219,10 @@ class Resource(object):
         url_args_filter = self._from_url or getattr(resource, 'from_url', None)
         kw = request.routing_args[1]
         if url_args_filter:
-            if 'ctx' in get_args(url_args_filter):
-                kw = url_args_filter(request, ctx=ctx, **kw)
-            else:
-                kw = url_args_filter(request, **kw)
+            kw = call_with_ctx(url_args_filter, ctx, request, **kw)
 
         fn = self._handler_lookup[handler]
-        if 'ctx' in get_args(fn):
-            response = make_response(fn(request, ctx=ctx, **kw))
-        else:
-            response = make_response(fn(request, **kw))
+        response = make_response(call_with_ctx(fn, ctx, request, **kw))
 
         ctx._run_callbacks('leave', request, response)
 
