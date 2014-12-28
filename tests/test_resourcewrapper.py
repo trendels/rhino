@@ -73,14 +73,26 @@ def test_resource_obj():
         def handler2(self, request, ctx):
             return ok()
 
-    resource = MyResource()
-    resource.handler3 = delete(lambda req: ok())
-
-    r = Resource(resource)
+    r = Resource(MyResource())
     ctx = Context()
     assert r(Request({'REQUEST_METHOD': 'GET'}), ctx)
     assert r(Request({'REQUEST_METHOD': 'PUT'}), ctx)
-    assert r(Request({'REQUEST_METHOD': 'DELETE'}), ctx)
+
+
+def test_resource_class():
+    @Resource
+    class MyResource(object):
+        @get
+        def handler1(self, request):
+            return ok()
+
+        @put
+        def handler2(self, request, ctx):
+            return ok()
+
+    ctx = Context()
+    assert MyResource(Request({'REQUEST_METHOD': 'GET'}), ctx)
+    assert MyResource(Request({'REQUEST_METHOD': 'PUT'}), ctx)
 
 
 def test_resource_from_url():

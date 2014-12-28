@@ -199,7 +199,8 @@ class Resource(object):
                         self._handler_lookup[meta] = prop
 
     def __call__(self, request, ctx):
-        resource = self._wrapped
+        resource_is_class = type(self._wrapped) in class_types
+        resource = self._wrapped() if resource_is_class else self._wrapped
         try:
             handler, vary = resolve_handler(request, self._handlers)
         except MethodNotAllowed as e:
@@ -222,7 +223,10 @@ class Resource(object):
             kw = call_with_ctx(url_args_filter, ctx, request, **kw)
 
         fn = self._handler_lookup[handler]
-        response = make_response(call_with_ctx(fn, ctx, request, **kw))
+        if resource_is_class:
+            response = make_response(call_with_ctx(fn, ctx, resource, request, **kw))
+        else:
+            response = make_response(call_with_ctx(fn, ctx, request, **kw))
 
         ctx._run_callbacks('leave', request, response)
 
