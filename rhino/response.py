@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 
-import httplib
 import urllib
 import urlparse
 import time
@@ -10,7 +9,7 @@ from wsgiref.headers import Headers as ResponseHeaders
 from wsgiref.util import application_uri
 
 from .http import httpdate_to_timestamp, datetime_to_httpdate, \
-        timedelta_to_httpdate, total_seconds, match_etag
+        timedelta_to_httpdate, total_seconds, match_etag, status_codes
 
 # Include: etag, content-location, expires, cache-control, vary
 # TODO The revised HTTP RFCs (rfcs 7230-7235) have removed the distinction
@@ -155,7 +154,7 @@ class Response(object):
     @property
     def status(self):
         """The statusline as a string (status code + reaspon)"""
-        reason = httplib.responses.get(self.code, "Unknown")
+        reason = status_codes.get(self.code, "Unknown")
         return "%s %s" % (self._code, reason)
 
     def add_callback(self, fn):

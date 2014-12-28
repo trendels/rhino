@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import httplib
 import re
 import time
 from calendar import timegm
@@ -19,6 +20,8 @@ _etag_header = r'^(?:(%s)|(?:%s(?:\s*,\s*|$))+)$' % (_etag_star, _etag)
 etag_re = re.compile(_etag)
 etag_header_re = re.compile(_etag_header)
 quoted_string_re = re.compile(_quoted_string)
+
+status_codes = httplib.responses.copy()
 
 
 def parse_etag_header(header):
