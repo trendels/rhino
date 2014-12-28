@@ -132,7 +132,7 @@ def test_resolve_handler():
     assert rv == (put_handlers[1], vary_content_type)
 
     req = Request({'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': 'application/xml'})
-    req._add_context(root=None, mapper=None, route=Route('/', None, view='test'))
+    req._add_context(root=None, mapper=None, route=Route('/', None, name=':test'))
     rv = resolve_handler(req, handlers)
     assert rv == (post_handlers_test_view[1], vary_both)
 

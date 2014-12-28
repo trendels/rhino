@@ -50,7 +50,7 @@ import urllib
 from .errors import HTTPException, InternalServerError, NotFound
 from .request import Request
 from .response import Response
-from .resource import Resource
+from .resource import Resource, VIEW_SEPARATOR
 from .util import call_with_ctx
 
 # template2regex function taken from Joe Gregorio's wsgidispatcher.py
@@ -339,17 +339,17 @@ class Context(object):
 
 class Route(object):
     """
-    A Route links a URL template with an optional name and view to a resource.
+    A Route links a URL template with an optional name to a resource.
 
     Routes are used internally by rhino.Mapper, and are not part of the
     public API.
     """
 
-    def __init__(self, template, resource, ranges=None, name=None, view=None):
+    def __init__(self, template, resource, ranges=None, name=None):
         if ranges is None:
             ranges = DEFAULT_RANGES
-        if name is not None and ('.' in name or '/' in name):
-            raise InvalidArgumentError("Route name '%s' contains invalid characters ('.', '/')" % name)
+        if name is not None and any(c in name for c in './'):
+            raise InvalidArgumentError("Route name '%s' contains invalid characters ('./')" % name)
 
         regex, params = template2regex(template, ranges)
         self.regex = re.compile(regex)
@@ -358,7 +358,6 @@ class Route(object):
         self.resource = resource
         self.ranges = ranges
         self.name = name
-        self.view = view
         self.is_anchored = len(template) and template[-1] != '|'
 
     def path(self, params):
@@ -414,23 +413,21 @@ class Mapper(object):
         self._lookup = {}  # index of routes by object ID for faster path(obj)
         self._ctx_properties = {}
 
-    def add(self, template, resource, name=None, view=None):
+    def add(self, template, resource, name=None):
         """Add a resource to the mapper under a URL template.
 
         The optional ``name`` assigns a name to this route that can be
         used when building URLs. The name must be unique within this
-        Mapper instance.
-
-        The optional ``view`` can be used by resources to change how to respond
-        to the request based on which route it came from.
-        """
+        Mapper instance. If the name contains '%(VIEW_SEPARATOR)s', the part
+        after the '%(VIEW_SEPARATOR)s is the view name.
+        """ % {'VIEW_SEPARATOR': VIEW_SEPARATOR}
         # Special case for standalone handler functions
         if hasattr(resource, '_rhino_meta'):
-            route = Route(template, Resource(resource), name=name, view=view,
-                        ranges=self.ranges)
+            route = Route(
+                    template, Resource(resource), name=name, ranges=self.ranges)
         else:
-            route = Route(template, resource, name=name, view=view,
-                    ranges=self.ranges)
+            route = Route(
+                    template, resource, name=name, ranges=self.ranges)
         obj_id = id(resource)
         if obj_id not in self._lookup:
             # It's ok to have multiple routes for the same object id.

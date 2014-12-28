@@ -10,12 +10,17 @@ from .util import dual_use_decorator, dual_use_decorator_method, call_with_ctx
 from .vendor import mimeparse
 
 class_types = (type, types.ClassType)  # new-style and old-style classes
+
+VIEW_SEPARATOR = ':'
 MIMEPARSE_NO_MATCH = (-1, 0)
 
 class handler_metadata(namedtuple(
         'handler_metadata', 'verb view accepts provides')):
     @classmethod
     def create(cls, verb, view=None, accepts='*/*', provides=None):
+        if view and VIEW_SEPARATOR in view:
+            raise ValueError("View name cannot contain '%s': %s"
+                    % (VIEW_SEPARATOR, view))
         return cls(verb, view, accepts, provides)
 
 
@@ -98,7 +103,9 @@ def resolve_handler(request, view_handlers):
     """
     view = None
     if request._context:  # Allow context to be missing for easier testing
-        view = request._context[-1].route.view
+        route_name = request._context[-1].route.name
+        if route_name and VIEW_SEPARATOR in route_name:
+            view = route_name.split(VIEW_SEPARATOR, 1)[1] or None
 
     if view not in view_handlers:
         raise NotFound
