@@ -96,7 +96,8 @@ class Unauthorized(ClientError):
 
     def __init__(self, scheme, **params):
         super(Unauthorized, self).__init__()
-        param_str = ', '.join(['%s="%s"' % (k, v) for k, v in params.items()])
+        param_str = ', '.join(['%s="%s"' % (k, v)
+                               for k, v in sorted(params.items())])
         www_authenticate = "%s %s" % (scheme, param_str)
         self.response.headers['WWW-Authenticate'] = www_authenticate
 
