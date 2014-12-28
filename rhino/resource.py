@@ -243,9 +243,6 @@ class Resource(object):
 
     def _make_decorator(self, *args, **kw):
         def decorator(fn):
-            name = fn.__name__
-            if hasattr(self, name):
-                raise AttributeError("A property named '%s' already exists on this '%s' instance." % (name, self.__class__.__name__))
             meta = handler_metadata.create(*args, **kw)
             self._handlers[meta.view][meta.verb].append(meta)
             self._handler_lookup[meta] = fn
