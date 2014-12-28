@@ -141,25 +141,26 @@ class Request(object):
         _query:
             Append query string (dict or list of tuples)
 
-        _absolute:
-            When False, build relative URLs (default: True)
+        _relative:
+            When True, build a relative URL (default: False)
 
         All other keyword arguments are treated as URL parameters.
         """
         # Allow passing 'self' as named parameter
         self, target = args
         query = kw.pop('_query', None)
-        absolute = kw.pop('_absolute', True)
+        relative = kw.pop('_relative', False)
         url = build_url(self._context, target, kw)
         if query:
             if isinstance(query, dict):
                 query = sorted(query.items())
-            url = url + '?'+ urllib.urlencode(query)
-        if absolute:
+            url = url + '?' + urllib.urlencode(query)
+        if relative:
+            return url
+        else:
             if self._application_uri is None:
                 self._application_uri = application_uri(self.environ)
-            url = urlparse.urljoin(self._application_uri, url)
-        return url
+            return urlparse.urljoin(self._application_uri, url)
 
     @property
     def method(self):
