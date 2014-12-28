@@ -3,6 +3,8 @@ This extension requires the Beaker module to be installed::
 
     $ pip install beaker
 """
+from __future__ import absolute_import
+
 from collections import namedtuple
 from functools import partial
 
@@ -142,7 +144,7 @@ class Session(BeakerSession):
     def __init__(
             self, secret, timeout=None, cookie_name='session_id',
             cookie_expires=True, cookie_domain=None, cookie_path='/',
-            secure=False, httponly=False):
+            secure=False, httponly=False, auto=True):
         super(Session, self).__init__(
             type='cookie',
             validate_key=secret,
@@ -152,5 +154,6 @@ class Session(BeakerSession):
             cookie_domain=cookie_domain,
             cookie_path=cookie_path,
             secure=secure,
-            httponly=httponly
+            httponly=httponly,
+            auto=auto,
         )

@@ -21,6 +21,8 @@ Example usage::
     app.add('/', index)
 
 """
+from __future__ import absolute_import
+
 from functools import partial
 
 import jinja2
@@ -46,11 +48,10 @@ class JinjaRenderer(object):
 
     def __init__(self, directory=None, autoescape=True, **env_args):
         if directory is not None:
-            loader = jinja2.FileSystemLoader(directory)
+            env_args['loader'] = jinja2.FileSystemLoader(directory)
         #: The jinja2.Environment instance. Can be used to add additional
         #: filters after initalization
-        self.env = jinja2.Environment(
-                autoescape=autoescape, loader=loader, **env_args)
+        self.env = jinja2.Environment(autoescape=autoescape,  **env_args)
 
     def render_template(self, ctx, template_name, **values):
         template = self.env.get_template(template_name)
