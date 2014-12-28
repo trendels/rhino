@@ -96,7 +96,7 @@ def test_resource_class():
 
 
 def test_resource_from_url():
-    class ResourceWithUrlFor(object):
+    class ResourceWithFromUrl(object):
         def __init__(self):
             self.called = False
 
@@ -104,23 +104,23 @@ def test_resource_from_url():
             self.called = True
             return {}
 
-    class ResourceWithUrlForCtx(ResourceWithUrlFor):
+    class ResourceWithFromUrlCtx(ResourceWithFromUrl):
         def from_url(self, request, ctx):
             self.called = True
             return {}
 
-    class ResourceWithUrlForError(ResourceWithUrlFor):
+    class ResourceWithFromUrlError(ResourceWithFromUrl):
         def from_url(self, request):
             self.called = True
             return 'test'
 
-    resource1 = ResourceWithUrlFor()
+    resource1 = ResourceWithFromUrl()
     resource1.handler = get(lambda req: ok())
 
-    resource2 = ResourceWithUrlForCtx()
+    resource2 = ResourceWithFromUrlCtx()
     resource2.handler = get(lambda req: ok())
 
-    resource3 = ResourceWithUrlForError()
+    resource3 = ResourceWithFromUrlError()
     resource3.handler = get(lambda req: ok())
 
     r1 = Resource(resource1)
