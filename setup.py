@@ -11,5 +11,5 @@ setup(
     packages=['rhino'],
     url='https://github.com/trendels/rhino',
     license='MIT',
-    description='Microframework for building RESTful web services',
+    description='A microframework for building RESTful web services',
 )
