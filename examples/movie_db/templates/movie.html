@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+<h2>{{ movie.title }}</h2>
+{% if movie.rating %}
+<p>Rating: {{ movie.rating }} Stars</p>
+{% endif %}
+Actors:
+<ul>
+  {% for role in movie.roles|sort(attribute='actor.name') %}
+  <li><a href="{{ url_for('actor', id=role.actor.id) }}">{{ role.actor.name }}</a> as {{ role.name }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}
