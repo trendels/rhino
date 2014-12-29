@@ -5,7 +5,8 @@ from wsgiref.util import setup_testing_defaults
 
 from mock import patch
 from pytest import raises as assert_raises
-from rhino.response import Entity, Response, response, ok, redirect, \
+from rhino.response import Entity, Response, \
+        response, ok, created, no_content, redirect, \
         datetime_to_httpdate
 from rhino.request import Request
 
@@ -306,6 +307,17 @@ def test_ok():
 
     assert_raises(ValueError, ok, code=199)
     assert_raises(ValueError, ok, code=300)
+
+
+def test_created():
+    res = created()
+    assert res.code == 201
+
+
+def test_no_content():
+    res = no_content()
+    assert res.code == 204
+    assert_raises(TypeError, no_content, body='test')
 
 
 def test_redirect():

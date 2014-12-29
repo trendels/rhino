@@ -376,6 +376,16 @@ def ok(body='', code=200, **kw):
     return response(code=code, body=body, **kw)
 
 
+def created(body='', **kw):
+    """Shortcut for response(201, ...)."""
+    return response(code=201, body=body, **kw)
+
+
+def no_content(**kw):
+    """Shortcut for response(204, ...)."""
+    return response(code=204, body='', **kw)
+
+
 def redirect(location, code=302, **kw):
     """Shortcut for response(302, location=location, ...)
     Status code must be in the 3xx range."""
