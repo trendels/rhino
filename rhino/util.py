@@ -28,9 +28,8 @@ def sse_event(event=None, data=None, id=None, retry=None, comment=None):
 
 
 def dual_use_decorator(fn):
-    """
-    Turn a function into a decorator that can be called with or without arguments.
-    """
+    """Turn a function into a decorator that can be called with or without
+    arguments."""
     @functools.wraps(fn)
     def decorator(*args, **kw):
         if len(args) == 1 and not kw and callable(args[0]):
@@ -41,9 +40,8 @@ def dual_use_decorator(fn):
 
 
 def dual_use_decorator_method(fn):
-    """
-    Turn a method into a decorator that can be called with or without arguments.
-    """
+    """Turn a method into a decorator that can be called with or without
+    arguments. """
     @functools.wraps(fn)
     def decorator(*args, **kw):
         if len(args) == 2 and not kw and callable(args[1]):
@@ -54,6 +52,7 @@ def dual_use_decorator_method(fn):
 
 
 def get_args(obj):
+    """Get a list of argument names for a given callable."""
     if inspect.isfunction(obj):
         return inspect.getargspec(obj).args
     elif inspect.ismethod(obj):
@@ -67,6 +66,7 @@ def get_args(obj):
 
 
 def call_with_ctx(fn, ctx, *args, **kw):
+    """Call fn with or without 'ctx', depending on its signature."""
     if 'ctx' in get_args(fn):
         return fn(*args, ctx=ctx, **kw)
     else:

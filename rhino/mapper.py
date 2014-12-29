@@ -1,46 +1,3 @@
-"""
-* Patterns are matched in the order in which they are added to the Dispatcher.
-* First match wins
-
-By default, a template parameter matches anything up to the next '/' character.
-
-You can add an optional range qualifier to every template
-parameter that restricts the characters that consistitute
-a match. The range specifier follows a colon in the template name.
-Here are the ranges that are predefined:
-
-+-----------+--------------------+
-|Range      |Regular Expression  |
-+===========+====================+
-|word       |\w+                 | 
-+-----------+--------------------+
-|alpha      |[a-zA-Z]+           |
-+-----------+--------------------+
-|digits     |\d+                 |
-+-----------+--------------------+
-|alnum      |[a-zA-Z0-9]+        |
-+-----------+--------------------+
-|segment    |[^/]+               |
-+-----------+--------------------+
-|unreserved |[a-zA-Z\d\-\.\_\~]+ |
-+-----------+--------------------+
-|any        |.+                  |
-+-----------+--------------------+
-
-Templates understand three special kinds of markup:
-
-    +--------+-------------------------------------------------------------------------------------------------------------------+
-    | {name} | Whatever matches this part of the path will be available to the application in the routing_args named parameters. | 
-    +--------+-------------------------------------------------------------------------------------------------------------------+
-    | []     | Any part of a path enclosed in brackets is optional                                                               |
-    +--------+-------------------------------------------------------------------------------------------------------------------+ 
-    | \|     | The bar may only be present at the end of the template and signals that the path need not match the whole path.   |
-    +--------+-------------------------------------------------------------------------------------------------------------------+
-
-    * Brackets may be nested
-    * Brackets may contain template parameters
-
-"""
 from __future__ import absolute_import
 
 import re
@@ -83,12 +40,13 @@ S_SKIP = 2
 
 
 def template2regex(template, ranges=None):
-    """
+    """Convert a URL template to a regular expression.
+
     Converts a template, such as /{name}/ to a regular expression, e.g.
     /(?P<name>[^/]+)/ and a list of the named parameters found in the template
-    (e.g. ['name']).
-    Ranges are given after a colon in a template name to indicate a restriction
-    on the characters that can appear there. For example, in the template::
+    (e.g. ['name']). Ranges are given after a colon in a template name to
+    indicate a restriction on the characters that can appear there. For
+    example, in the template::
 
         "/user/{id:alpha}"
 
@@ -101,11 +59,10 @@ def template2regex(template, ranges=None):
 
     Example:
 
-        >>> import rhino.mapper
-        >>> rhino.mapper.template2regex("{fred}")
-        ('^(?P<fred>[^/]+)$', ['fred'])
+    >>> import rhino.mapper
+    >>> rhino.mapper.template2regex("{fred}")
+    ('^(?P<fred>[^/]+)$', ['fred'])
 
-    This function is used internally by rhino.Mapper.
     """
     if len(template) and -1 < template.find('|') < len(template) - 1:
         raise InvalidTemplateError("'|' may only appear at the end, found at position %d in %s" % (template.find('|'), template))
@@ -166,22 +123,24 @@ def template2regex(template, ranges=None):
 
 
 def template2path(template, params, ranges=None):
-    """
+    """Converts a template and a dict of parameters to a path fragment.
+
     Converts a template, such as /{name}/ and a dictionary of parameter
-    values to a path (string). Parameter values will be converted to
+    values to a URL path (string). Parameter values will be converted to
     strings and escaped.
 
-      - param values that are used are validated against their range
-      - unused parameters are ignored
-      - optional ([]) blocks are skipped unless they contain one or more
-        parameters and all of them are present in 'params'.
-      - handles nested [] blocks
+    Parameter values that are used are converted using `str()` and validated
+    against the paremter range. Unused parameters are ignored.
+
+    Any optional ([]) blocks in the template are skipped unless they contain at
+    least one parameter and all parameters needed to fill the block (including
+    nested blocks) are present in `params`.
 
     Example:
 
-        >>> import rhino.mapper
-        >>> rhino.mapper.template2path("/{name}", {'name': 'fred'})
-        '/fred'
+    >>> import rhino.mapper
+    >>> rhino.mapper.template2path("/{name}", {'name': 'fred'})
+    '/fred'
 
     """
     if len(template) and -1 < template.find('|') < len(template) - 1:
@@ -297,17 +256,39 @@ class Context(object):
         self.__callbacks = _callback_dict()
 
     def add_callback(self, phase, fn):
-        """Add a callback to run in a specific phase.
+        """Adds a callback to the context.
 
-        Possible values for phase:
+        The `phase` determins when and if the callback is executed, and which
+        positional arguments are passed in:
 
-            Phase       Callback arguments  Description of where and when it is called
-            =======================================================================================================
-            'enter'     request             In resource, after handler has been resolved but before it is run
-            'leave'     request, response   In resource, after handler has returned successfully
-            'finalize'  request, response   In mapper, before response body and headers are finalized
-            'teardown'  -                   In mapper, before WSGI response is returned
-            'close'     -                   In the WSGI server, when it calls close() on the WSGI response iterator
+        'enter'
+            Called from `Resource`, after a handler for the current request has
+            been resolved, but before the handler is called.
+
+            Arguments: request
+
+        'leave'
+            Called from `Resource`, after the handler has returned
+            successfully.
+
+            Arguments: request, response
+
+        'finalize'
+            Called from `Mapper`, before WSGI response is finalized.
+
+            Arguments: request, response
+
+        'teardown'
+            Called from `Mapper`, before control is passed back to the
+            WSGI layer.
+
+            Arguments: -
+
+        'close'
+            Called when the WSGI server calls `close()` on the response
+            iterator.
+
+            Arguments: -
 
         """
         try:
@@ -339,10 +320,7 @@ class Context(object):
 
 class Route(object):
     """
-    A Route links a URL template with an optional name to a resource.
-
-    Routes are used internally by rhino.Mapper, and are not part of the
-    public API.
+    A Route links a URL template and an optional name to a resource.
     """
 
     def __init__(self, template, resource, ranges=None, name=None):
@@ -361,14 +339,13 @@ class Route(object):
         self.is_anchored = len(template) and template[-1] != '|'
 
     def path(self, params):
-        """Build URL path fragment for this route."""
+        """Builds the URL path fragment for this route."""
         return template2path(self.template, params, self.ranges)
 
     def __call__(self, request, ctx):
         """Try to dispatch a request.
 
-        If the route matches the request URI, returns the result of calling
-        resource(request), None otherwise.
+        Returns a `Response` instance, or None if the route does not match.
         """
         path = request.path_info
         match = self.regex.match(path)
@@ -391,13 +368,9 @@ class Route(object):
 
 class Mapper(object):
     """
-    The mapper groups resources or other mappers under a common URL root, and
+    A Mapper groups resources or other mappers under a common URL root, and
     dispatches incoming requests based on their URL. It also provides the WSGI
     interface for the application.
-
-    The `ranges` parameter can be used to extend or override the default
-    ranges. Ranges passed as a dictionary will be merged into the default
-    ranges, with those given in `ranges` taking precedence.
     """
     default_encoding = None
     default_content_type = None
@@ -414,13 +387,15 @@ class Mapper(object):
         self._ctx_properties = {}
 
     def add(self, template, resource, name=None):
-        """Add a resource to the mapper under a URL template.
+        """Add a route to a resource.
 
-        The optional ``name`` assigns a name to this route that can be
-        used when building URLs. The name must be unique within this
-        Mapper instance. If the name contains '%(VIEW_SEPARATOR)s', the part
-        after the '%(VIEW_SEPARATOR)s is the view name.
+        The optional `name` assigns a name to this route that can be used when
+        building URLs. The name must be unique within this Mapper instance.
+
+        If the name contains '%(VIEW_SEPARATOR)s', the part after the
+        '%(VIEW_SEPARATOR)s is considered to be the view name.
         """ % {'VIEW_SEPARATOR': VIEW_SEPARATOR}
+
         # Special case for standalone handler functions
         if hasattr(resource, '_rhino_meta'):
             route = Route(
@@ -440,12 +415,41 @@ class Mapper(object):
         self.routes.append(route)
 
     def add_ctx_property(self, name, fn, cached=True):
+        """Install a context property.
+
+        A context property is a callable that will be called on first access
+        of the property named `name` on the context instance. The result
+        will be cached unless `cached` is False.
+
+        If the context property is not callable, it will be installed
+        as-is, otherwise, it will be called with the context instance as
+        first argument.
+        """
         if name in self._ctx_properties:
             raise InvalidArgumentError("A context property name '%s' already exists." % name)
         self._ctx_properties[name] = (fn, cached)
 
     def path(self, target, params):
-        """Build URL path fragment for a resource or route of this mapper."""
+        """Build a URL path fragment for a resource or route.
+
+        Possible values for `target`:
+
+        A string with no '.'s
+            If the string does not contain '.', it will be used to look up
+            a named route of this mapper instance and return it's path.
+
+        A string of the form 'a.b', 'a.b.c', etc.
+            Follows the route to nested mappers by splitting off consectutive
+            segments. Returns the path of the route found by looking up the
+            final segment on the last mapper.
+
+        A `Route` instance
+            Returns the path for the route.
+
+        A resource that was `add()`ed previously
+            Looks up the first route that points to this resource and
+            returns its path.
+        """
         if type(target) in string_types:
             if '.' in target:
                 # Build path for a dotted route name
@@ -474,7 +478,7 @@ class Mapper(object):
             raise InvalidArgumentError("No Route found for target '%s' in this %s instance." % (target, self.__class__.__name__))
 
     def wsgi(self, environ, start_response):
-        """This methods implements the mapper's WSGI interface."""
+        """Implements the mapper's WSGI interface."""
         request = Request(environ)
         ctx = Context(request)
         try:

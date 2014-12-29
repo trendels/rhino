@@ -71,15 +71,13 @@ class Response(object):
     Class attributes:
 
     default_encoding
-
         When finalizing the response and the response body is a unicode string,
         it is encoded using default_encoding (default: 'utf-8')
 
     default_content_type
-
-        When finalizing the response and the response body is not empty
-        this is used as the default value for the Content-Type header,
-        if none is provided (default: 'text/plain; charset=utf-8')
+        When finalizing the response and the response body is not empty this is
+        used as the default value for the Content-Type header, if none is
+        provided (default: 'text/plain; charset=utf-8')
     """
     default_encoding = 'utf-8'
     default_content_type = 'text/plain; charset=utf-8'
@@ -102,24 +100,29 @@ class Response(object):
 
             Valid values for the response body are:
 
-                1. The empty string (``''``).
-                   This indicates an empty response body.
+            The empty string ('')
+                This indicates an empty response body.
 
-                2. A str or unicode object.
-                   Sent as-is, after encoding unicode using default_encoding
+            A str or unicode object
+               Sent as-is, after encoding unicode using default_encoding
 
-                3. An iterator that yields str or unicode objects.
-                   The response is streamed to the client using chunked
-                   transfer-encoding (when implemented by the WSGI server).
+            An iterator that yields str or unicode objects
+               The response is streamed to the client using chunked
+               transfer-encoding (when implemented by the WSGI server).
 
-                4. A callable that returns a single str or unicode object.
-                   This is only useful in combination with an 'Etag' or
-                   'Last-Modified' header, to delay construction of the
-                   response body until after conditional request handling
-                   has taken place, and no "304 Not Modified" response has
-                   been sent.
+            A callable that returns a single str or unicode object
+               This is only useful in combination with an 'Etag' or
+               'Last-Modified' header, to delay construction of the
+               response body until after conditional request handling
+               has taken place, and no "304 Not Modified" response has
+               been sent.
 
-                5. An Entity instance whose body attribute is one of the above.
+            An Entity instance
+                The response body (which must be of one of the types listed
+                above) will be taken from the entity instance, and any entity
+                headers will be added to the response headers, with existing
+                headers of the same name taking precedence.
+
         """
         headers = ResponseHeaders(headers or [])
 
@@ -158,8 +161,7 @@ class Response(object):
         return "%s %s" % (self._code, reason)
 
     def add_callback(self, fn):
-        """Add a callback to be excuted when the response is close()d by the
-        WSGI server."""
+        """Add a callback to be executed when the response is closed."""
         self._callbacks.append(fn)
 
     def set_cookie(self, key, value='', max_age=None, path='/', domain=None,
@@ -168,31 +170,24 @@ class Response(object):
 
         Parameters:
 
-        key:
-            the cookie name
-
-        value:
-            the cookie value
-
-        max_age:
-            the maximum age of the cookie in seconds, or as a
+        key
+            The cookie name.
+        value
+            The cookie value.
+        max_age
+            The maximum age of the cookie in seconds, or as a
             datetime.timedelta instance.
-
-        path:
-            restrict the cookie to this path (default: '/').
-
-        domain:
-            restrict the cookie to his domain.
-
-        secure:
+        path
+            Restrict the cookie to this path (default: '/').
+        domain
+            Restrict the cookie to his domain.
+        secure
             When True, instruct the client to only sent the cookie over HTTPS.
-
-        httponly:
+        httponly
             When True, instruct the client to disallow javascript access to
             the cookie.
-
         expires:
-            another way of specifying the maximum age of the cookie. Accepts
+            Another way of specifying the maximum age of the cookie. Accepts
             the same values as max_age (number of seconds, datetime.timedelta).
             Additionaly accepts a datetime.datetime instance.
             Note: a value of type int or float is interpreted as a number of
@@ -222,13 +217,18 @@ class Response(object):
 
     def delete_cookie(self, key, path='/', domain=None):
         """Delete a cookie (by setting it to a blank value).
+
         The path and domain values must match that of the original cookie.
         """
         self.set_cookie(key, value='', max_age=0, path=path, domain=domain,
                         expires=datetime.utcfromtimestamp(0))
 
     def conditional_to(self, request):
-        """Make a new response that is conditional to a given request."""
+        """Return a response that is conditional to a given request.
+
+        Returns the Response instance unchanged, or a new Response instance
+        with a "304 Not Modified" status code.
+        """
         if not self.code == 200:
             return self
 
@@ -268,7 +268,11 @@ class Response(object):
         return self
 
     def __call__(self, environ, start_response):
-        """WSGI interface. Finalizes the request and sends a WSGI response"""
+        """WSGI interface
+
+        Finalizes the request, calls `start_response` and returns a
+        response iterator.
+        """
         code = self._code
         headers = self._headers
         body = self._body
@@ -324,31 +328,27 @@ def response(code, body='', etag=None, last_modified=None, expires=None, **kw):
 
     Parameters:
 
-    code:
-        An integer status code
-
-    body:
-        The response body. See Response.__init__ for details.
-
-    etag:
-        A value for the Etag header. Double quotes will be added unless it is
-        a double-quoted string.
-
-    last_modified:
+    code
+        An integer status code.
+    body
+        The response body. See Response.__init__() for details.
+    etag
+        A value for the Etag header. Double quotes will be added unless the
+        string starts and ends with a double qote.
+    last_modified
         A value for the Last-Modified header as a datetime.datetime instance
         or Unix timestamp.
-
-    expires:
+    expires
         A value for the Expires header as number of seconds, datetime.timedelta
         or datetime.datetime instance.
         Note: a value of type int or float is interpreted as a number of
         seconds in the future, *not* as Unix timestamp.
-
-    ``**kw``:
+    **kw
         All other keyword arguments are interpreted as response headers.
         The names will be converted to header names by replacing
         underscores with hyphens and converting to title case
         (e.g. 'x_powered_by' => 'X-Powered-By').
+
     """
     if etag is not None:
         if not (etag[0] == '"' and etag[-1] == '"'):
@@ -370,7 +370,8 @@ def response(code, body='', etag=None, last_modified=None, expires=None, **kw):
 
 def ok(body='', code=200, **kw):
     """Shortcut for response(200, ...).
-    Status code must be in the 2xx range."""
+
+    The status code must be in the 2xx range."""
     if not 200 <= code < 300:
         raise ValueError("Not a 2xx status code: '%s'" % code)
     return response(code=code, body=body, **kw)
@@ -382,13 +383,14 @@ def created(body='', **kw):
 
 
 def no_content(**kw):
-    """Shortcut for response(204, ...)."""
+    """Shortcut for response(204, body='', ...)."""
     return response(code=204, body='', **kw)
 
 
 def redirect(location, code=302, **kw):
     """Shortcut for response(302, location=location, ...)
-    Status code must be in the 3xx range."""
+
+    The status code must be in the 3xx range."""
     if not 300 <= code < 400:
         raise ValueError("Not a 3xx status code: '%s'" % code)
     return response(code=code, location=location, **kw)

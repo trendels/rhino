@@ -33,56 +33,42 @@ def _make_handler_decorator(*args, **kw):
 
 @dual_use_decorator
 def get(*args, **kw):
-    """Create a resource from a standalone handler.
-
-    Handles GET requests."""
+    """Mark the decorated function as a handler for GET requests."""
     return _make_handler_decorator('GET', *args, **kw)
 
 
 @dual_use_decorator
 def post(*args, **kw):
-    """Create a resource from a standalone handler.
-
-    Handles POST requests."""
+    """Mark the decorated function as a handler for POST requests."""
     return _make_handler_decorator('POST', *args, **kw)
 
 
 @dual_use_decorator
 def put(*args, **kw):
-    """Create a resource from a standalone handler.
-
-    Handles PUT requests."""
+    """Mark the decorated function as a handler for PUT requests."""
     return _make_handler_decorator('PUT', *args, **kw)
 
 
 @dual_use_decorator
 def delete(*args, **kw):
-    """Create a resource from a standalone handler.
-
-    Handles DELETE requests."""
+    """Mark the decorated function as a handler for DELETE requests."""
     return _make_handler_decorator('DELETE', *args, **kw)
 
 
 @dual_use_decorator
 def patch(*args, **kw):
-    """Create a resource from a standalone handler.
-
-    Handles PATCH requests."""
+    """Mark the decorated function as a handler for PATCH requests."""
     return _make_handler_decorator('PATCH', *args, **kw)
 
 
 @dual_use_decorator
 def options(*args, **kw):
-    """Create a resource from a standalone handler.
-
-    Handles OPTIONS requests."""
+    """Mark the decorated function as a handler for OPTIONS requests."""
     return _make_handler_decorator('OPTIONS', *args, **kw)
 
 
 def make_response(obj):
-    """
-    Coerces the value returned from a request handler into a Response instance.
-    """
+    """Try to coerce an object into a Response instance."""
     if obj is None:
         raise TypeError("Handler return value cannot be None.")
     if isinstance(obj, Response):
@@ -93,10 +79,10 @@ def make_response(obj):
 def resolve_handler(request, view_handlers):
     """Select a suitable handler to handle the request.
 
-    Returns a tuple of (handler, vary), where handler is a handler_metadata
-    tuple and vary is a set containing header names that were used during
-    content-negotiation and that have to be included in the 'Vary' header of
-    the outgoing response.
+    Returns a (handler, vary) tuple, where handler is a handler_metadata tuple
+    and vary is a set containing header names that were used during content
+    negotiation and that should to be included in the 'Vary' header of the
+    outgoing response.
 
     When no suitable handler exists, raises NotFound, MethodNotAllowed,
     UnsupportedMediaType or NotAcceptable.
@@ -147,8 +133,10 @@ def resolve_handler(request, view_handlers):
 
 
 def negotiate_content_type(content_type, handlers):
-    """Of all media-ranges acceped by handlers, find the most specific one that
-    matches content_type, and return only those handlers that accept it.
+    """Filter handlers that accept a given content-type.
+
+    Finds the most specific media-range that matches `content_type`, and
+    returns those handlers that accept it.
     """
     accepted = [h.accepts for h in handlers]
     scored_ranges = [(mimeparse.fitness_and_quality_parsed(content_type,
@@ -166,6 +154,11 @@ def negotiate_content_type(content_type, handlers):
 
 
 def negotiate_accept(accept, handlers):
+    """Filter handlers that provide an acceptable mime-type.
+
+    Finds the best match among handlers given an Accept header, and returns
+    those handlers that provide the matching mime-type.
+    """
     provided = [h.provides for h in handlers]
     if None not in provided:
         # All handlers are annotated with the mime-type they
@@ -187,6 +180,52 @@ def negotiate_accept(accept, handlers):
 
 
 class Resource(object):
+    """
+    Represents a REST resource.
+
+    This class can be used in multiple ways:
+
+    As a standalone resource, using it's methods to register handlers::
+
+        my_resource = Resource()
+
+        @my_resource.get
+        def get_resource(request):
+            # ...
+
+    As a class decorator for class-based resources::
+
+        @Resource
+        class MyResource(object):
+            @get
+            def index(self, request):
+                # ...
+
+    As a wrapper to create resouces from custom objects::
+
+        class MyClass(object):
+            def __init_(self, ...):
+                # ...
+
+            @get
+            def index(self, request):
+                # ...
+
+        my_resource = Resource(MyClass(...))
+
+    When used as a wrapper or class decorator, handlers will be picked up from
+    methods of the wrapped instance or class that have been decorated with one
+    of the decorator functions provided by this module (`get`, `post`, etc.)
+
+    Additionally, if the wrapped object implements `from_url`, that method will
+    be called before any handler to filter the URL parameters that will be
+    passed to the handler as keyword arguments.
+
+    When used as a standalone instance, functions can be registered as handlers
+    using the instance's methods, as shown above. The `from_url` method can be
+    used in the same way to register a filter for URL parameters.
+    """
+
     def __init__(self, wrapped=None):
         self._wrapped = wrapped
         self._handlers = defaultdict(lambda: defaultdict(list))
@@ -287,5 +326,6 @@ class Resource(object):
         return self._make_decorator('OPTIONS', *args, **kw)
 
     def from_url(self, fn):
+        """Install the decorated function as a filter for URL parameters."""
         self._from_url = fn
         return fn

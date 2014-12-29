@@ -24,16 +24,22 @@ class wsgi_response(namedtuple('wsgi_response', 'status headers body')):
 
 
 class TestClient(object):
+    """Wraps a WSGI application under test.
+
+    Provides helpers to pass requests to the application and inspect the
+    response.
+    """
+
     def __init__(self, app):
-        """Wraps a WSGI application under test and provides methods to interact
-        with it."""
         self.app = app
 
     def request(self, method, path, environ=None, **kw):
         """Send a request to the application under test.
 
         The environment will be populated with some default keys. Additional
-        headers can be passed as keyword arguments.
+        keyword arguments will be interpreted as request headers.
+
+        For example, passing x_foo=1 will add a request header "X-Foo: 1".
         """
         if environ is None:
             environ = {}
@@ -74,7 +80,7 @@ class TestClient(object):
 
         If body is a dictionary, it will we submitted as a form with
         content_type='application/x-www-form-urlencoded'. Otherwise,
-        the content_type parameter is mandatory."""
+        the content_type parameter is required."""
         if environ is None:
             environ = {}
         if isinstance(body, dict):

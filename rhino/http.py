@@ -28,20 +28,21 @@ def parse_etag_header(header):
     """Parse a header containing one or more ETags or a wildcard ('*').
 
     Returns the string '*' or a list of etags as (weak, etag) tuples.
-    'weak' is the prefix designating a weak etag, or the empty string.
-    'etag' is the etag (including quotes) with the weak prefix stripped
+    `weak` is the prefix designating a weak etag, or the empty string.
+    `etag` is the etag (including quotes) with the weak prefix stripped
     off. Returns an empty list if the header could not be parsed.
 
     Example:
 
-        >>> parse_etag_header('*')
-        '*'
-        >>> parse_etag_header('"foo"  ')
-        [('', '"foo"')]
-        >>> parse_etag_header('"foo", w/"bar", W/"baz"')
-        [('', '"foo"'), ('w/', '"bar"'), ('W/', '"baz"')]
-        >>> parse_etag_header('invalid')
-        []
+    >>> parse_etag_header('*')
+    '*'
+    >>> parse_etag_header('"foo"  ')
+    [('', '"foo"')]
+    >>> parse_etag_header('"foo", w/"bar", W/"baz"')
+    [('', '"foo"'), ('w/', '"bar"'), ('W/', '"baz"')]
+    >>> parse_etag_header('invalid')
+    []
+
     """
     m = etag_header_re.match(header.strip())
     if not m:
@@ -55,7 +56,7 @@ def parse_etag_header(header):
 def match_etag(etag, header, weak=False):
     """Try to match an ETag against a header value.
 
-    If 'weak' is True, use the weak comparison function (default: False).
+    If `weak` is True, uses the weak comparison function.
     """
     if etag is None:
         return False
@@ -103,7 +104,10 @@ def datetime_to_httpdate(dt):
 
 
 def timedelta_to_httpdate(td):
-    """Convert datetime.timedelta or number of seconds to a future HTTP date."""
+    """Convert datetime.timedelta or number of seconds to HTTP date.
+
+    Returns an HTTP date in the future.
+    """
     if isinstance(td, (int, float)):
         return format_date_time(time.time() + td)
     elif isinstance(td, timedelta):
@@ -116,18 +120,19 @@ def timedelta_to_httpdate(td):
 def cache_control(max_age=None, private=False, public=False, s_maxage=None,
         must_revalidate=False, proxy_revalidate=False, no_cache=False,
         no_store=False):
-    """Generate a string to use as the value for a Cache-Control header.
+    """Generate the value for a Cache-Control header.
 
     Example:
 
-        >>> from rhino.http import cache_control as cc
-        >>> from datetime import timedelta
-        >>> cc(public=1, max_age=3600)
-        'public, max-age=3600'
-        >>> cc(public=1, max_age=timedelta(hours=1))
-        'public, max-age=3600'
-        >>> cc(private=True, no_cache=True, no_store=True)
-        'private, no-cache, no-store'
+    >>> from rhino.http import cache_control as cc
+    >>> from datetime import timedelta
+    >>> cc(public=1, max_age=3600)
+    'public, max-age=3600'
+    >>> cc(public=1, max_age=timedelta(hours=1))
+    'public, max-age=3600'
+    >>> cc(private=True, no_cache=True, no_store=True)
+    'private, no-cache, no-store'
+
     """
     if all([private, public]):
         raise ValueError("'private' and 'public' are mutually exclusive")

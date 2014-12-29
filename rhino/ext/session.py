@@ -1,7 +1,16 @@
 """
+This module contains classes that can be used to add session support for Rhino
+applications.
+
 This extension requires the Beaker module to be installed::
 
     $ pip install beaker
+
+The Session class provides a simple and easy to use signed cookie-based session
+with support for displaying "flashed" messages.
+
+The BeakerSession class provides access to the different backends provided by
+beaker.session.
 """
 from __future__ import absolute_import
 
@@ -15,26 +24,26 @@ message = namedtuple('message', 'type text')
 
 
 class SessionObject(beaker.session.SessionObject):
-    """
-    A subclass of beaker.session.SessionObject with support for
-    "flashed" messages.
-    """
+    """A session object with support for "flashed" messages."""
 
-    #: The key name to use for storing messages in the session dict.
     _msg_key = '_msg'
 
     def add_message(self, text, type=None):
-        """Add a message."""
+        """Add a message with an optional type."""
         key = self._msg_key
         self.setdefault(key, [])
         self[key].append(message(type, text))
         self.save()
 
     def pop_messages(self, type=None):
-        """Get all of a specific type. When type is None, returns all messages.
-        Messages are returned as namedtuples with fields "type" and
-        "text". Messages returned by this function are removed from
-        the session.
+        """Retrieve stored messages and remove them from the session.
+
+        Return all messages with a specific type, or all messages when `type`
+        is None. Messages are returned in the order they were added. All
+        messages returned in this way are removed from the session and will not
+        be returned in subsequent calls.
+
+        Returns a list of namedtuples with the fields (type, text).
         """
         key = self._msg_key
         messages = []
@@ -58,16 +67,7 @@ class SessionObject(beaker.session.SessionObject):
 
 
 class BeakerSession(object):
-    """Support for beaker.session
-
-    Usage::
-
-        app = rhino.Mapper()
-        app.add_ctx_property('session', BeakerSession(**config))
-
-    In a request handler, the session can now be accessed as ``ctx.session``.
-    """
-
+    """Adds a session property to the context."""
     session_class = beaker.session.SessionObject
 
     def __init__(self, **session_args):
@@ -96,47 +96,7 @@ class BeakerSession(object):
 
 
 class Session(BeakerSession):
-    """A simple Session based on signed cookies with support for "flashed"
-    messages.
-
-    Usage::
-
-        app = rhino.Mapper()
-        app.add_ctx_property('session', Session(secret='...'))
-
-    In a request handler, the session can now be accessed as ``ctx.session``.
-
-    The session object has two methods to support "flashed" messages. The
-    ``add_message`` method accepts a message text and optional message type
-    (a string)::
-
-        session.add_message('Welcome!')
-        session.add_message('And error occured', type='error')
-
-    The ``pop_messages`` method retrieves all messages, or all messages
-    of a particular type, if used with the ``type`` argument (type=None means
-    all messages). It return a list of messages as dictionaries with the keys
-    ``'text'`` (the message text), and ``'type'`` (the message type).
-
-    For example, in a template you could write::
-
-        {% for msg in ctx.pop_messages() %}
-          <div class="message {% msg.type %}">{% msg.text %}</div>
-        {% endfor %}
-
-    to show all messages, or::
-
-        <p>Errors:</p>
-        {% for msg in ctx.pop_messages(type='error') %}
-          <div class="error">{% msg.text %}</div>
-        {% endfor %}
-
-    to show only messages of type "error".
-
-    Messages returned by ``pop_messages`` will be removed from the session
-    and not returned again.
-    """
-
+    """Adds a session based on signed cookies to the context."""
     session_class = SessionObject
 
     # Avoid passing **kwargs to Beaker because it silently ignores unknown

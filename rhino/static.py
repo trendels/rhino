@@ -9,6 +9,8 @@ from .response import ok
 
 
 class StaticFile(object):
+    """Resource for serving a static file."""
+
     block_size = 65536
     default_content_type = 'application/octet-stream'
 
@@ -44,6 +46,8 @@ class StaticFile(object):
 
 
 class StaticDirectory(object):
+    """Resource for serving static files from a directory."""
+
     # TODO add support for index.html, directory listings?
     def __init__(self, root, expires=None):
         self.root = os.path.abspath(root)

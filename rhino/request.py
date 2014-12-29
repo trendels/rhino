@@ -69,6 +69,7 @@ class QueryDict(object):
     Accessing a key returns the first value for that key.
     The keys(), values() and items() methods will return a key/value multiple
     times, if it is present multiple times in the query string.
+
     The get_all() method can be used to return all values for a given key.
     """
 
@@ -138,13 +139,34 @@ class Request(object):
 
         Special keyword arguments:
 
-        _query:
+        `_query`
             Append query string (dict or list of tuples)
 
-        _relative:
+        `_relative`
             When True, build a relative URL (default: False)
 
-        All other keyword arguments are treated as URL parameters.
+        All other keyword arguments are treated as parameters for the URL
+        template.
+
+        The target can be any valid target for `Mapper.path`, which will be
+        looked up on the current mapper instance and used to build the URL for
+        that route. Additionally, it can be one of:
+
+        '.'
+            Builds the URL for the current route.
+
+        '/'
+            Builds the URL for the root (top-most) mapper instance.
+
+        '/a', '/a.b', etc.
+            Builds the URL for a named route relative to the root mapper.
+
+        '.a', '..a', '..a.b', etc.
+            Builds a URL for a named route relative to the current mapper.
+            Each additional leading '.' after the first one starts one
+            level higher in the hierarchy of nested mappers (i.e. '.a' is
+            equivalent to 'a').
+
         """
         # Allow passing 'self' as named parameter
         self, target = args
@@ -253,6 +275,7 @@ class Request(object):
     @property
     def body(self):
         """Reads content_length bytes from wsgi.input and returns the result.
+
         Cached after first access."""
         if self._body is None:
             self._body = self.environ['wsgi.input'].read(self.content_length)
@@ -261,6 +284,7 @@ class Request(object):
     @property
     def form(self):
         """Reads the request body and tries to parse it as a web form.
+
         Parsing is done using the stdlib's cgi.FieldStorage which supports
         multipart forms (file uploads).
         Returns a QueryDict instance holding the form fields. Uploaded files
@@ -288,7 +312,7 @@ class Request(object):
 
     @property
     def cookies(self):
-        """Returns a dictionary mapping cookie names to their value."""
+        """Returns a dictionary mapping cookie names to their values."""
         if self._cookies is None:
             c = SimpleCookie(self.environ.get('HTTP_COOKIE'))
             self._cookies = dict([
