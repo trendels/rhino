@@ -2,7 +2,8 @@ import functools
 
 from pytest import raises as assert_raises
 
-from rhino.util import dual_use_decorator, dual_use_decorator_method, get_args
+from rhino.util import dual_use_decorator, dual_use_decorator_method, \
+        get_args, sse_event
 
 
 @dual_use_decorator
@@ -125,3 +126,20 @@ def test_get_args():
     assert get_args(foo.baz) == ['k', 'l']
 
     assert_raises(TypeError, get_args, None)
+
+
+def test_sse_event():
+    assert sse_event('test', 'foo\nbar') == \
+            'event: test\ndata: foo\ndata: bar\n\n'
+    assert sse_event(comment='a\nb\n') == \
+            ': a\n: b\n: \n\n'
+    assert sse_event(
+            event='test', data='foo', id='id', retry=12, comment='hi') == \
+            ': hi\nevent: test\nid: id\nretry: 12\ndata: foo\n\n'
+
+def test_sse_event_minimal():
+    assert sse_event(comment='') == ': \n\n'
+
+
+def test_sse_event_empty():
+    assert_raises(TypeError, sse_event)

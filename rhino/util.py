@@ -4,6 +4,29 @@ import functools
 import inspect
 
 
+def _sse_encode(k, v):
+    return ''.join('%s: %s\n' % (k, line) for line in v.split('\n'))
+
+
+def sse_event(event=None, data=None, id=None, retry=None, comment=None):
+    """Encode a Server-Sent Event (SSE).
+
+    At least one field must be present. All fields are strings, except
+    retry, which should be an integer. The data and comment fields can contain
+    newlines.
+    """
+    if all(x is None for x in [event, data, id, retry, comment]):
+        raise TypeError("Event must have at least one field")
+    return ''.join([
+        _sse_encode('', comment) if comment is not None else '',
+        _sse_encode('event', event) if event is not None else '',
+        _sse_encode('id', id) if id is not None else '',
+        _sse_encode('retry', str(retry)) if retry is not None else '',
+        _sse_encode('data', data) if data is not None else '',
+        '\n',
+    ])
+
+
 def dual_use_decorator(fn):
     """
     Turn a function into a decorator that can be called with or without arguments.
