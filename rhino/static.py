@@ -46,7 +46,19 @@ class StaticFile(object):
 
 
 class StaticDirectory(object):
-    """Resource for serving static files from a directory."""
+    """Resource for serving static files from a directory.
+
+    Must be mapped to a route including a template parameter named
+    `path`. Example::
+
+        from rhino import Mapper, StaticDirectory
+
+        app = Mapper()
+        app.add('/static/{path:any}', StaticDirectory('./static'))
+
+    Setting the `path` parameter's range to `any`, which includes '/', enables
+    serving files from subdirectories of './static'.
+    """
 
     # TODO add support for index.html, directory listings?
     def __init__(self, root, expires=None):

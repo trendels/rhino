@@ -258,7 +258,7 @@ class Context(object):
     def add_callback(self, phase, fn):
         """Adds a callback to the context.
 
-        The `phase` determins when and if the callback is executed, and which
+        The `phase` determines when and if the callback is executed, and which
         positional arguments are passed in:
 
         'enter'
@@ -439,14 +439,14 @@ class Mapper(object):
             a named route of this mapper instance and return it's path.
 
         A string of the form 'a.b', 'a.b.c', etc.
-            Follows the route to nested mappers by splitting off consectutive
+            Follows the route to nested mappers by splitting off consecutive
             segments. Returns the path of the route found by looking up the
             final segment on the last mapper.
 
         A `Route` instance
             Returns the path for the route.
 
-        A resource that was `add()`ed previously
+        A resource that was added previously
             Looks up the first route that points to this resource and
             returns its path.
         """

@@ -191,7 +191,7 @@ class Resource(object):
 
         @my_resource.get
         def get_resource(request):
-            # ...
+            pass
 
     As a class decorator for class-based resources::
 
@@ -199,19 +199,19 @@ class Resource(object):
         class MyResource(object):
             @get
             def index(self, request):
-                # ...
+                pass
 
     As a wrapper to create resouces from custom objects::
 
         class MyClass(object):
-            def __init_(self, ...):
-                # ...
+            def __init_(self, *args):
+                pass
 
             @get
             def index(self, request):
-                # ...
+                pass
 
-        my_resource = Resource(MyClass(...))
+        my_resource = Resource(MyClass())
 
     When used as a wrapper or class decorator, handlers will be picked up from
     methods of the wrapped instance or class that have been decorated with one

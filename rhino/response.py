@@ -343,7 +343,7 @@ def response(code, body='', etag=None, last_modified=None, expires=None, **kw):
         or datetime.datetime instance.
         Note: a value of type int or float is interpreted as a number of
         seconds in the future, *not* as Unix timestamp.
-    **kw
+    `**kw`
         All other keyword arguments are interpreted as response headers.
         The names will be converted to header names by replacing
         underscores with hyphens and converting to title case
