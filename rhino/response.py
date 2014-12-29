@@ -156,7 +156,7 @@ class Response(object):
 
     @property
     def status(self):
-        """The statusline as a string (status code + reaspon)"""
+        """The statusline as a string (status code + reason)"""
         reason = status_codes.get(self.code, "Unknown")
         return "%s %s" % (self._code, reason)
 
