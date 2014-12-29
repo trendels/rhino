@@ -7,7 +7,7 @@ import urllib
 from .errors import HTTPException, InternalServerError, NotFound
 from .request import Request
 from .response import Response
-from .resource import Resource, VIEW_SEPARATOR
+from .resource import Resource
 from .util import call_with_ctx
 
 # template2regex function taken from Joe Gregorio's wsgidispatcher.py
@@ -391,11 +391,7 @@ class Mapper(object):
 
         The optional `name` assigns a name to this route that can be used when
         building URLs. The name must be unique within this Mapper instance.
-
-        If the name contains '%(VIEW_SEPARATOR)s', the part after the
-        '%(VIEW_SEPARATOR)s is considered to be the view name.
-        """ % {'VIEW_SEPARATOR': VIEW_SEPARATOR}
-
+        """
         # Special case for standalone handler functions
         if hasattr(resource, '_rhino_meta'):
             route = Route(

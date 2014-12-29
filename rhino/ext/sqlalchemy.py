@@ -11,7 +11,7 @@ The session is lazily initialized and closed at the end of every request.
 Example usage::
 
     from rhino import Mapper, get
-    from rhino.ext.SQLAlchemy import SessionProperty
+    from rhino.ext.sqlalchemy import SessionProperty
 
     from models import Movie  # module containing SQLAlchemy ORM classes
 
