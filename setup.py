@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from setuptools import setup
+from setuptools import setup, find_packages
 
 version = '0.0.1'
 
@@ -11,7 +11,7 @@ setup(
     version=version,
     author='Stanis Trendelenburg',
     author_email='stanis.trendelenburg@gmail.com',
-    packages=['rhino'],
+    packages=find_packages(exclude=['test*', 'example*']),
     url='https://github.com/trendels/rhino',
     license='MIT',
     description='A microframework for building RESTful web services',
