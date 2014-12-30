@@ -1,0 +1,5 @@
+include README.rst LICENSE Makefile requirements.txt
+recursive-include rhino *.py
+recursive-include test test_*.py
+recursive-include examples README *.py *.html *.css *.ico *.txt
+recursive-include doc *.rst *.py Makefile *.bat *.svg
