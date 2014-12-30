@@ -155,7 +155,7 @@ class Unauthorized(ClientError):
     scheme
         The authentication scheme to use, e.g. 'Basic'.
 
-    **params
+    `**params`
         Parameters for the WWW-Authenticate header, e.g. realm="my website".
     """
     code = 401
