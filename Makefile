@@ -2,7 +2,7 @@ pytest_bin := py.test
 pytest_opts := --doctest-modules --ignore=rhino/vendor
 coverage_opts := --cov=rhino --cov=examples --cov-report=term --cov-report=html
 test_cmd := $(pytest_bin) $(pytest_opts)
-test_targets := tests/ rhino/
+test_targets := test/ rhino/
 
 test:
 	$(test_cmd) $(test_targets)
