@@ -12,3 +12,7 @@ html
 # Install requirements for extensions
 beaker
 jinja2
+sqlalchemy
+
+# Install requirements for building the documentation
+sphinx
