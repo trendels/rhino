@@ -378,6 +378,11 @@ class Mapper(object):
     # TODO 'root' parameter for manually specifying a URL prefix not reflected
     # in SCRIPT_NAME (e.g. when proxying).
     def __init__(self, ranges=None):
+        """Create a new mapper.
+
+        The `ranges` parameter can be used to override or augment the default
+        ranges by passing in a dict mapping range names to patterns.
+        """
         self.ranges = DEFAULT_RANGES.copy()
         if ranges is not None:
             self.ranges.update(ranges)
