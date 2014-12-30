@@ -128,8 +128,7 @@ def resolve_handler(request, view_handlers):
         if not handlers:
             raise NotAcceptable
 
-    handler = handlers[0]
-    return handler, vary
+    return handlers[0], vary
 
 
 def negotiate_content_type(content_type, handlers):
