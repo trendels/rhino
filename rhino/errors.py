@@ -116,8 +116,8 @@ class MethodNotAllowed(ClientError):
     code = 405
     message = 'The request method is not allowed for this resource.'
 
-    def __init__(self, allow, *args, **kw):
-        super(MethodNotAllowed, self).__init__(*args, **kw)
+    def __init__(self, allow):
+        super(MethodNotAllowed, self).__init__()
         self.response.headers['Allow'] = allow
 
 
