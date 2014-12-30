@@ -68,7 +68,7 @@ class SessionObject(beaker.session.SessionObject):
 
 class BeakerSession(object):
     """Adds a session property to the context."""
-    session_class = beaker.session.SessionObject
+    session_class = SessionObject
 
     def __init__(self, **session_args):
         # Default parameters from beaker.middleware.SessionMiddleware
