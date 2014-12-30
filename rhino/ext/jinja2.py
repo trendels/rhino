@@ -16,7 +16,7 @@ Example usage::
 
     @get
     def index(request, ctx):
-        ctx.render_template('index.html', greeting="hello, world!")
+        return ctx.render_template('index.html', greeting="hello, world!")
 
     app.add('/', index)
 
