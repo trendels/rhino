@@ -12,4 +12,5 @@ API Reference
    api/context
    api/static
    api/util
+   api/errors
    api/extensions

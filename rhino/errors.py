@@ -29,6 +29,25 @@ html_template = '''<!DOCTYPE html>
 '''
 
 class HTTPException(Exception):
+    """Base class for HTTP Exceptions
+
+    Class variables:
+
+    code
+        The status code (int)
+    message
+        If present, an HTML error page will be sent that contains this message.
+        The contents of `message` will be HTML-escaped.
+
+    Instance properties:
+
+    response
+        The `rhino.Response` instance that will be sent to the client.
+
+    The constructor takes one argument, an optional message that will replace
+    the default message. Sublcasses can override the constructor to require
+    error-specific arguments.
+    """
     code = 500
     message = None
     details = None  # TODO for displaying structured error data in debug mode
@@ -49,12 +68,27 @@ class HTTPException(Exception):
         self.response = Response(self.code, body=body, headers=headers)
 
 
-class Redirection(HTTPException): pass
-class ClientError(HTTPException): pass
-class ServerError(HTTPException): pass
+class Redirection(HTTPException):
+    """Base class for redirections (3xx)."""
+    pass
+
+class ClientError(HTTPException):
+    """Base class for client errors (4xx)."""
+    pass
+
+class ServerError(HTTPException):
+    """Base class for server errors (5xx)."""
+    pass
 
 
 class MovedPermanently(Redirection):
+    """301 Moved Permanently.
+
+    Required arguments:
+
+    location
+        The value for the Location header.
+    """
     code = 301
 
     def __init__(self, location):
@@ -63,6 +97,13 @@ class MovedPermanently(Redirection):
 
 
 class Found(Redirection):
+    """302 Found.
+
+    Required arguments:
+
+    location
+        The value for the Location header.
+    """
     code = 302
 
     def __init__(self, location):
@@ -71,6 +112,13 @@ class Found(Redirection):
 
 
 class SeeOther(Redirection):
+    """303 See Other.
+
+    Required arguments:
+
+    location
+        The value for the Location header.
+    """
     code = 303
 
     def __init__(self, location):
@@ -79,6 +127,13 @@ class SeeOther(Redirection):
 
 
 class TemporaryRedirect(Redirection):
+    """307 Temporary Redirect.
+
+    Required arguments:
+
+    location
+        The value for the Location header.
+    """
     code = 307
 
     def __init__(self, location):
@@ -87,11 +142,22 @@ class TemporaryRedirect(Redirection):
 
 
 class BadRequest(ClientError):
+    """400 Bad Request."""
     code = 400
     message = 'The server could not understand the request.'
 
 
 class Unauthorized(ClientError):
+    """401 Unauthorized.
+
+    Required arguments:
+
+    scheme
+        The authentication scheme to use, e.g. 'Basic'.
+
+    **params
+        Parameters for the WWW-Authenticate header, e.g. realm="my website".
+    """
     code = 401
 
     def __init__(self, scheme, **params):
@@ -103,16 +169,26 @@ class Unauthorized(ClientError):
 
 
 class Forbidden(ClientError):
+    """403 Forbidden."""
     code = 403
     message = 'The server is refusing to fulfill the request.'
 
 
 class NotFound(ClientError):
+    """404 NotFound."""
     code = 404
     message = 'The requested resource could not be found.'
 
 
 class MethodNotAllowed(ClientError):
+    """404 Method Not Allowed.
+
+    Required arguments:
+
+    allow
+        The value for the 'Allow' header (A list of comma-separated HTTP
+        method names).
+    """
     code = 405
     message = 'The request method is not allowed for this resource.'
 
@@ -122,11 +198,13 @@ class MethodNotAllowed(ClientError):
 
 
 class NotAcceptable(ClientError):
+    """406 Not Acceptable."""
     code = 406
     message = 'The resource is not capable of generating a response entity in an acceptable format.'
 
 
 class Gone(ClientError):
+    """410 Gone."""
     code = 410
     message = 'The requested resource is no longer available.'
     details = """
@@ -136,10 +214,12 @@ class Gone(ClientError):
     """
 
 class UnsupportedMediaType(ClientError):
+    """415 Unsupported Media Type."""
     code = 415
     message = 'The request entity is in a format that is not supported by this resource.'
 
 
 class InternalServerError(ServerError):
+    """500 Internal Server Error."""
     code = 500
     message = 'The server encountered an error while processing the request.'
