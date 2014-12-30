@@ -36,6 +36,9 @@ extensions = [
 # Include class documentation from both the class and __init__ docstrings.
 autoclass_content = 'both'
 
+# Order automatically documented members by the occurence in the source file.
+autodoc_member_order = 'bysource'
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
