@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}{{ actor.name }}{% endblock %}
+
+{% block content %}
+<h2>{{ actor.name }}</h2>
+Roles:
+<ul>
+  {% for role in actor.roles %}
+  <li>{{ role.name }} in <a href="{{ url_for('movie', id=role.movie.id) }}">{{ role.movie.title }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}
