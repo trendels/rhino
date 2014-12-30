@@ -137,7 +137,6 @@ class Response(object):
         self._headers = headers
         self._body = body
         self._callbacks = []
-        self.request = None
 
     @property
     def code(self):
@@ -313,14 +312,12 @@ class Response(object):
         header_list = [(k.encode('ascii'), v.encode('latin-1'))
                        for k, v in headers.items()]
 
-        request_callbacks = self.request._callbacks if self.request else []
-        callbacks = request_callbacks + self._callbacks
-
         start_response(self.status, header_list)
 
         if code in (204, 304) or environ.get('REQUEST_METHOD') == 'HEAD':
-            return ResponseBody('', callbacks)
-        return ResponseBody(body, callbacks)
+            body = ''
+
+        return ResponseBody(body, self._callbacks)
 
 
 def response(code, body='', etag=None, last_modified=None, expires=None, **kw):
