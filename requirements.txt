@@ -2,6 +2,7 @@
 -e .
 
 # Install development requirements
+coverage
 mock
 pytest
 pytest-cov

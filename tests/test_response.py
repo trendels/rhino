@@ -170,7 +170,14 @@ def test_set_cookie_all():
         httponly=True,
         expires=datetime(2012, 12, 8, 0, 0, 0),
     )
-    assert res.headers.get_all('Set-Cookie') == ['a="Sm\\303\\270rebr\\303\\270d"; Domain=example.net; expires=Sat, 08-Dec-2012 00:00:00 GMT; httponly; Max-Age=600; Path=/test; secure']
+    cookies = res.headers.get_all('Set-Cookie')
+    assert len(cookies) == 1
+    # The 'expires' date format in the stdlib's cookie module was fixed
+    # in a 2.7 point release.
+    assert cookies[0] in [
+        'a="Sm\\303\\270rebr\\303\\270d"; Domain=example.net; expires=Sat, 08-Dec-2012 00:00:00 GMT; httponly; Max-Age=600; Path=/test; secure',
+        'a="Sm\\303\\270rebr\\303\\270d"; Domain=example.net; expires=Sat, 08 Dec 2012 00:00:00 GMT; httponly; Max-Age=600; Path=/test; secure',
+    ]
 
 
 def test_set_cookie_timedelta():
@@ -182,13 +189,26 @@ def test_set_cookie_timedelta():
     with patch.object(time, 'time') as mock_time:
         mock_time.return_value = 1.0
         res.set_cookie('foo', 'bar', expires=timedelta(minutes=5))
-    assert res.headers.get_all('Set-Cookie') == ['foo=bar; expires=Thu, 01-Jan-1970 00:05:01 GMT; Path=/']
-
+    cookies = res.headers.get_all('Set-Cookie')
+    assert len(cookies) == 1
+    # The 'expires' date format in the stdlib's cookie module was fixed
+    # in a 2.7 point release.
+    assert cookies[0] in [
+        'foo=bar; expires=Thu, 01-Jan-1970 00:05:01 GMT; Path=/',
+        'foo=bar; expires=Thu, 01 Jan 1970 00:05:01 GMT; Path=/',
+    ]
 
 def test_delete_cookie():
     res = response(200)
     res.delete_cookie('x', path='/', domain='example.net')
-    assert res.headers.get_all('Set-Cookie') == ['x=; Domain=example.net; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/']
+    cookies = res.headers.get_all('Set-Cookie')
+    assert len(cookies) == 1
+    # The 'expires' date format in the stdlib's cookie module was fixed
+    # in a 2.7 point release.
+    assert cookies[0] in [
+        'x=; Domain=example.net; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/',
+        'x=; Domain=example.net; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/',
+    ]
 
 
 def test_conditional_to_etag():

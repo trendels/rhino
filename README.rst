@@ -1,6 +1,8 @@
 Rhino
 =====
 
+|build-status| |docs|
+
 Rhino is a python microframework for building RESTful web services.
 
 Minimal "Hello World" example:
@@ -24,3 +26,17 @@ Features
 - Resource-centric design
 - Support for content negotiation
 
+Documentation
+-------------
+
+Read the `documentation at readthedocs. <http://rhino.readthedocs.org/>`_.
+
+.. |build-status| image:: https://travis-ci.org/trendels/rhino.svg?branch=github
+   :target: https://travis-ci.org/trendels/rhino
+   :alt: Build Status
+   :scale: 100%
+
+.. |docs| image:: https://readthedocs.org/projects/rhino/badge/?version=latest
+   :target: https://readthedocs.org/projects/rhino/?badge=latest
+   :alt: Documentation Status
+   :scale: 100%
