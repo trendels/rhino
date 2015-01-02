@@ -368,9 +368,17 @@ class Route(object):
 
 class Mapper(object):
     """
-    A Mapper groups resources or other mappers under a common URL root, and
-    dispatches incoming requests based on their URL. It also provides the WSGI
-    interface for the application.
+    Class variables:
+
+    default_encoding (default ``None``):
+        When set, is used to override the ``default_encoding`` of outgoing
+        Responses. See ``Response`` for details. Does not affect responses
+        returned via exceptions.
+
+    default_content_type (default ``None``):
+        When set, is used to override the ``default_content_type`` of outgoing
+        Responses. See ``Response`` for details. Does not affect responses
+        returned via exceptions.
     """
     default_encoding = None
     default_content_type = None
@@ -435,11 +443,11 @@ class Mapper(object):
 
         Possible values for `target`:
 
-        A string with no '.'s
-            If the string does not contain '.', it will be used to look up
+        A string that does not contain a ``.``
+            If the string does not contain ``.``, it will be used to look up
             a named route of this mapper instance and return it's path.
 
-        A string of the form 'a.b', 'a.b.c', etc.
+        A string of the form ``a.b``, ``a.b.c``, etc.
             Follows the route to nested mappers by splitting off consecutive
             segments. Returns the path of the route found by looking up the
             final segment on the last mapper.
