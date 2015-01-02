@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="post" action="">
+  <p>Really delete TODO item "{{ item.text }}"?</p>
+  <a href="{{ url_for('index') }}">No, take me back.</a>
+  <input type="submit" value="Yes">
+</form>
+{% endblock %}

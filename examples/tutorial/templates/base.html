@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>TODO list</title>
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', path='style.css') }}">
+  </head>
+  <body>
+    <h1 id="logo">
+      <a href="{{ url_for('index') }}">TODO list</a>
+    </h1>
+    <div id="content">
+      {% block content %}{% endblock %}
+    </div>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="post" action="{{ url_for('add_item') }}">
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
+  <input type="text" name="text" placeholder="Item text">
+  <input type="submit" value="Add Item">
+</form>
+<ul id="todos">
+  {% for item in items %}
+  <li class="item">
+    <span class="{{ 'done' if item.done else '' }}">{{ item.text }}</span>
+    <a href="{{ url_for('item:edit', item_id=item.id) }}">edit</a>
+    <a href="{{ url_for('item:delete', item_id=item.id) }}">delete</a>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

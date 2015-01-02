@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="post" action="">
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
+  <input type="text" name="text" value="{{ item.text }}">
+  <label><input type="checkbox" name="done" value="done"
+                {{ 'checked' if item.done else '' }}>Done</label>
+  <input type="submit" value="Update">
+</form>
+{% endblock %}

@@ -1,0 +1,12 @@
+a {
+    text-decoration: none;
+}
+
+.done {
+    text-decoration: line-through;
+}
+
+.error {
+    font-weight: bold;
+    color: darkred;
+}
