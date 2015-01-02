@@ -11,28 +11,29 @@ they were added. Patterns may be given as strings that must match the request
 path exactly, or they may be templates.
 
 Groups of matching characters for templates are extracted from the URI and
-accessible via the `request.routing_args` accessor.
+accessible via the :attr:`~Request.routing_args` property of the
+:class:`Request` instance.
 
 A template is a string that can contain thee special kinds of markup:
 
 ``{name}`` or ``{name:range}``
 
    Whatever matches this part of the path will be available in the
-   `request.routing_args` dict of named parameters.
+   :attr:`~Request.routing_args` dict of named parameters.
 
 ``[]``
 
    Any part enclosed in brackets is optional. Brackets can be nested and
    contain named parameters. If an optional part contains named parameters and
    is missing from the request URL, the parameter names contained therein will
-   also be missing from `request.routing_args`.
+   also be missing from :attr:`~Request.routing_args`.
 
 ``|``
 
    A vertical bar may only be present at the end of the template, and causes
    the path to be matched only against the part before the ``'|'``. The path
    can contain more characters after the match, which will be preserved in
-   `request.path_info`.
+   ``environ['PATH_INFO']``, where it can be used by nested mappers.
 
 A named parameter can contain an optional named range specifier after a ``:``.
 which restricts what characters the parameter can match. If no range is

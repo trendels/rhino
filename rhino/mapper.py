@@ -262,24 +262,24 @@ class Context(object):
         positional arguments are passed in:
 
         'enter'
-            Called from `Resource`, after a handler for the current request has
-            been resolved, but before the handler is called.
+            Called from :class:`Resource`, after a handler for the current
+            request has been resolved, but before the handler is called.
 
             Arguments: request
 
         'leave'
-            Called from `Resource`, after the handler has returned
+            Called from :class:`Resource`, after the handler has returned
             successfully.
 
             Arguments: request, response
 
         'finalize'
-            Called from `Mapper`, before WSGI response is finalized.
+            Called from :class:`Mapper`, before WSGI response is finalized.
 
             Arguments: request, response
 
         'teardown'
-            Called from `Mapper`, before control is passed back to the
+            Called from :class:`Mapper`, before control is passed back to the
             WSGI layer.
 
             Arguments: -
@@ -345,7 +345,8 @@ class Route(object):
     def __call__(self, request, ctx):
         """Try to dispatch a request.
 
-        Returns a `Response` instance, or None if the route does not match.
+        Returns a the result of calling the route's target resource, or None if
+        the route does not match.
         """
         path = request.path_info
         match = self.regex.match(path)
@@ -372,12 +373,12 @@ class Mapper(object):
 
     default_encoding (default ``None``):
         When set, is used to override the ``default_encoding`` of outgoing
-        Responses. See ``Response`` for details. Does not affect responses
+        Responses. See :class:`Response` for details. Does not affect responses
         returned via exceptions.
 
     default_content_type (default ``None``):
         When set, is used to override the ``default_content_type`` of outgoing
-        Responses. See ``Response`` for details. Does not affect responses
+        Responses. See :class:`Response` for details. Does not affect responses
         returned via exceptions.
     """
     default_encoding = None
@@ -389,7 +390,7 @@ class Mapper(object):
         """Create a new mapper.
 
         The `ranges` parameter can be used to override or augment the default
-        ranges by passing in a dict mapping range names to patterns.
+        ranges by passing in a dict mapping range names to regexp patterns.
         """
         self.ranges = DEFAULT_RANGES.copy()
         if ranges is not None:
@@ -426,9 +427,9 @@ class Mapper(object):
     def add_ctx_property(self, name, fn, cached=True):
         """Install a context property.
 
-        A context property is a callable that will be called on first access
-        of the property named `name` on the context instance. The result
-        will be cached unless `cached` is False.
+        A context property is a callable that will be called on first access of
+        the property named `name` on :class:`Context` instances passing through
+        this mapper. The result will be cached unless `cached` is False.
 
         If the context property is not callable, it will be installed
         as-is, otherwise, it will be called with the context instance as
@@ -452,7 +453,7 @@ class Mapper(object):
             segments. Returns the path of the route found by looking up the
             final segment on the last mapper.
 
-        A `Route` instance
+        A :class:`Route` instance
             Returns the path for the route.
 
         A resource that was added previously
