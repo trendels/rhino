@@ -42,7 +42,7 @@ Minimal "Hello World" example
 Documentation
 -------------
 
-Read the `documentation at readthedocs. <http://rhino.readthedocs.org/>`_.
+Read the `documentation at readthedocs <http://rhino.readthedocs.org/>`_.
 
 .. |build-status| image:: https://travis-ci.org/trendels/rhino.svg?branch=github
    :target: https://travis-ci.org/trendels/rhino
