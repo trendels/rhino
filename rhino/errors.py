@@ -54,15 +54,15 @@ class HTTPException(Exception):
     Class variables:
 
     code
-        The status code (int)
+      : The status code (int)
     message
-        If present, an HTML error page will be sent that contains this message.
+      : If present, an HTML error page will be sent that contains this message.
         The contents of `message` will be HTML-escaped.
 
     Instance properties:
 
     response
-        The `rhino.Response` instance that will be sent to the client.
+      : The `rhino.Response` instance that will be sent to the client.
 
     The constructor takes one argument, an optional message that will replace
     the default message. Subclasses can override the constructor to require
@@ -107,7 +107,7 @@ class MovedPermanently(Redirection):
     Required arguments:
 
     location
-        The value for the Location header.
+      : The value for the Location header.
     """
     code = 301
 
@@ -122,7 +122,7 @@ class Found(Redirection):
     Required arguments:
 
     location
-        The value for the Location header.
+      : The value for the Location header.
     """
     code = 302
 
@@ -137,7 +137,7 @@ class SeeOther(Redirection):
     Required arguments:
 
     location
-        The value for the Location header.
+      : The value for the Location header.
     """
     code = 303
 
@@ -152,7 +152,7 @@ class TemporaryRedirect(Redirection):
     Required arguments:
 
     location
-        The value for the Location header.
+      : The value for the Location header.
     """
     code = 307
 
@@ -173,10 +173,10 @@ class Unauthorized(ClientError):
     Required arguments:
 
     scheme
-        The authentication scheme to use, e.g. 'Basic'.
+      : The authentication scheme to use, e.g. 'Basic'.
 
-    `**params`
-        Parameters for the WWW-Authenticate header, e.g. realm="my website".
+    **params
+      : Parameters for the WWW-Authenticate header, e.g. `realm="my website"`.
     """
     code = 401
 
@@ -206,7 +206,7 @@ class MethodNotAllowed(ClientError):
     Required arguments:
 
     allow
-        The value for the 'Allow' header (A list of comma-separated HTTP
+      : The value for the 'Allow' header (A list of comma-separated HTTP
         method names).
     """
     code = 405

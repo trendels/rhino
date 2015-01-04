@@ -71,7 +71,11 @@ def get_args(obj):
 
 
 def call_with_ctx(fn, ctx, *args, **kw):
-    """Call fn with or without 'ctx', depending on its signature."""
+    """Call fn with or without 'ctx', depending on its signature.
+
+    If the `fn` callable accepts an argument named "ctx", then `ctx` will be
+    passed as a keyword argument, else `ctx` is ignored.
+    """
     if 'ctx' in get_args(fn):
         return fn(*args, ctx=ctx, **kw)
     else:

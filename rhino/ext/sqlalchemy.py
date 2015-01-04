@@ -2,13 +2,13 @@
 This module contains a SessionProperty class that can be used to add a
 SQLALchemy Session object to the context.
 
-This extension requires the SQLAlchemy module to be installed::
+This extension requires the SQLAlchemy module to be installed:
 
     $ pip install sqlalchemy
 
 The session is lazily initialized and closed at the end of every request.
 
-Example usage::
+Example usage:
 
     from rhino import Mapper, get
     from rhino.ext.sqlalchemy import SessionProperty

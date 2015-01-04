@@ -146,10 +146,10 @@ class Request(object):
         Special keyword arguments:
 
         `_query`
-            Append query string (dict or list of tuples)
+          : Append query string (dict or list of tuples)
 
         `_relative`
-            When True, build a relative URL (default: False)
+          : When True, build a relative URL (default: False)
 
         All other keyword arguments are treated as parameters for the URL
         template.
@@ -159,16 +159,16 @@ class Request(object):
         that route. Additionally, it can be one of:
 
         '.'
-            Builds the URL for the current route.
+          : Builds the URL for the current route.
 
         '/'
-            Builds the URL for the root (top-most) mapper instance.
+          : Builds the URL for the root (top-most) mapper instance.
 
         '/a', '/a.b', etc.
-            Builds the URL for a named route relative to the root mapper.
+          : Builds the URL for a named route relative to the root mapper.
 
         '.a', '..a', '..a.b', etc.
-            Builds a URL for a named route relative to the current mapper.
+          : Builds a URL for a named route relative to the current mapper.
             Each additional leading '.' after the first one starts one
             level higher in the hierarchy of nested mappers (i.e. '.a' is
             equivalent to 'a').
@@ -291,9 +291,9 @@ class Request(object):
     def form(self):
         """Reads the request body and tries to parse it as a web form.
 
-        Parsing is done using the stdlib's cgi.FieldStorage which supports
-        multipart forms (file uploads).
-        Returns a QueryDict instance holding the form fields. Uploaded files
+        Parsing is done using the stdlib's `cgi.FieldStorage` class
+        which supports multipart forms (file uploads).
+        Returns a `QueryDict` instance holding the form fields. Uploaded files
         are represented as form fields with a 'filename' attribute.
         """
         if self._form is None:

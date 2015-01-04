@@ -271,30 +271,30 @@ class Context(object):
         positional arguments are passed in:
 
         'enter'
-            Called from :class:`Resource`, after a handler for the current
+          : Called from `rhino.Resource`, after a handler for the current
             request has been resolved, but before the handler is called.
 
             Arguments: request
 
         'leave'
-            Called from :class:`Resource`, after the handler has returned
+          : Called from `rhino.Resource`, after the handler has returned
             successfully.
 
             Arguments: request, response
 
         'finalize'
-            Called from :class:`Mapper`, before WSGI response is finalized.
+          : Called from `Mapper`, before WSGI response is finalized.
 
             Arguments: request, response
 
         'teardown'
-            Called from :class:`Mapper`, before control is passed back to the
+          : Called from `Mapper`, before control is passed back to the
             WSGI layer.
 
             Arguments: -
 
         'close'
-            Called when the WSGI server calls `close()` on the response
+          : Called when the WSGI server calls `close()` on the response
             iterator.
 
             Arguments: -
@@ -380,14 +380,14 @@ class Mapper(object):
     """
     Class variables:
 
-    default_encoding (default ``None``):
-        When set, is used to override the ``default_encoding`` of outgoing
-        Responses. See :class:`Response` for details. Does not affect responses
+    default_encoding (default `None`):
+      : When set, is used to override the `default_encoding` of outgoing
+        Responses. See `rhino.Response` for details. Does not affect responses
         returned via exceptions.
 
-    default_content_type (default ``None``):
-        When set, is used to override the ``default_content_type`` of outgoing
-        Responses. See :class:`Response` for details. Does not affect responses
+    default_content_type (default `None`):
+      : When set, is used to override the `default_content_type` of outgoing
+        Responses. See `rhino.Response` for details. Does not affect responses
         returned via exceptions.
     """
     default_encoding = None
@@ -437,7 +437,7 @@ class Mapper(object):
         """Install a context property.
 
         A context property is a callable that will be called on first access of
-        the property named `name` on :class:`Context` instances passing through
+        the property named `name` on `Context` instances passing through
         this mapper. The result will be cached unless `cached` is False.
 
         If the context property is not callable, it will be installed
@@ -453,20 +453,20 @@ class Mapper(object):
 
         Possible values for `target`:
 
-        A string that does not contain a ``.``
-            If the string does not contain ``.``, it will be used to look up
+        A string that does not contain a `.`
+          : If the string does not contain `.`, it will be used to look up
             a named route of this mapper instance and return it's path.
 
-        A string of the form ``a.b``, ``a.b.c``, etc.
-            Follows the route to nested mappers by splitting off consecutive
+        A string of the form `a.b`, `a.b.c`, etc.
+          : Follows the route to nested mappers by splitting off consecutive
             segments. Returns the path of the route found by looking up the
             final segment on the last mapper.
 
-        A :class:`Route` instance
-            Returns the path for the route.
+        A `Route` instance
+          : Returns the path for the route.
 
         A resource that was added previously
-            Looks up the first route that points to this resource and
+          : Looks up the first route that points to this resource and
             returns its path.
         """
         if type(target) in string_types:

@@ -1,12 +1,12 @@
 """
-This module contains a JinjaRenderer class that can be used to add a
+This module contains a `JinjaRenderer` class that can be used to add a
 renderer property to the context that renders Jinja2 templates.
 
-This extension requires the Jinja2 module to be installed::
+This extension requires the Jinja2 module to be installed:
 
     $ pip install jinja2
 
-Example usage::
+Example usage:
 
     from rhino import Mapper, get
     from rhino.ext.jinja2 import JinjaRenderer
