@@ -9,6 +9,10 @@ from datetime import datetime, timedelta
 from email.utils import parsedate
 from wsgiref.handlers import format_date_time
 
+__all__ = [
+    'cache_control',
+]
+
 # The "unrolled" version is faster by about a factor of 2.
 #_quoted_string = r'"(?:[^"\\]|\\.)*"'
 _quoted_string = r'"[^"\\]*(?:\\.[^\\"]*)*"'
@@ -124,14 +128,14 @@ def cache_control(max_age=None, private=False, public=False, s_maxage=None,
 
     Example:
 
-    >>> from rhino.http import cache_control as cc
-    >>> from datetime import timedelta
-    >>> cc(public=1, max_age=3600)
-    'public, max-age=3600'
-    >>> cc(public=1, max_age=timedelta(hours=1))
-    'public, max-age=3600'
-    >>> cc(private=True, no_cache=True, no_store=True)
-    'private, no-cache, no-store'
+        >>> from rhino.http import cache_control as cc
+        >>> from datetime import timedelta
+        >>> cc(public=1, max_age=3600)
+        'public, max-age=3600'
+        >>> cc(public=1, max_age=timedelta(hours=1))
+        'public, max-age=3600'
+        >>> cc(private=True, no_cache=True, no_store=True)
+        'private, no-cache, no-store'
 
     """
     if all([private, public]):

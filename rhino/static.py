@@ -49,7 +49,7 @@ class StaticDirectory(object):
     """Resource for serving static files from a directory.
 
     Must be mapped to a route including a template parameter named
-    `path`. Example::
+    `path`. Example:
 
         from rhino import Mapper, StaticDirectory
 

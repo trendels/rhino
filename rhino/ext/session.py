@@ -2,15 +2,18 @@
 This module contains classes that can be used to add session support for Rhino
 applications.
 
-This extension requires the Beaker module to be installed::
+This extension requires the Beaker module to be installed:
 
     $ pip install beaker
 
-The Session class provides a simple and easy to use signed cookie-based session
-with support for displaying "flashed" messages.
+The `Session` class provides a simple and easy to use signed
+cookie-based session.
 
-The BeakerSession class provides access to the different backends provided by
+The `BeakerSession` class provides access to the different backends provided by
 beaker.session.
+
+Both classes use the `SessionObject` class as the interface to the session that
+subclasses Beaker's SessionObject to add support for "flashed" messages.
 """
 from __future__ import absolute_import
 
@@ -19,6 +22,12 @@ from functools import partial
 
 import beaker.session
 from beaker.util import coerce_session_params
+
+__all__ = [
+    'BeakerSession',
+    'Session',
+    'SessionObject',
+]
 
 message = namedtuple('message', 'type text')
 

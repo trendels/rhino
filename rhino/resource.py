@@ -9,6 +9,12 @@ from .response import Response
 from .util import dual_use_decorator, dual_use_decorator_method, call_with_ctx
 from .vendor import mimeparse
 
+__all__ = [
+    'Resource',
+    'make_response',
+    'get', 'post', 'put', 'delete', 'patch', 'options',
+]
+
 class_types = (type, types.ClassType)  # new-style and old-style classes
 
 VIEW_SEPARATOR = ':'
@@ -184,7 +190,7 @@ class Resource(object):
 
     This class can be used in multiple ways:
 
-    As a standalone resource, using it's methods to register handlers::
+    As a standalone resource, using it's methods to register handlers:
 
         my_resource = Resource()
 
@@ -192,7 +198,7 @@ class Resource(object):
         def get_resource(request):
             pass
 
-    As a class decorator for class-based resources::
+    As a class decorator for class-based resources:
 
         @Resource
         class MyResource(object):
@@ -200,7 +206,7 @@ class Resource(object):
             def index(self, request):
                 pass
 
-    As a wrapper to create resouces from custom objects::
+    As a wrapper to create resouces from custom objects:
 
         class MyClass(object):
             def __init_(self, *args):

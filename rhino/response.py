@@ -11,6 +11,16 @@ from wsgiref.util import application_uri
 from .http import httpdate_to_timestamp, datetime_to_httpdate, \
         timedelta_to_httpdate, total_seconds, match_etag, status_codes
 
+__all__ = [
+    'Response',
+    'Entity',
+    'response',
+    'ok',
+    'created',
+    'no_content',
+    'redirect',
+]
+
 # Include: etag, content-location, expires, cache-control, vary
 # TODO The revised HTTP RFCs (rfcs 7230-7235) have removed the distinction
 # between entity-headers and other heathers. We might need to revisit this.
@@ -43,7 +53,7 @@ class ResponseBody(object):
     """A WSGI response iterator.
 
     Holds the response body and a list of callbacks to be called when the
-    response is close()d by the WSGI server.
+    response is closed by the WSGI server.
     """
 
     def __init__(self, body, callbacks=None):
@@ -71,11 +81,11 @@ class Response(object):
     Class attributes:
 
     default_encoding
-        When finalizing the response and the response body is a unicode string,
+      : When finalizing the response and the response body is a unicode string,
         it is encoded using default_encoding (default: 'utf-8')
 
     default_content_type
-        When finalizing the response and the response body is not empty this is
+      : When finalizing the response and the response body is not empty this is
         used as the default value for the Content-Type header, if none is
         provided (default: 'text/plain; charset=utf-8')
     """
@@ -88,41 +98,40 @@ class Response(object):
         Parameters:
 
         code
-            an integer status code.
+          : an integer status code.
 
         headers
-            a list of response headers as (name, value) tuples.
+          : a list of response headers as (name, value) tuples.
 
         body
-            a value for the response body.
+          : a value for the response body.
             The body is only validated when the request is finalized
-            (in __call__).
+            (in `__call__`).
 
             Valid values for the response body are:
 
             The empty string ('')
-                This indicates an empty response body.
+              : This indicates an empty response body.
 
             A str or unicode object
-               Sent as-is, after encoding unicode using default_encoding
+              : Sent as-is, after encoding unicode using default_encoding
 
             An iterator that yields str or unicode objects
-               The response is streamed to the client using chunked
-               transfer-encoding (when implemented by the WSGI server).
+              : The response is streamed to the client using chunked
+                transfer-encoding (when implemented by the WSGI server).
 
             A callable that returns a single str or unicode object
-               This is only useful in combination with an 'Etag' or
-               'Last-Modified' header, to delay construction of the
-               response body until after conditional request handling
-               has taken place, and no "304 Not Modified" response has
-               been sent.
+              : This is only useful in combination with an 'Etag' or
+                'Last-Modified' header, to delay construction of the
+                response body until after conditional request handling
+                has taken place, and no "304 Not Modified" response has
+                been sent.
 
             An Entity instance
-                The response body (which must be of one of the types listed
+              : The response body (which must be of one of the types listed
                 above) will be taken from the entity instance, and any entity
                 headers will be added to the response headers, with existing
                 headers of the same name taking precedence.
-
         """
         headers = ResponseHeaders(headers or [])
 
@@ -145,7 +154,7 @@ class Response(object):
 
     @property
     def headers(self):
-        """A ResponseHeaders instance representing the response headers."""
+        """A `wsgiref.headers.ResponseHeaders` instance."""
         return self._headers
 
     @property
@@ -170,23 +179,23 @@ class Response(object):
         Parameters:
 
         key
-            The cookie name.
+          : The cookie name.
         value
-            The cookie value.
+          : The cookie value.
         max_age
-            The maximum age of the cookie in seconds, or as a
+          : The maximum age of the cookie in seconds, or as a
             datetime.timedelta instance.
         path
-            Restrict the cookie to this path (default: '/').
+          : Restrict the cookie to this path (default: '/').
         domain
-            Restrict the cookie to his domain.
+          : Restrict the cookie to his domain.
         secure
-            When True, instruct the client to only sent the cookie over HTTPS.
+          : When True, instruct the client to only sent the cookie over HTTPS.
         httponly
-            When True, instruct the client to disallow javascript access to
+          : When True, instruct the client to disallow javascript access to
             the cookie.
         expires:
-            Another way of specifying the maximum age of the cookie. Accepts
+          : Another way of specifying the maximum age of the cookie. Accepts
             the same values as max_age (number of seconds, datetime.timedelta).
             Additionaly accepts a datetime.datetime instance.
             Note: a value of type int or float is interpreted as a number of
@@ -326,27 +335,27 @@ def response(code, body='', etag=None, last_modified=None, expires=None, **kw):
     Parameters:
 
     code
-        An integer status code.
+     :  An integer status code.
     body
-        The response body. See Response.__init__() for details.
+     :  The response body. See `Response.__init__` for details.
     etag
-        A value for the Etag header. Double quotes will be added unless the
+     :  A value for the Etag header. Double quotes will be added unless the
         string starts and ends with a double qote. If the value is callable,
         it will be called with `body` as argument and should return a string
         (quotes will be added to the returned string as described above).
     last_modified
-        A value for the Last-Modified header as a datetime.datetime instance
+     :  A value for the Last-Modified header as a datetime.datetime instance
         or Unix timestamp.
     expires
-        A value for the Expires header as number of seconds, datetime.timedelta
+     :  A value for the Expires header as number of seconds, datetime.timedelta
         or datetime.datetime instance.
         Note: a value of type int or float is interpreted as a number of
         seconds in the future, *not* as Unix timestamp.
-    `**kw`
-        All other keyword arguments are interpreted as response headers.
+    **kw
+     :  All other keyword arguments are interpreted as response headers.
         The names will be converted to header names by replacing
         underscores with hyphens and converting to title case
-        (e.g. 'x_powered_by' => 'X-Powered-By').
+        (e.g. `x_powered_by` => `X-Powered-By`).
 
     """
     if etag is not None:

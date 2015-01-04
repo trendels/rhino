@@ -1,33 +1,38 @@
 Rhino
 =====
 
-|build-status| |docs|
+|build-status-img|
 
 Rhino is a python microframework for building RESTful web services.
 
 Installation
 ------------
 
-From pypi::
+From pypi:
 
-   $ pip install rhino
+::
 
-From a github checkout::
+    $ pip install rhino
 
-   $ git clone https://github.com/trendels/rhino.git
-   $ cd rhino
-   $ python setup.py install
+From a git checkout:
 
-To run the test suite, clone the repository as shown above, and run::
+::
 
-   $ pip install -r requirements.txt
-   $ make test
+    $ git clone https://github.com/trendels/rhino.git
+    $ cd rhino
+    $ python setup.py install
 
+To run the test suite, clone the repository as shown above, and run:
+
+::
+
+    $ pip install -r requirements.txt
+    $ make test
 
 Minimal "Hello World" example
 -----------------------------
 
-.. code-block:: python
+.. code:: python
 
     from rhino import Mapper, get
 
@@ -42,14 +47,20 @@ Minimal "Hello World" example
 Documentation
 -------------
 
-Read the `documentation at readthedocs <http://rhino.readthedocs.org/>`_.
+The online documentation can be found at
+https://trendels.github.io/rhino/
 
-.. |build-status| image:: https://travis-ci.org/trendels/rhino.svg?branch=github
+Bugs
+----
+
+Please report bugs using the `github issue
+tracker <https://github.com/trendels/rhino/issues>`__.
+
+License
+-------
+
+Rhino is licensed unter the MIT License. See the included file
+``LICENSE`` for details.
+
+.. |build-status-img| image:: https://travis-ci.org/trendels/rhino.svg?branch=github
    :target: https://travis-ci.org/trendels/rhino
-   :alt: Build Status
-   :scale: 100%
-
-.. |docs| image:: https://readthedocs.org/projects/rhino/badge/?version=latest
-   :target: https://readthedocs.org/projects/rhino/?badge=latest
-   :alt: Documentation Status
-   :scale: 100%

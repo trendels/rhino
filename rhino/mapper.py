@@ -1,3 +1,70 @@
+"""
+The mapper dispatches incoming requests based on URL templates and also
+provides a WSGI interface.
+
+The HTTP request's path is matched against a series of patterns in the order
+they were added. Patterns may be given as strings that must match the request
+path exactly, or they may be templates.
+
+Groups of matching characters for templates are extracted from the URI and
+accessible via the `routing_args` property of `rhino.Request`.
+
+A template is a string that can contain thee special kinds of markup:
+
+`{name}` or `{name:range}`
+
+  : Whatever matches this part of the path will be available in the
+    `Request.routing_args` dict of named parameters.
+
+`[]`
+
+  : Any part enclosed in brackets is optional. Brackets can be nested and
+    contain named parameters. If an optional part contains named parameters and
+    is missing from the request URL, the parameter names contained therein will
+    also be missing from `Request.routing_args`.
+
+`|`
+
+  : A vertical bar may only be present at the end of the template, and causes
+    the path to be matched only against the part before the `'|'`. The path
+    can contain more characters after the match, which will be preserved in
+    `environ['PATH_INFO']`, where it can be used by nested mappers.
+
+A named parameter can contain an optional named range specifier after a `:`.
+which restricts what characters the parameter can match. If no range is
+specified a parameter matches `segment`. The default ranges are as follows:
+
+Range       Regular Expression
+----------  ---------------------
+word        `\w+`
+alpha       `[a-zA-Z]+`
+digits      `\d+`
+alnum       `[a-zA-Z0-9]+`
+segment     `[^/]+`
+unreserved  `[a-zA-Z\d\-\.\_\~]+`
+any         `.+`
+
+The default ranges can be extended or overwritten by passing a dict mapping
+range names to regular expressions to the Mapper constructor. The regular
+expressions should be strings:
+
+    # match numbers in engineering format
+    mapper = Mapper(ranges={'real': r'(\+|-)?[1-9]\.[0-9]*E(\+|-)?[0-9]+'})
+    mapper.add('/a/b/{n:real}', my_math_app)
+
+The `'|'` is needed when nesting mappers:
+
+    foo_mapper = Mapper()
+    foo_mapper.add('/bar', bar_resource)
+
+    mapper = Mapper()
+    mapper.add('/', index)
+    mapper.add('/foo|', foo_mapper)
+
+A request to `/foo/bar` is now dispatched by `mapper` to `foo_mapper` and
+on to `bar_resource`.
+"""
+
 from __future__ import absolute_import
 
 import re
@@ -9,6 +76,15 @@ from .request import Request
 from .response import Response
 from .resource import Resource
 from .util import call_with_ctx
+
+__all__ = [
+    'Mapper',
+    'Route',
+    'Context',
+    'MapperException',
+    'InvalidArgumentError',
+    'InvalidTemplateError',
+]
 
 # template2regex function taken from Joe Gregorio's wsgidispatcher.py
 # (https://code.google.com/p/robaccia/) with minor modifications.
@@ -46,11 +122,11 @@ def template2regex(template, ranges=None):
     /(?P<name>[^/]+)/ and a list of the named parameters found in the template
     (e.g. ['name']). Ranges are given after a colon in a template name to
     indicate a restriction on the characters that can appear there. For
-    example, in the template::
+    example, in the template:
 
         "/user/{id:alpha}"
 
-    The ``id`` must contain only characters from a-zA-Z. Other characters there
+    The `id` must contain only characters from a-zA-Z. Other characters there
     will cause the pattern not to match.
 
     The ranges parameter is an optional dictionary that maps range names to
@@ -262,30 +338,30 @@ class Context(object):
         positional arguments are passed in:
 
         'enter'
-            Called from :class:`Resource`, after a handler for the current
+          : Called from `rhino.Resource`, after a handler for the current
             request has been resolved, but before the handler is called.
 
             Arguments: request
 
         'leave'
-            Called from :class:`Resource`, after the handler has returned
+          : Called from `rhino.Resource`, after the handler has returned
             successfully.
 
             Arguments: request, response
 
         'finalize'
-            Called from :class:`Mapper`, before WSGI response is finalized.
+          : Called from `Mapper`, before WSGI response is finalized.
 
             Arguments: request, response
 
         'teardown'
-            Called from :class:`Mapper`, before control is passed back to the
+          : Called from `Mapper`, before control is passed back to the
             WSGI layer.
 
             Arguments: -
 
         'close'
-            Called when the WSGI server calls `close()` on the response
+          : Called when the WSGI server calls `close()` on the response
             iterator.
 
             Arguments: -
@@ -371,14 +447,14 @@ class Mapper(object):
     """
     Class variables:
 
-    default_encoding (default ``None``):
-        When set, is used to override the ``default_encoding`` of outgoing
-        Responses. See :class:`Response` for details. Does not affect responses
+    default_encoding (default `None`):
+      : When set, is used to override the `default_encoding` of outgoing
+        Responses. See `rhino.Response` for details. Does not affect responses
         returned via exceptions.
 
-    default_content_type (default ``None``):
-        When set, is used to override the ``default_content_type`` of outgoing
-        Responses. See :class:`Response` for details. Does not affect responses
+    default_content_type (default `None`):
+      : When set, is used to override the `default_content_type` of outgoing
+        Responses. See `rhino.Response` for details. Does not affect responses
         returned via exceptions.
     """
     default_encoding = None
@@ -428,7 +504,7 @@ class Mapper(object):
         """Install a context property.
 
         A context property is a callable that will be called on first access of
-        the property named `name` on :class:`Context` instances passing through
+        the property named `name` on `Context` instances passing through
         this mapper. The result will be cached unless `cached` is False.
 
         If the context property is not callable, it will be installed
@@ -444,20 +520,20 @@ class Mapper(object):
 
         Possible values for `target`:
 
-        A string that does not contain a ``.``
-            If the string does not contain ``.``, it will be used to look up
+        A string that does not contain a `.`
+          : If the string does not contain `.`, it will be used to look up
             a named route of this mapper instance and return it's path.
 
-        A string of the form ``a.b``, ``a.b.c``, etc.
-            Follows the route to nested mappers by splitting off consecutive
+        A string of the form `a.b`, `a.b.c`, etc.
+          : Follows the route to nested mappers by splitting off consecutive
             segments. Returns the path of the route found by looking up the
             final segment on the last mapper.
 
-        A :class:`Route` instance
-            Returns the path for the route.
+        A `Route` instance
+          : Returns the path for the route.
 
         A resource that was added previously
-            Looks up the first route that points to this resource and
+          : Looks up the first route that points to this resource and
             returns its path.
         """
         if type(target) in string_types:

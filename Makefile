@@ -11,3 +11,6 @@ cover:
 	$(test_cmd) $(coverage_opts) $(test_targets)
 
 .PHONY: test cover
+
+README.rst: README.mkd
+	pandoc --from=markdown --to=rst $< > $@
