@@ -61,6 +61,74 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </div>
 <section id="module-rhino.mapper" class="level1">
 <h1>Module <a href="../modules/rhino.mapper.html#rhino.mapper"><code id="rhino.mapper">rhino.mapper</code></a></h1>
+<div class="docstring">
+<p>The mapper dispatches incoming requests based on URL templates and also provides a WSGI interface.</p>
+<p>The HTTP request's path is matched against a series of patterns in the order they were added. Patterns may be given as strings that must match the request path exactly, or they may be templates.</p>
+<p>Groups of matching characters for templates are extracted from the URI and accessible via the <code>routing_args</code> property of <a href="../modules/rhino.html#Request"><code>rhino.Request</code></a>.</p>
+<p>A template is a string that can contain thee special kinds of markup:</p>
+<dl>
+<dt><code>{name}</code> or <code>{name:range}</code></dt>
+<dd><p>Whatever matches this part of the path will be available in the <code>Request.routing_args</code> dict of named parameters.</p>
+</dd>
+<dt><code>[]</code></dt>
+<dd><p>Any part enclosed in brackets is optional. Brackets can be nested and contain named parameters. If an optional part contains named parameters and is missing from the request URL, the parameter names contained therein will also be missing from <code>Request.routing_args</code>.</p>
+</dd>
+<dt><code>|</code></dt>
+<dd><p>A vertical bar may only be present at the end of the template, and causes the path to be matched only against the part before the <code>'|'</code>. The path can contain more characters after the match, which will be preserved in <code>environ['PATH_INFO']</code>, where it can be used by nested mappers.</p>
+</dd>
+</dl>
+<p>A named parameter can contain an optional named range specifier after a <code>:</code>. which restricts what characters the parameter can match. If no range is specified a parameter matches <code>segment</code>. The default ranges are as follows:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Range</th>
+<th style="text-align: left;">Regular Expression</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">word</td>
+<td style="text-align: left;"><code>\w+</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">alpha</td>
+<td style="text-align: left;"><code>[a-zA-Z]+</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">digits</td>
+<td style="text-align: left;"><code>\d+</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">alnum</td>
+<td style="text-align: left;"><code>[a-zA-Z0-9]+</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">segment</td>
+<td style="text-align: left;"><code>[^/]+</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">unreserved</td>
+<td style="text-align: left;"><code>[a-zA-Z\d\-\.\_\~]+</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">any</td>
+<td style="text-align: left;"><code>.+</code></td>
+</tr>
+</tbody>
+</table>
+<p>The default ranges can be extended or overwritten by passing a dict mapping range names to regular expressions to the Mapper constructor. The regular expressions should be strings:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="co"># match numbers in engineering format</span>
+mapper = Mapper(ranges={<span class="st">&#39;real&#39;</span>: <span class="st">r&#39;(\+|-)?[1-9]\.[0-9]*E(\+|-)?[0-9]+&#39;</span>})
+mapper.add(<span class="st">&#39;/a/b/{n:real}&#39;</span>, my_math_app)</code></pre>
+<p>The <code>'|'</code> is needed when nesting mappers:</p>
+<pre class="sourceCode python"><code class="sourceCode python">foo_mapper = Mapper()
+foo_mapper.add(<span class="st">&#39;/bar&#39;</span>, bar_resource)
+
+mapper = Mapper()
+mapper.add(<span class="st">&#39;/&#39;</span>, index)
+mapper.add(<span class="st">&#39;/foo|&#39;</span>, foo_mapper)</code></pre>
+<p>A request to <code>/foo/bar</code> is now dispatched by <code>mapper</code> to <code>foo_mapper</code> and on to <code>bar_resource</code>.</p>
+</div>
 <section id="classes" class="level2">
 <h2>Classes</h2>
 <section id="Mapper" class="level3">
