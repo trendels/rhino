@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title></title>
+  <title>Module rhino.ext.session</title>
   <style type="text/css">code{white-space: pre;}</style>
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -31,35 +31,37 @@ code > span.er { color: #ff0000; font-weight: bold; }
   <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
+
 <div id="sidebar">
-<img alt="The Rhino logo" src="../static/Rhinoceros.svg">
+<img alt="Rhino logo" src="../static/Rhinoceros.svg">
 <ul>
 <li><a href="../index.html">Welcome</a></li>
-<li><a href="../api/index.html">API Documentation</a></li>
+<li><a href="../modules/index.html">Module Index</a></li>
 </ul>
 </div>
+
 <div id="module-toc">
 <ul>
-<li><a href="#rhino.ext.session">Module <a href="../api/rhino.ext.session.html#rhino.ext.session"><code>rhino.ext.session</code></a></a>
+<li><a href="#rhino.ext.session">Module <a href="../modules/rhino.ext.session.html#rhino.ext.session"><code>rhino.ext.session</code></a></a>
 <ul>
 <li><a href="#classes">Classes</a>
 <ul>
-<li><a href="../api/rhino.ext.session.html#BeakerSession"><code>BeakerSession</code></a></li>
-<li><a href="../api/rhino.ext.session.html#Session"><code>Session</code></a></li>
-<li><a href="../api/rhino.ext.session.html#SessionObject"><code>SessionObject</code></a></li>
-<li><a href="../api/rhino.ext.session.html#message"><code>message</code></a></li>
+<li><a href="../modules/rhino.ext.session.html#BeakerSession"><code>BeakerSession</code></a></li>
+<li><a href="../modules/rhino.ext.session.html#Session"><code>Session</code></a></li>
+<li><a href="../modules/rhino.ext.session.html#SessionObject"><code>SessionObject</code></a></li>
 </ul></li>
 </ul></li>
 </ul>
 </div>
 <section id="module-rhino.ext.session" class="level1">
-<h1>Module <a href="../api/rhino.ext.session.html#rhino.ext.session"><code id="rhino.ext.session">rhino.ext.session</code></a></h1>
+<h1>Module <a href="../modules/rhino.ext.session.html#rhino.ext.session"><code id="rhino.ext.session">rhino.ext.session</code></a></h1>
 <div class="docstring">
 <p>This module contains classes that can be used to add session support for Rhino applications.</p>
-<p>This extension requires the Beaker module to be installed::</p>
+<p>This extension requires the Beaker module to be installed:</p>
 <pre class="sourceCode python"><code class="sourceCode python">$ pip install beaker</code></pre>
-<p>The Session class provides a simple and easy to use signed cookie-based session with support for displaying “flashed” messages.</p>
-<p>The BeakerSession class provides access to the different backends provided by beaker.session.</p>
+<p>The <a href="../modules/rhino.ext.session.html#Session"><code>Session</code></a> class provides a simple and easy to use signed cookie-based session.</p>
+<p>The <a href="../modules/rhino.ext.session.html#BeakerSession"><code>BeakerSession</code></a> class provides access to the different backends provided by beaker.session.</p>
+<p>Both classes use the <a href="../modules/rhino.ext.session.html#SessionObject"><code>SessionObject</code></a> class as the interface to the session that subclasses Beaker's SessionObject to add support for &quot;flashed&quot; messages.</p>
 </div>
 <section id="classes" class="level2">
 <h2>Classes</h2>
@@ -90,7 +92,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <section id="SessionObject" class="level3">
 <h3><code class="sourceCode python"><span class="kw">class</span> SessionObject</code></h3>
 <div class="docstring">
-<p>A session object with support for “flashed” messages.</p>
+<p>A session object with support for &quot;flashed&quot; messages.</p>
 </div>
 <section id="SessionObject.__init__" class="level4">
 <h4><code class="sourceCode python"><span class="ot">__init__</span>(environ, **params)</code></h4>
@@ -139,24 +141,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </section>
 <section id="SessionObject.save" class="level4">
 <h4><code class="sourceCode python">save()</code></h4>
-</section>
-</section>
-<section id="message" class="level3">
-<h3><code class="sourceCode python"><span class="kw">class</span> message</code></h3>
-<div class="docstring">
-<p>message(type, text)</p>
-</div>
-<section id="text" class="level4">
-<h4><code id="message.text">text</code></h4>
-<div class="docstring">
-<p>Alias for field number 1</p>
-</div>
-</section>
-<section id="type" class="level4">
-<h4><code class="sourceCode python" id="message.type"><span class="dt">type</span></code></h4>
-<div class="docstring">
-<p>Alias for field number 0</p>
-</div>
 </section>
 </section>
 </section>

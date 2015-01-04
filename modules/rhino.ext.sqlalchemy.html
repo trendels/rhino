@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title></title>
+  <title>Module rhino.ext.sqlalchemy</title>
   <style type="text/css">code{white-space: pre;}</style>
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -31,52 +31,55 @@ code > span.er { color: #ff0000; font-weight: bold; }
   <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
+
 <div id="sidebar">
-<img alt="The Rhino logo" src="../static/Rhinoceros.svg">
+<img alt="Rhino logo" src="../static/Rhinoceros.svg">
 <ul>
 <li><a href="../index.html">Welcome</a></li>
-<li><a href="../api/index.html">API Documentation</a></li>
+<li><a href="../modules/index.html">Module Index</a></li>
 </ul>
 </div>
+
 <div id="module-toc">
 <ul>
-<li><a href="#rhino.ext.jinja2">Module <a href="../api/rhino.ext.jinja2.html#rhino.ext.jinja2"><code>rhino.ext.jinja2</code></a></a>
+<li><a href="#rhino.ext.sqlalchemy">Module <a href="../modules/rhino.ext.sqlalchemy.html#rhino.ext.sqlalchemy"><code>rhino.ext.sqlalchemy</code></a></a>
 <ul>
 <li><a href="#classes">Classes</a>
 <ul>
-<li><a href="../api/rhino.ext.jinja2.html#JinjaRenderer"><code>JinjaRenderer</code></a></li>
+<li><a href="../modules/rhino.ext.sqlalchemy.html#SessionProperty"><code>SessionProperty</code></a></li>
 </ul></li>
 </ul></li>
 </ul>
 </div>
-<section id="module-rhino.ext.jinja2" class="level1">
-<h1>Module <a href="../api/rhino.ext.jinja2.html#rhino.ext.jinja2"><code id="rhino.ext.jinja2">rhino.ext.jinja2</code></a></h1>
+<section id="module-rhino.ext.sqlalchemy" class="level1">
+<h1>Module <a href="../modules/rhino.ext.sqlalchemy.html#rhino.ext.sqlalchemy"><code id="rhino.ext.sqlalchemy">rhino.ext.sqlalchemy</code></a></h1>
 <div class="docstring">
-<p>This module contains a JinjaRenderer class that can be used to add a renderer property to the context that renders Jinja2 templates.</p>
-<p>This extension requires the Jinja2 module to be installed::</p>
-<pre class="sourceCode python"><code class="sourceCode python">$ pip install jinja2</code></pre>
-<p>Example usage::</p>
+<p>This module contains a SessionProperty class that can be used to add a SQLALchemy Session object to the context.</p>
+<p>This extension requires the SQLAlchemy module to be installed:</p>
+<pre class="sourceCode python"><code class="sourceCode python">$ pip install sqlalchemy</code></pre>
+<p>The session is lazily initialized and closed at the end of every request.</p>
+<p>Example usage:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> Mapper, get
-<span class="ch">from</span> rhino.ext.jinja2 <span class="ch">import</span> JinjaRenderer
+<span class="ch">from</span> rhino.ext.sqlalchemy <span class="ch">import</span> SessionProperty
+
+<span class="ch">from</span> models <span class="ch">import</span> Movie  <span class="co"># module containing SQLAlchemy ORM classes</span>
 
 app = rhino.Mapper()
-app.add_ctx_property(<span class="st">&#39;render_template&#39;</span>, JinjaRenderer(<span class="st">&#39;./templates&#39;</span>))
+app.add_ctx_property(<span class="st">&#39;db&#39;</span>, SessionProperty(<span class="st">&#39;sqlite:///db.sqlite&#39;</span>))
 
 <span class="ot">@get</span>
 <span class="kw">def</span> index(request, ctx):
-    <span class="kw">return</span> ctx.render_template(<span class="st">&#39;index.html&#39;</span>, greeting=<span class="st">&quot;hello, world!&quot;</span>)
+    movies = ctx.db.query(Movie).<span class="dt">all</span>()
+    <span class="co"># ...</span>
 
 app.add(<span class="st">&#39;/&#39;</span>, index)</code></pre>
 </div>
 <section id="classes" class="level2">
 <h2>Classes</h2>
-<section id="JinjaRenderer" class="level3">
-<h3><code class="sourceCode python"><span class="kw">class</span> JinjaRenderer</code></h3>
-<section id="JinjaRenderer.__init__" class="level4">
-<h4><code class="sourceCode python"><span class="ot">__init__</span>(directory=<span class="ot">None</span>, autoescape=<span class="ot">True</span>, **env_args)</code></h4>
-</section>
-<section id="JinjaRenderer.render_template" class="level4">
-<h4><code class="sourceCode python">render_template(ctx, template_name, **values)</code></h4>
+<section id="SessionProperty" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> SessionProperty</code></h3>
+<section id="SessionProperty.__init__" class="level4">
+<h4><code class="sourceCode python"><span class="ot">__init__</span>(url=<span class="ot">None</span>, delay_close=<span class="ot">False</span>, **session_args)</code></h4>
 </section>
 </section>
 </section>

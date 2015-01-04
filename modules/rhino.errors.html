@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Module rhino.errors</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+  </style>
+  <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+
+<div id="sidebar">
+<img alt="Rhino logo" src="../static/Rhinoceros.svg">
+<ul>
+<li><a href="../index.html">Welcome</a></li>
+<li><a href="../modules/index.html">Module Index</a></li>
+</ul>
+</div>
+
+<div id="module-toc">
+<ul>
+<li><a href="#rhino.errors">Module <a href="../modules/rhino.errors.html#rhino.errors"><code>rhino.errors</code></a></a>
+<ul>
+<li><a href="#exceptions">Exceptions</a>
+<ul>
+<li><a href="../modules/rhino.errors.html#HTTPException"><code>HTTPException</code></a></li>
+<li><a href="../modules/rhino.errors.html#Redirection"><code>Redirection</code></a></li>
+<li><a href="../modules/rhino.errors.html#ClientError"><code>ClientError</code></a></li>
+<li><a href="../modules/rhino.errors.html#ServerError"><code>ServerError</code></a></li>
+<li><a href="../modules/rhino.errors.html#MovedPermanently"><code>MovedPermanently</code></a></li>
+<li><a href="../modules/rhino.errors.html#Found"><code>Found</code></a></li>
+<li><a href="../modules/rhino.errors.html#SeeOther"><code>SeeOther</code></a></li>
+<li><a href="../modules/rhino.errors.html#TemporaryRedirect"><code>TemporaryRedirect</code></a></li>
+<li><a href="../modules/rhino.errors.html#BadRequest"><code>BadRequest</code></a></li>
+<li><a href="../modules/rhino.errors.html#Unauthorized"><code>Unauthorized</code></a></li>
+<li><a href="../modules/rhino.errors.html#Forbidden"><code>Forbidden</code></a></li>
+<li><a href="../modules/rhino.errors.html#NotFound"><code>NotFound</code></a></li>
+<li><a href="../modules/rhino.errors.html#MethodNotAllowed"><code>MethodNotAllowed</code></a></li>
+<li><a href="../modules/rhino.errors.html#NotAcceptable"><code>NotAcceptable</code></a></li>
+<li><a href="../modules/rhino.errors.html#Gone"><code>Gone</code></a></li>
+<li><a href="../modules/rhino.errors.html#UnsupportedMediaType"><code>UnsupportedMediaType</code></a></li>
+<li><a href="../modules/rhino.errors.html#InternalServerError"><code>InternalServerError</code></a></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<section id="module-rhino.errors" class="level1">
+<h1>Module <a href="../modules/rhino.errors.html#rhino.errors"><code id="rhino.errors">rhino.errors</code></a></h1>
+<section id="exceptions" class="level2">
+<h2>Exceptions</h2>
+<section id="HTTPException" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> HTTPException</code></h3>
+<div class="docstring">
+<p>Base class for HTTP Exceptions</p>
+<p>Class variables:</p>
+<dl>
+<dt>code</dt>
+<dd>The status code (int)
+</dd>
+<dt>message</dt>
+<dd>If present, an HTML error page will be sent that contains this message. The contents of <code>message</code> will be HTML-escaped.
+</dd>
+</dl>
+<p>Instance properties:</p>
+<dl>
+<dt>response</dt>
+<dd>The <a href="../modules/rhino.html#Response"><code>rhino.Response</code></a> instance that will be sent to the client.
+</dd>
+</dl>
+<p>The constructor takes one argument, an optional message that will replace the default message. Subclasses can override the constructor to require error-specific arguments.</p>
+</div>
+</section>
+<section id="Redirection" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> Redirection</code></h3>
+<div class="docstring">
+<p>Base class for redirections (3xx).</p>
+</div>
+</section>
+<section id="ClientError" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> ClientError</code></h3>
+<div class="docstring">
+<p>Base class for client errors (4xx).</p>
+</div>
+</section>
+<section id="ServerError" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> ServerError</code></h3>
+<div class="docstring">
+<p>Base class for server errors (5xx).</p>
+</div>
+</section>
+<section id="MovedPermanently" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> MovedPermanently</code></h3>
+<div class="docstring">
+<p>301 Moved Permanently.</p>
+<p>Required arguments:</p>
+<dl>
+<dt>location</dt>
+<dd>The value for the Location header.
+</dd>
+</dl>
+</div>
+</section>
+<section id="Found" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> Found</code></h3>
+<div class="docstring">
+<p>302 Found.</p>
+<p>Required arguments:</p>
+<dl>
+<dt>location</dt>
+<dd>The value for the Location header.
+</dd>
+</dl>
+</div>
+</section>
+<section id="SeeOther" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> SeeOther</code></h3>
+<div class="docstring">
+<p>303 See Other.</p>
+<p>Required arguments:</p>
+<dl>
+<dt>location</dt>
+<dd>The value for the Location header.
+</dd>
+</dl>
+</div>
+</section>
+<section id="TemporaryRedirect" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> TemporaryRedirect</code></h3>
+<div class="docstring">
+<p>307 Temporary Redirect.</p>
+<p>Required arguments:</p>
+<dl>
+<dt>location</dt>
+<dd>The value for the Location header.
+</dd>
+</dl>
+</div>
+</section>
+<section id="BadRequest" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> BadRequest</code></h3>
+<div class="docstring">
+<p>400 Bad Request.</p>
+</div>
+</section>
+<section id="Unauthorized" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> Unauthorized</code></h3>
+<div class="docstring">
+<p>401 Unauthorized.</p>
+<p>Required arguments:</p>
+<dl>
+<dt>scheme</dt>
+<dd>The authentication scheme to use, e.g. 'Basic'.
+</dd>
+<dt>**params</dt>
+<dd>Parameters for the WWW-Authenticate header, e.g. <code>realm=&quot;my website&quot;</code>.
+</dd>
+</dl>
+</div>
+</section>
+<section id="Forbidden" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> Forbidden</code></h3>
+<div class="docstring">
+<p>403 Forbidden.</p>
+</div>
+</section>
+<section id="NotFound" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> NotFound</code></h3>
+<div class="docstring">
+<p>404 NotFound.</p>
+</div>
+</section>
+<section id="MethodNotAllowed" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> MethodNotAllowed</code></h3>
+<div class="docstring">
+<p>404 Method Not Allowed.</p>
+<p>Required arguments:</p>
+<dl>
+<dt>allow</dt>
+<dd>The value for the 'Allow' header (A list of comma-separated HTTP method names).
+</dd>
+</dl>
+</div>
+</section>
+<section id="NotAcceptable" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> NotAcceptable</code></h3>
+<div class="docstring">
+<p>406 Not Acceptable.</p>
+</div>
+</section>
+<section id="Gone" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> Gone</code></h3>
+<div class="docstring">
+<p>410 Gone.</p>
+</div>
+</section>
+<section id="UnsupportedMediaType" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> UnsupportedMediaType</code></h3>
+<div class="docstring">
+<p>415 Unsupported Media Type.</p>
+</div>
+</section>
+<section id="InternalServerError" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> InternalServerError</code></h3>
+<div class="docstring">
+<p>500 Internal Server Error.</p>
+</div>
+</section>
+</section>
+</section>
+</body>
+</html>

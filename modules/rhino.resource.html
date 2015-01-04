@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title></title>
+  <title>Module rhino.resource</title>
   <style type="text/css">code{white-space: pre;}</style>
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -31,36 +31,38 @@ code > span.er { color: #ff0000; font-weight: bold; }
   <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
+
 <div id="sidebar">
-<img alt="The Rhino logo" src="../static/Rhinoceros.svg">
+<img alt="Rhino logo" src="../static/Rhinoceros.svg">
 <ul>
 <li><a href="../index.html">Welcome</a></li>
-<li><a href="../api/index.html">API Documentation</a></li>
+<li><a href="../modules/index.html">Module Index</a></li>
 </ul>
 </div>
+
 <div id="module-toc">
 <ul>
-<li><a href="#rhino.resource">Module <a href="../api/rhino.resource.html#rhino.resource"><code>rhino.resource</code></a></a>
+<li><a href="#rhino.resource">Module <a href="../modules/rhino.resource.html#rhino.resource"><code>rhino.resource</code></a></a>
 <ul>
 <li><a href="#classes">Classes</a>
 <ul>
-<li><a href="../api/rhino.resource.html#Resource"><code>Resource</code></a></li>
+<li><a href="../modules/rhino.resource.html#Resource"><code>Resource</code></a></li>
 </ul></li>
 <li><a href="#functions">Functions</a>
 <ul>
-<li><a href="../api/rhino.resource.html#get"><code>get</code></a></li>
-<li><a href="../api/rhino.resource.html#post"><code>post</code></a></li>
-<li><a href="../api/rhino.resource.html#put"><code>put</code></a></li>
-<li><a href="../api/rhino.resource.html#delete"><code>delete</code></a></li>
-<li><a href="../api/rhino.resource.html#patch"><code>patch</code></a></li>
-<li><a href="../api/rhino.resource.html#options"><code>options</code></a></li>
-<li><a href="../api/rhino.resource.html#make_response"><code>make_response</code></a></li>
+<li><a href="../modules/rhino.resource.html#make_response"><code>make_response</code></a></li>
+<li><a href="../modules/rhino.resource.html#get"><code>get</code></a></li>
+<li><a href="../modules/rhino.resource.html#post"><code>post</code></a></li>
+<li><a href="../modules/rhino.resource.html#put"><code>put</code></a></li>
+<li><a href="../modules/rhino.resource.html#delete"><code>delete</code></a></li>
+<li><a href="../modules/rhino.resource.html#patch"><code>patch</code></a></li>
+<li><a href="../modules/rhino.resource.html#options"><code>options</code></a></li>
 </ul></li>
 </ul></li>
 </ul>
 </div>
 <section id="module-rhino.resource" class="level1">
-<h1>Module <a href="../api/rhino.resource.html#rhino.resource"><code id="rhino.resource">rhino.resource</code></a></h1>
+<h1>Module <a href="../modules/rhino.resource.html#rhino.resource"><code id="rhino.resource">rhino.resource</code></a></h1>
 <section id="classes" class="level2">
 <h2>Classes</h2>
 <section id="Resource" class="level3">
@@ -68,19 +70,19 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div class="docstring">
 <p>Represents a REST resource.</p>
 <p>This class can be used in multiple ways:</p>
-<p>As a standalone resource, using it’s methods to register handlers::</p>
+<p>As a standalone resource, using it's methods to register handlers:</p>
 <pre class="sourceCode python"><code class="sourceCode python">my_resource = Resource()
 
 <span class="ot">@my_resource.get</span>
 <span class="kw">def</span> get_resource(request):
     <span class="kw">pass</span></code></pre>
-<p>As a class decorator for class-based resources::</p>
+<p>As a class decorator for class-based resources:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ot">@Resource</span>
 <span class="kw">class</span> MyResource(<span class="dt">object</span>):
     <span class="ot">@get</span>
     <span class="kw">def</span> index(<span class="ot">self</span>, request):
         <span class="kw">pass</span></code></pre>
-<p>As a wrapper to create resouces from custom objects::</p>
+<p>As a wrapper to create resouces from custom objects:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="kw">class</span> MyClass(<span class="dt">object</span>):
     <span class="kw">def</span> __init_(<span class="ot">self</span>, *args):
         <span class="kw">pass</span>
@@ -90,9 +92,9 @@ code > span.er { color: #ff0000; font-weight: bold; }
         <span class="kw">pass</span>
 
 my_resource = Resource(MyClass())</code></pre>
-<p>When used as a wrapper or class decorator, handlers will be picked up from methods of the wrapped instance or class that have been decorated with one of the decorator functions provided by this module (<a href="../api/rhino.resource.html#get"><code>get</code></a>, <a href="../api/rhino.resource.html#post"><code>post</code></a>, etc.)</p>
+<p>When used as a wrapper or class decorator, handlers will be picked up from methods of the wrapped instance or class that have been decorated with one of the decorator functions provided by this module (<a href="../modules/rhino.resource.html#get"><code>get</code></a>, <a href="../modules/rhino.resource.html#post"><code>post</code></a>, etc.)</p>
 <p>Additionally, if the wrapped object implements <code>from_url</code>, that method will be called before any handler to filter the URL parameters that will be passed to the handler as keyword arguments.</p>
-<p>When used as a standalone instance, functions can be registered as handlers using the instance’s methods, as shown above. The <code>from_url</code> method can be used in the same way to register a filter for URL parameters.</p>
+<p>When used as a standalone instance, functions can be registered as handlers using the instance's methods, as shown above. The <code>from_url</code> method can be used in the same way to register a filter for URL parameters.</p>
 </div>
 <section id="Resource.__init__" class="level4">
 <h4><code class="sourceCode python"><span class="ot">__init__</span>(wrapped=<span class="ot">None</span>)</code></h4>
@@ -143,6 +145,12 @@ my_resource = Resource(MyClass())</code></pre>
 </section>
 <section id="functions" class="level2">
 <h2>Functions</h2>
+<section id="make_response" class="level3">
+<h3><code class="sourceCode python">make_response(obj)</code></h3>
+<div class="docstring">
+<p>Try to coerce an object into a Response instance.</p>
+</div>
+</section>
 <section id="get" class="level3">
 <h3><code class="sourceCode python">get(*args, **kw)</code></h3>
 <div class="docstring">
@@ -177,12 +185,6 @@ my_resource = Resource(MyClass())</code></pre>
 <h3><code class="sourceCode python">options(*args, **kw)</code></h3>
 <div class="docstring">
 <p>Mark the decorated function as a handler for OPTIONS requests.</p>
-</div>
-</section>
-<section id="make_response" class="level3">
-<h3><code class="sourceCode python">make_response(obj)</code></h3>
-<div class="docstring">
-<p>Try to coerce an object into a Response instance.</p>
 </div>
 </section>
 </section>

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title></title>
+  <title>Module rhino.mapper</title>
   <style type="text/css">code{white-space: pre;}</style>
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -31,42 +31,50 @@ code > span.er { color: #ff0000; font-weight: bold; }
   <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
+
 <div id="sidebar">
-<img alt="The Rhino logo" src="../static/Rhinoceros.svg">
+<img alt="Rhino logo" src="../static/Rhinoceros.svg">
 <ul>
 <li><a href="../index.html">Welcome</a></li>
-<li><a href="../api/index.html">API Documentation</a></li>
+<li><a href="../modules/index.html">Module Index</a></li>
 </ul>
 </div>
+
 <div id="module-toc">
 <ul>
-<li><a href="#rhino.mapper">Module <a href="../api/rhino.mapper.html#rhino.mapper"><code>rhino.mapper</code></a></a>
+<li><a href="#rhino.mapper">Module <a href="../modules/rhino.mapper.html#rhino.mapper"><code>rhino.mapper</code></a></a>
 <ul>
 <li><a href="#classes">Classes</a>
 <ul>
-<li><a href="../api/rhino.mapper.html#Mapper"><code>Mapper</code></a></li>
-<li><a href="../api/rhino.mapper.html#Route"><code>Route</code></a></li>
-<li><a href="../api/rhino.mapper.html#Context"><code>Context</code></a></li>
+<li><a href="../modules/rhino.mapper.html#Mapper"><code>Mapper</code></a></li>
+<li><a href="../modules/rhino.mapper.html#Route"><code>Route</code></a></li>
+<li><a href="../modules/rhino.mapper.html#Context"><code>Context</code></a></li>
 </ul></li>
 <li><a href="#exceptions">Exceptions</a>
 <ul>
-<li><a href="../api/rhino.mapper.html#MapperException"><code>MapperException</code></a></li>
-<li><a href="../api/rhino.mapper.html#InvalidArgumentError"><code>InvalidArgumentError</code></a></li>
-<li><a href="../api/rhino.mapper.html#InvalidTemplateError"><code>InvalidTemplateError</code></a></li>
+<li><a href="../modules/rhino.mapper.html#MapperException"><code>MapperException</code></a></li>
+<li><a href="../modules/rhino.mapper.html#InvalidArgumentError"><code>InvalidArgumentError</code></a></li>
+<li><a href="../modules/rhino.mapper.html#InvalidTemplateError"><code>InvalidTemplateError</code></a></li>
 </ul></li>
 </ul></li>
 </ul>
 </div>
 <section id="module-rhino.mapper" class="level1">
-<h1>Module <a href="../api/rhino.mapper.html#rhino.mapper"><code id="rhino.mapper">rhino.mapper</code></a></h1>
+<h1>Module <a href="../modules/rhino.mapper.html#rhino.mapper"><code id="rhino.mapper">rhino.mapper</code></a></h1>
 <section id="classes" class="level2">
 <h2>Classes</h2>
 <section id="Mapper" class="level3">
 <h3><code class="sourceCode python"><span class="kw">class</span> Mapper</code></h3>
 <div class="docstring">
 <p>Class variables:</p>
-<p>default_encoding (default <code class="sourceCode python"><span class="ot">None</span></code>): When set, is used to override the <code>default_encoding</code> of outgoing Responses. See <a href="../api/rhino.response.html#Response"><code>rhino.response.Response</code></a> for details. Does not affect responses returned via exceptions.</p>
-<p>default_content_type (default <code class="sourceCode python"><span class="ot">None</span></code>): When set, is used to override the <code>default_content_type</code> of outgoing Responses. See <a href="../api/rhino.response.html#Response"><code>rhino.response.Response</code></a> for details. Does not affect responses returned via exceptions.</p>
+<dl>
+<dt>default_encoding (default <code class="sourceCode python"><span class="ot">None</span></code>):</dt>
+<dd>When set, is used to override the <code>default_encoding</code> of outgoing Responses. See <a href="../modules/rhino.html#Response"><code>rhino.Response</code></a> for details. Does not affect responses returned via exceptions.
+</dd>
+<dt>default_content_type (default <code class="sourceCode python"><span class="ot">None</span></code>):</dt>
+<dd>When set, is used to override the <code>default_content_type</code> of outgoing Responses. See <a href="../modules/rhino.html#Response"><code>rhino.Response</code></a> for details. Does not affect responses returned via exceptions.
+</dd>
+</dl>
 </div>
 <section id="Mapper.__init__" class="level4">
 <h4><code class="sourceCode python"><span class="ot">__init__</span>(ranges=<span class="ot">None</span>)</code></h4>
@@ -86,14 +94,14 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <h4><code class="sourceCode python">add_ctx_property(name, fn, cached=<span class="ot">True</span>)</code></h4>
 <div class="docstring">
 <p>Install a context property.</p>
-<p>A context property is a callable that will be called on first access of the property named <code>name</code> on <a href="../api/rhino.mapper.html#Context"><code>Context</code></a> instances passing through this mapper. The result will be cached unless <code>cached</code> is False.</p>
+<p>A context property is a callable that will be called on first access of the property named <code>name</code> on <a href="../modules/rhino.mapper.html#Context"><code>Context</code></a> instances passing through this mapper. The result will be cached unless <code>cached</code> is False.</p>
 <p>If the context property is not callable, it will be installed as-is, otherwise, it will be called with the context instance as first argument.</p>
 </div>
 </section>
 <section id="Mapper.handle_error" class="level4">
 <h4><code class="sourceCode python">handle_error(request, exc_info)</code></h4>
 <div class="docstring">
-<p>Log the ‘exc_info’ tuple in the server log.</p>
+<p>Log the 'exc_info' tuple in the server log.</p>
 </div>
 </section>
 <section id="Mapper.path" class="level4">
@@ -101,10 +109,20 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div class="docstring">
 <p>Build a URL path fragment for a resource or route.</p>
 <p>Possible values for <code>target</code>:</p>
-<p>A string that does not contain a <code>.</code> If the string does not contain <code>.</code>, it will be used to look up a named route of this mapper instance and return it’s path.</p>
-<p>A string of the form <code>a.b</code>, <code>a.b.c</code>, etc. Follows the route to nested mappers by splitting off consecutive segments. Returns the path of the route found by looking up the final segment on the last mapper.</p>
-<p>A <a href="../api/rhino.mapper.html#Route"><code>Route</code></a> instance Returns the path for the route.</p>
-<p>A resource that was added previously Looks up the first route that points to this resource and returns its path.</p>
+<dl>
+<dt>A string that does not contain a <code>.</code></dt>
+<dd>If the string does not contain <code>.</code>, it will be used to look up a named route of this mapper instance and return it's path.
+</dd>
+<dt>A string of the form <code>a.b</code>, <code>a.b.c</code>, etc.</dt>
+<dd>Follows the route to nested mappers by splitting off consecutive segments. Returns the path of the route found by looking up the final segment on the last mapper.
+</dd>
+<dt>A <a href="../modules/rhino.mapper.html#Route"><code>Route</code></a> instance</dt>
+<dd>Returns the path for the route.
+</dd>
+<dt>A resource that was added previously</dt>
+<dd>Looks up the first route that points to this resource and returns its path.
+</dd>
+</dl>
 </div>
 </section>
 <section id="Mapper.start_server" class="level4">
@@ -116,7 +134,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <section id="Mapper.wsgi" class="level4">
 <h4><code class="sourceCode python">wsgi(environ, start_response)</code></h4>
 <div class="docstring">
-<p>Implements the mapper’s WSGI interface.</p>
+<p>Implements the mapper's WSGI interface.</p>
 </div>
 </section>
 </section>
@@ -146,23 +164,23 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>Adds a callback to the context.</p>
 <p>The <code>phase</code> determines when and if the callback is executed, and which positional arguments are passed in:</p>
 <dl>
-<dt>‘enter’</dt>
-<dd><p>Called from <code>Resource</code>, after a handler for the current request has been resolved, but before the handler is called.</p>
+<dt>'enter'</dt>
+<dd><p>Called from <a href="../modules/rhino.html#Resource"><code>rhino.Resource</code></a>, after a handler for the current request has been resolved, but before the handler is called.</p>
 <p>Arguments: request</p>
 </dd>
-<dt>‘leave’</dt>
-<dd><p>Called from <code>Resource</code>, after the handler has returned successfully.</p>
+<dt>'leave'</dt>
+<dd><p>Called from <a href="../modules/rhino.html#Resource"><code>rhino.Resource</code></a>, after the handler has returned successfully.</p>
 <p>Arguments: request, response</p>
 </dd>
-<dt>‘finalize’</dt>
-<dd><p>Called from <a href="../api/rhino.mapper.html#Mapper"><code>Mapper</code></a>, before WSGI response is finalized.</p>
+<dt>'finalize'</dt>
+<dd><p>Called from <a href="../modules/rhino.mapper.html#Mapper"><code>Mapper</code></a>, before WSGI response is finalized.</p>
 <p>Arguments: request, response</p>
 </dd>
-<dt>‘teardown’</dt>
-<dd><p>Called from <a href="../api/rhino.mapper.html#Mapper"><code>Mapper</code></a>, before control is passed back to the WSGI layer.</p>
+<dt>'teardown'</dt>
+<dd><p>Called from <a href="../modules/rhino.mapper.html#Mapper"><code>Mapper</code></a>, before control is passed back to the WSGI layer.</p>
 <p>Arguments: -</p>
 </dd>
-<dt>‘close’</dt>
+<dt>'close'</dt>
 <dd><p>Called when the WSGI server calls <code>close()</code> on the response iterator.</p>
 <p>Arguments: -</p>
 </dd>

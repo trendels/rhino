@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Welcome to Rhino’s documentation</title>
+  <title>Rhino Module Documentation</title>
   <style type="text/css">code{white-space: pre;}</style>
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -32,22 +32,24 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </head>
 <body>
 <header>
-<h1 class="title">Welcome to Rhino’s documentation</h1>
+<h1 class="title">Rhino Module Documentation</h1>
 </header>
+
 <div id="sidebar">
-<img alt="The Rhino logo" src="./static/Rhinoceros.svg">
+<img alt="Rhino logo" src="./static/Rhinoceros.svg">
 <ul>
 <li><a href="./index.html">Welcome</a></li>
-<li><a href="./api/index.html">API Documentation</a></li>
+<li><a href="./modules/index.html">Module Index</a></li>
 </ul>
 </div>
-<p><a href="https://travis-ci.org/trendels/rhino"><img src="https://travis-ci.org/trendels/rhino.svg?branch=github" alt="build-status-badge" /></a></p>
+
+<p><a href="https://travis-ci.org/trendels/rhino"><img src="https://travis-ci.org/trendels/rhino.svg?branch=github" alt="build-status-img" /></a></p>
 <p>Rhino is a python microframework for building RESTful web services.</p>
 <section id="installation" class="level1">
 <h1>Installation</h1>
 <p>From pypi:</p>
 <pre class="sourceCode python"><code class="sourceCode python">$ pip install rhino</code></pre>
-<p>From a github checkout:</p>
+<p>From a git checkout:</p>
 <pre class="sourceCode python"><code class="sourceCode python">$ git clone https://github.com/trendels/rhino.git
 $ cd rhino
 $ python setup.py install</code></pre>
@@ -56,7 +58,7 @@ $ python setup.py install</code></pre>
 $ make test</code></pre>
 </section>
 <section id="minimal-hello-world-example" class="level1">
-<h1>Minimal “Hello World” example</h1>
+<h1>Minimal &quot;Hello World&quot; example</h1>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> Mapper, get
 
 <span class="ot">@get</span>
@@ -66,12 +68,12 @@ $ make test</code></pre>
 app = Mapper()
 app.add(<span class="st">&#39;/&#39;</span>, hello)
 app.start_server()</code></pre>
-</section>
-<section id="documentation" class="level1">
-<h1>Documentation</h1>
+<section id="documentation" class="level2">
+<h2>Documentation</h2>
 <ul>
-<li><a href="api/index.html">API Reference</a></li>
+<li><a href="modules/index.html">Module Index</a></li>
 </ul>
+</section>
 </section>
 </body>
 </html>

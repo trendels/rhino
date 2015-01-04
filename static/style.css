@@ -20,6 +20,7 @@ dt { font-weight: bold; }
 .docstring { margin-left: 40px; margin-bottom: 2em; }
 pre { background: #eee; padding: 10px 15px 10px 15px; margin-left: 10px; margin: 0 20px 0 20px; }
 a { text-decoration: none; }
+a, a:visited { color: blue; }
 #sidebar {
     position: fixed;
     top: 0;
@@ -29,4 +30,12 @@ a { text-decoration: none; }
 #sidebar img {
     width: 90%;
     margin-left: 5%;
+}
+#module-toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 35ex;
+    height: 100%;
+    overflow: auto;
 }

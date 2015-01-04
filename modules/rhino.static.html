@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title></title>
+  <title>Module rhino.static</title>
   <style type="text/css">code{white-space: pre;}</style>
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -31,39 +31,41 @@ code > span.er { color: #ff0000; font-weight: bold; }
   <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
+
 <div id="sidebar">
-<img alt="The Rhino logo" src="../static/Rhinoceros.svg">
+<img alt="Rhino logo" src="../static/Rhinoceros.svg">
 <ul>
 <li><a href="../index.html">Welcome</a></li>
-<li><a href="../api/index.html">API Documentation</a></li>
+<li><a href="../modules/index.html">Module Index</a></li>
 </ul>
 </div>
+
 <div id="module-toc">
 <ul>
-<li><a href="#rhino.static">Module <a href="../api/rhino.static.html#rhino.static"><code>rhino.static</code></a></a>
+<li><a href="#rhino.static">Module <a href="../modules/rhino.static.html#rhino.static"><code>rhino.static</code></a></a>
 <ul>
 <li><a href="#classes">Classes</a>
 <ul>
-<li><a href="../api/rhino.static.html#StaticDirectory"><code>StaticDirectory</code></a></li>
-<li><a href="../api/rhino.static.html#StaticFile"><code>StaticFile</code></a></li>
+<li><a href="../modules/rhino.static.html#StaticDirectory"><code>StaticDirectory</code></a></li>
+<li><a href="../modules/rhino.static.html#StaticFile"><code>StaticFile</code></a></li>
 </ul></li>
 </ul></li>
 </ul>
 </div>
 <section id="module-rhino.static" class="level1">
-<h1>Module <a href="../api/rhino.static.html#rhino.static"><code id="rhino.static">rhino.static</code></a></h1>
+<h1>Module <a href="../modules/rhino.static.html#rhino.static"><code id="rhino.static">rhino.static</code></a></h1>
 <section id="classes" class="level2">
 <h2>Classes</h2>
 <section id="StaticDirectory" class="level3">
 <h3><code class="sourceCode python"><span class="kw">class</span> StaticDirectory</code></h3>
 <div class="docstring">
 <p>Resource for serving static files from a directory.</p>
-<p>Must be mapped to a route including a template parameter named <code>path</code>. Example::</p>
+<p>Must be mapped to a route including a template parameter named <code>path</code>. Example:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> Mapper, StaticDirectory
 
 app = Mapper()
 app.add(<span class="st">&#39;/static/{path:any}&#39;</span>, StaticDirectory(<span class="st">&#39;./static&#39;</span>))</code></pre>
-<p>Setting the <code>path</code> parameter’s range to <code class="sourceCode python"><span class="dt">any</span></code>, which includes ‘/’, enables serving files from subdirectories of ‘./static’.</p>
+<p>Setting the <code>path</code> parameter's range to <code class="sourceCode python"><span class="dt">any</span></code>, which includes '/', enables serving files from subdirectories of './static'.</p>
 </div>
 <section id="StaticDirectory.__init__" class="level4">
 <h4><code class="sourceCode python"><span class="ot">__init__</span>(root, expires=<span class="ot">None</span>)</code></h4>
