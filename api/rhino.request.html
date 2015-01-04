@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+  </style>
+  <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+<div id="sidebar">
+<img alt="The Rhino logo" src="../static/Rhinoceros.svg">
+<ul>
+<li><a href="../index.html">Welcome</a></li>
+<li><a href="../api/index.html">API Documentation</a></li>
+</ul>
+</div>
+<div id="module-toc">
+<ul>
+<li><a href="#rhino.request">Module <a href="../api/rhino.request.html#rhino.request"><code>rhino.request</code></a></a>
+<ul>
+<li><a href="#classes">Classes</a>
+<ul>
+<li><a href="../api/rhino.request.html#QueryDict"><code>QueryDict</code></a></li>
+<li><a href="../api/rhino.request.html#Request"><code>Request</code></a></li>
+<li><a href="../api/rhino.request.html#RequestHeaders"><code>RequestHeaders</code></a></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<section id="module-rhino.request" class="level1">
+<h1>Module <a href="../api/rhino.request.html#rhino.request"><code id="rhino.request">rhino.request</code></a></h1>
+<section id="classes" class="level2">
+<h2>Classes</h2>
+<section id="QueryDict" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> QueryDict</code></h3>
+<div class="docstring">
+<p>A dictionary-like object to access query parameters.</p>
+<p>Accessing a key returns the first value for that key. The keys(), values() and items() methods will return a key/value multiple times, if it is present multiple times in the query string.</p>
+<p>The get_all() method can be used to return all values for a given key.</p>
+</div>
+<section id="QueryDict.__init__" class="level4">
+<h4><code class="sourceCode python"><span class="ot">__init__</span>(items)</code></h4>
+</section>
+<section id="QueryDict.get" class="level4">
+<h4><code class="sourceCode python">get(key, default=<span class="ot">None</span>)</code></h4>
+</section>
+<section id="QueryDict.get_all" class="level4">
+<h4><code class="sourceCode python">get_all(key)</code></h4>
+<div class="docstring">
+<p>Return a list of values for the given key.</p>
+</div>
+</section>
+<section id="QueryDict.items" class="level4">
+<h4><code class="sourceCode python">items()</code></h4>
+</section>
+<section id="QueryDict.keys" class="level4">
+<h4><code class="sourceCode python">keys()</code></h4>
+</section>
+<section id="QueryDict.values" class="level4">
+<h4><code class="sourceCode python">values()</code></h4>
+</section>
+</section>
+<section id="Request" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> Request</code></h3>
+<div class="docstring">
+<p>Represents an HTTP request built from a WSGI environment.</p>
+</div>
+<section id="Request.__init__" class="level4">
+<h4><code class="sourceCode python"><span class="ot">__init__</span>(environ)</code></h4>
+</section>
+<section id="body" class="level4">
+<h4><code id="Request.body">body</code></h4>
+<div class="docstring">
+<p>Reads content_length bytes from wsgi.input and returns the result.</p>
+<p>Cached after first access.</p>
+</div>
+</section>
+<section id="content_length" class="level4">
+<h4><code id="Request.content_length">content_length</code></h4>
+<div class="docstring">
+<p>The value of the Content-Length header as an integer, or 0</p>
+</div>
+</section>
+<section id="content_type" class="level4">
+<h4><code id="Request.content_type">content_type</code></h4>
+<div class="docstring">
+<p>The value of the Content-Type header, or None</p>
+</div>
+</section>
+<section id="cookies" class="level4">
+<h4><code id="Request.cookies">cookies</code></h4>
+<div class="docstring">
+<p>Returns a dictionary mapping cookie names to their values.</p>
+</div>
+</section>
+<section id="form" class="level4">
+<h4><code id="Request.form">form</code></h4>
+<div class="docstring">
+<p>Reads the request body and tries to parse it as a web form.</p>
+<p>Parsing is done using the stdlib’s cgi.FieldStorage which supports multipart forms (file uploads). Returns a QueryDict instance holding the form fields. Uploaded files are represented as form fields with a ‘filename’ attribute.</p>
+</div>
+</section>
+<section id="method" class="level4">
+<h4><code id="Request.method">method</code></h4>
+<div class="docstring">
+<p>The HTTP request method (verb).</p>
+</div>
+</section>
+<section id="path_info" class="level4">
+<h4><code id="Request.path_info">path_info</code></h4>
+<div class="docstring">
+<p>The PATH_INFO environment key as a unicode string.</p>
+</div>
+</section>
+<section id="query" class="level4">
+<h4><code id="Request.query">query</code></h4>
+<div class="docstring">
+<p>A QueryDict instance holding the query parameters (QUERY_STRING).</p>
+</div>
+</section>
+<section id="remote_addr" class="level4">
+<h4><code id="Request.remote_addr">remote_addr</code></h4>
+<div class="docstring">
+<p>The REMOTE_ADDR environment key</p>
+</div>
+</section>
+<section id="remote_port" class="level4">
+<h4><code id="Request.remote_port">remote_port</code></h4>
+<div class="docstring">
+<p>The remote hosts’s port number as an integer, or None (REMOTE_PORT).</p>
+</div>
+</section>
+<section id="routing_args" class="level4">
+<h4><code id="Request.routing_args">routing_args</code></h4>
+<div class="docstring">
+<p>Returns named parameters extracted from the URL during routing.</p>
+</div>
+</section>
+<section id="scheme" class="level4">
+<h4><code id="Request.scheme">scheme</code></h4>
+<div class="docstring">
+<p>The URL scheme, usually ‘http’ or ‘https’ (wsgi.url_scheme).</p>
+</div>
+</section>
+<section id="script_name" class="level4">
+<h4><code id="Request.script_name">script_name</code></h4>
+<div class="docstring">
+<p>The SCRIPT_NAME environment key as a unicode string.</p>
+</div>
+</section>
+<section id="server_name" class="level4">
+<h4><code id="Request.server_name">server_name</code></h4>
+<div class="docstring">
+<p>The SERVER_NAME environment key</p>
+</div>
+</section>
+<section id="server_port" class="level4">
+<h4><code id="Request.server_port">server_port</code></h4>
+<div class="docstring">
+<p>The server’s port number as an integer, or None (SERVER_PORT).</p>
+</div>
+</section>
+<section id="server_protocol" class="level4">
+<h4><code id="Request.server_protocol">server_protocol</code></h4>
+<div class="docstring">
+<p>The SERVER_PROTOCOL environment key</p>
+</div>
+</section>
+<section id="url" class="level4">
+<h4><code id="Request.url">url</code></h4>
+<div class="docstring">
+<p>The reconstructed request URI (absolute).</p>
+</div>
+</section>
+<section id="Request.url_for" class="level4">
+<h4><code class="sourceCode python">url_for(*args, **kw)</code></h4>
+<div class="docstring">
+<p>Build the URL for a target.</p>
+<p>Special keyword arguments:</p>
+<p><code>_query</code> Append query string (dict or list of tuples)</p>
+<p><code>_relative</code> When True, build a relative URL (default: False)</p>
+<p>All other keyword arguments are treated as parameters for the URL template.</p>
+<p>The target can be any valid target for <code>Mapper.path</code>, which will be looked up on the current mapper instance and used to build the URL for that route. Additionally, it can be one of:</p>
+<p>‘.’ Builds the URL for the current route.</p>
+<p>‘/’ Builds the URL for the root (top-most) mapper instance.</p>
+<p>‘/a’, ‘/a.b’, etc. Builds the URL for a named route relative to the root mapper.</p>
+<p>‘.a’, ‘..a’, ‘..a.b’, etc. Builds a URL for a named route relative to the current mapper. Each additional leading ‘.’ after the first one starts one level higher in the hierarchy of nested mappers (i.e. ‘.a’ is equivalent to ‘a’).</p>
+</div>
+</section>
+</section>
+<section id="RequestHeaders" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> RequestHeaders</code></h3>
+<div class="docstring">
+<p>A dictionary-like object to access request headers.</p>
+<p>Keys are case-insensitive. Accessing a header that is not present returns None instead of raising KeyError.</p>
+</div>
+<section id="RequestHeaders.__init__" class="level4">
+<h4><code class="sourceCode python"><span class="ot">__init__</span>(environ)</code></h4>
+</section>
+<section id="RequestHeaders.get" class="level4">
+<h4><code class="sourceCode python">get(name, default=<span class="ot">None</span>)</code></h4>
+</section>
+<section id="RequestHeaders.items" class="level4">
+<h4><code class="sourceCode python">items()</code></h4>
+</section>
+<section id="RequestHeaders.keys" class="level4">
+<h4><code class="sourceCode python">keys()</code></h4>
+</section>
+<section id="RequestHeaders.values" class="level4">
+<h4><code class="sourceCode python">values()</code></h4>
+</section>
+</section>
+</section>
+</section>
+</body>
+</html>

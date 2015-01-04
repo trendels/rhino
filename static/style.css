@@ -1,0 +1,32 @@
+html {
+    font-family: serif;
+    font-size: 14px;
+    line-height: 1.5em;
+    color: #333;
+}
+body { max-width: 700px; margin-left: 40ex; }
+h1 { font-size: 140%; margin-top: 20px; }
+h2 { font-size: 120%; }
+pre, code { font-family: "Ubuntu Mono", monospace; line-height: 1.3em; }
+pre + pre { margin-top: 1em; }
+h1 code, h2 code, h3 code, h4 code {
+    white-space: normal;
+    display: inline-block;
+    padding-left: 40px;
+    text-indent: -40px;
+}
+dt { font-weight: bold; }
+.level3, .level4 { margin-left: 40px; }
+.docstring { margin-left: 40px; margin-bottom: 2em; }
+pre { background: #eee; padding: 10px 15px 10px 15px; margin-left: 10px; margin: 0 20px 0 20px; }
+a { text-decoration: none; }
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 35ex;
+}
+#sidebar img {
+    width: 90%;
+    margin-left: 5%;
+}

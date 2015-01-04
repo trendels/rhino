@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+  </style>
+  <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+<div id="sidebar">
+<img alt="The Rhino logo" src="../static/Rhinoceros.svg">
+<ul>
+<li><a href="../index.html">Welcome</a></li>
+<li><a href="../api/index.html">API Documentation</a></li>
+</ul>
+</div>
+<div id="module-toc">
+<ul>
+<li><a href="#rhino.ext.session">Module <a href="../api/rhino.ext.session.html#rhino.ext.session"><code>rhino.ext.session</code></a></a>
+<ul>
+<li><a href="#classes">Classes</a>
+<ul>
+<li><a href="../api/rhino.ext.session.html#BeakerSession"><code>BeakerSession</code></a></li>
+<li><a href="../api/rhino.ext.session.html#Session"><code>Session</code></a></li>
+<li><a href="../api/rhino.ext.session.html#SessionObject"><code>SessionObject</code></a></li>
+<li><a href="../api/rhino.ext.session.html#message"><code>message</code></a></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<section id="module-rhino.ext.session" class="level1">
+<h1>Module <a href="../api/rhino.ext.session.html#rhino.ext.session"><code id="rhino.ext.session">rhino.ext.session</code></a></h1>
+<div class="docstring">
+<p>This module contains classes that can be used to add session support for Rhino applications.</p>
+<p>This extension requires the Beaker module to be installed::</p>
+<pre class="sourceCode python"><code class="sourceCode python">$ pip install beaker</code></pre>
+<p>The Session class provides a simple and easy to use signed cookie-based session with support for displaying “flashed” messages.</p>
+<p>The BeakerSession class provides access to the different backends provided by beaker.session.</p>
+</div>
+<section id="classes" class="level2">
+<h2>Classes</h2>
+<section id="BeakerSession" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> BeakerSession</code></h3>
+<div class="docstring">
+<p>Adds a session property to the context.</p>
+</div>
+<section id="BeakerSession.__init__" class="level4">
+<h4><code class="sourceCode python"><span class="ot">__init__</span>(**session_args)</code></h4>
+</section>
+<section id="BeakerSession.finalize" class="level4">
+<h4><code class="sourceCode python">finalize(session, request, response)</code></h4>
+</section>
+</section>
+<section id="Session" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> Session</code></h3>
+<div class="docstring">
+<p>Adds a session based on signed cookies to the context.</p>
+</div>
+<section id="Session.__init__" class="level4">
+<h4><code class="sourceCode python"><span class="ot">__init__</span>(secret, timeout=<span class="ot">None</span>, cookie_name=<span class="st">&#39;session_id&#39;</span>, cookie_expires=<span class="ot">True</span>, cookie_domain=<span class="ot">None</span>, cookie_path=<span class="st">&#39;/&#39;</span>, secure=<span class="ot">False</span>, httponly=<span class="ot">False</span>, auto=<span class="ot">True</span>)</code></h4>
+</section>
+<section id="Session.finalize" class="level4">
+<h4><code class="sourceCode python">finalize(session, request, response)</code></h4>
+</section>
+</section>
+<section id="SessionObject" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> SessionObject</code></h3>
+<div class="docstring">
+<p>A session object with support for “flashed” messages.</p>
+</div>
+<section id="SessionObject.__init__" class="level4">
+<h4><code class="sourceCode python"><span class="ot">__init__</span>(environ, **params)</code></h4>
+</section>
+<section id="SessionObject.accessed" class="level4">
+<h4><code class="sourceCode python">accessed()</code></h4>
+<div class="docstring">
+<p>Returns whether or not the session has been accessed</p>
+</div>
+</section>
+<section id="SessionObject.add_message" class="level4">
+<h4><code class="sourceCode python">add_message(text, <span class="dt">type</span>=<span class="ot">None</span>)</code></h4>
+<div class="docstring">
+<p>Add a message with an optional type.</p>
+</div>
+</section>
+<section id="SessionObject.delete" class="level4">
+<h4><code class="sourceCode python">delete()</code></h4>
+</section>
+<section id="SessionObject.dirty" class="level4">
+<h4><code class="sourceCode python">dirty()</code></h4>
+</section>
+<section id="SessionObject.get_by_id" class="level4">
+<h4><code class="sourceCode python">get_by_id(<span class="dt">id</span>)</code></h4>
+<div class="docstring">
+<p>Loads a session given a session ID</p>
+</div>
+</section>
+<section id="SessionObject.has_key" class="level4">
+<h4><code class="sourceCode python">has_key(key)</code></h4>
+</section>
+<section id="SessionObject.persist" class="level4">
+<h4><code class="sourceCode python">persist()</code></h4>
+<div class="docstring">
+<p>Persist the session to the storage</p>
+<p>If its set to autosave, then the entire session will be saved regardless of if save() has been called. Otherwise, just the accessed time will be updated if save() was not called, or the session will be saved if save() was called.</p>
+</div>
+</section>
+<section id="SessionObject.pop_messages" class="level4">
+<h4><code class="sourceCode python">pop_messages(<span class="dt">type</span>=<span class="ot">None</span>)</code></h4>
+<div class="docstring">
+<p>Retrieve stored messages and remove them from the session.</p>
+<p>Return all messages with a specific type, or all messages when <code class="sourceCode python"><span class="dt">type</span></code> is None. Messages are returned in the order they were added. All messages returned in this way are removed from the session and will not be returned in subsequent calls.</p>
+<p>Returns a list of namedtuples with the fields (type, text).</p>
+</div>
+</section>
+<section id="SessionObject.save" class="level4">
+<h4><code class="sourceCode python">save()</code></h4>
+</section>
+</section>
+<section id="message" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> message</code></h3>
+<div class="docstring">
+<p>message(type, text)</p>
+</div>
+<section id="text" class="level4">
+<h4><code id="message.text">text</code></h4>
+<div class="docstring">
+<p>Alias for field number 1</p>
+</div>
+</section>
+<section id="type" class="level4">
+<h4><code class="sourceCode python" id="message.type"><span class="dt">type</span></code></h4>
+<div class="docstring">
+<p>Alias for field number 0</p>
+</div>
+</section>
+</section>
+</section>
+</section>
+</body>
+</html>

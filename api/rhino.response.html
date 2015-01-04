@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+  </style>
+  <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+<div id="sidebar">
+<img alt="The Rhino logo" src="../static/Rhinoceros.svg">
+<ul>
+<li><a href="../index.html">Welcome</a></li>
+<li><a href="../api/index.html">API Documentation</a></li>
+</ul>
+</div>
+<div id="module-toc">
+<ul>
+<li><a href="#rhino.response">Module <a href="../api/rhino.response.html#rhino.response"><code>rhino.response</code></a></a>
+<ul>
+<li><a href="#classes">Classes</a>
+<ul>
+<li><a href="../api/rhino.response.html#Entity"><code>Entity</code></a></li>
+<li><a href="../api/rhino.response.html#Response"><code>Response</code></a></li>
+<li><a href="../api/rhino.response.html#ResponseBody"><code>ResponseBody</code></a></li>
+</ul></li>
+<li><a href="#functions">Functions</a>
+<ul>
+<li><a href="../api/rhino.response.html#created"><code>created</code></a></li>
+<li><a href="../api/rhino.response.html#filter_304_headers"><code>filter_304_headers</code></a></li>
+<li><a href="../api/rhino.response.html#no_content"><code>no_content</code></a></li>
+<li><a href="../api/rhino.response.html#ok"><code>ok</code></a></li>
+<li><a href="../api/rhino.response.html#redirect"><code>redirect</code></a></li>
+<li><a href="../api/rhino.response.html#response"><code>response</code></a></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<section id="module-rhino.response" class="level1">
+<h1>Module <a href="../api/rhino.response.html#rhino.response"><code id="rhino.response">rhino.response</code></a></h1>
+<section id="classes" class="level2">
+<h2>Classes</h2>
+<section id="Entity" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> Entity</code></h3>
+<div class="docstring">
+<p>Represents a response body with entity headers.</p>
+</div>
+<section id="Entity.__init__" class="level4">
+<h4><code class="sourceCode python"><span class="ot">__init__</span>(body, **kw)</code></h4>
+</section>
+</section>
+<section id="Response" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> Response</code></h3>
+<div class="docstring">
+<p>Represents an HTTP response.</p>
+<p>Class attributes:</p>
+<dl>
+<dt>default_encoding</dt>
+<dd>When finalizing the response and the response body is a unicode string, it is encoded using default_encoding (default: ‘utf-8’)
+</dd>
+<dt>default_content_type</dt>
+<dd>When finalizing the response and the response body is not empty this is used as the default value for the Content-Type header, if none is provided (default: ‘text/plain; charset=utf-8’)
+</dd>
+</dl>
+</div>
+<section id="Response.__init__" class="level4">
+<h4><code class="sourceCode python"><span class="ot">__init__</span>(code, headers=<span class="ot">None</span>, body=<span class="st">&#39;&#39;</span>)</code></h4>
+<div class="docstring">
+<p>Create a new HTTP response.</p>
+<p>Parameters:</p>
+<dl>
+<dt>code</dt>
+<dd>The response status code (<code class="sourceCode python"><span class="dt">int</span></code>).
+</dd>
+<dt>headers</dt>
+<dd>A list of response headers as (name, value) tuples.
+</dd>
+<dt>body</dt>
+<dd><p>A value for the response body. The body is only validated when the request is finalized (in <strong>call</strong>).</p>
+<p>Valid values for the response body are:</p>
+<p>The empty string (’’) This indicates an empty response body.</p>
+<dl>
+<dt>A <code class="sourceCode python"><span class="dt">str</span></code> or <code class="sourceCode python"><span class="dt">unicode</span></code> object</dt>
+<dd>Sent as-is, after encoding unicode using default_encoding
+</dd>
+<dt>An iterator that yields <code class="sourceCode python"><span class="dt">str</span></code> or <code class="sourceCode python"><span class="dt">unicode</span></code> objects</dt>
+<dd>The response is streamed to the client using chunked transfer-encoding (when implemented by the WSGI server).
+</dd>
+<dt>A callable that returns a single <code class="sourceCode python"><span class="dt">str</span></code> or <code class="sourceCode python"><span class="dt">unicode</span></code> object</dt>
+<dd>This is only useful in combination with an ‘Etag’ or ‘Last-Modified’ header, to delay construction of the response body until after conditional request handling has taken place, and no “304 Not Modified” response has been sent.
+</dd>
+<dt>An <a href="../api/rhino.response.html#Entity"><code>Entity</code></a> instance</dt>
+<dd>The response body (which must be of one of the types listed above) will be taken from the entity instance, and any entity headers will be added to the response headers, with existing headers of the same name taking precedence.
+</dd>
+</dl>
+</dd>
+</dl>
+</div>
+</section>
+<section id="Response.add_callback" class="level4">
+<h4><code class="sourceCode python">add_callback(fn)</code></h4>
+<div class="docstring">
+<p>Add a callback to be executed when the response is closed.</p>
+</div>
+</section>
+<section id="body" class="level4">
+<h4><code id="Response.body">body</code></h4>
+<div class="docstring">
+<p>The response body.</p>
+</div>
+</section>
+<section id="code" class="level4">
+<h4><code id="Response.code">code</code></h4>
+<div class="docstring">
+<p>The HTTP status code as an integer.</p>
+</div>
+</section>
+<section id="Response.conditional_to" class="level4">
+<h4><code class="sourceCode python">conditional_to(request)</code></h4>
+<div class="docstring">
+<p>Return a response that is conditional to a given request.</p>
+<p>Returns the Response instance unchanged, or a new Response instance with a “304 Not Modified” status code.</p>
+</div>
+</section>
+<section id="Response.delete_cookie" class="level4">
+<h4><code class="sourceCode python">delete_cookie(key, path=<span class="st">&#39;/&#39;</span>, domain=<span class="ot">None</span>)</code></h4>
+<div class="docstring">
+<p>Delete a cookie (by setting it to a blank value).</p>
+<p>The path and domain values must match that of the original cookie.</p>
+</div>
+</section>
+<section id="headers" class="level4">
+<h4><code id="Response.headers">headers</code></h4>
+<div class="docstring">
+<p>A ResponseHeaders instance representing the response headers.</p>
+</div>
+</section>
+<section id="Response.set_cookie" class="level4">
+<h4><code class="sourceCode python">set_cookie(key, value=<span class="st">&#39;&#39;</span>, max_age=<span class="ot">None</span>, path=<span class="st">&#39;/&#39;</span>, domain=<span class="ot">None</span>, secure=<span class="ot">False</span>, httponly=<span class="ot">False</span>, expires=<span class="ot">None</span>)</code></h4>
+<div class="docstring">
+<p>Set a response cookie.</p>
+<p>Parameters:</p>
+<dl>
+<dt>key <code class="sourceCode python"><span class="dt">str</span></code></dt>
+<dd>The cookie name.
+</dd>
+<dt>value <code class="sourceCode python"><span class="dt">str</span></code></dt>
+<dd>The cookie value.
+</dd>
+<dt>max_age <code class="sourceCode python"><span class="dt">int</span></code>, <code>datetime.timedelta</code></dt>
+<dd>The maximum age of the cookie in seconds, or as a datetime.timedelta instance.
+</dd>
+<dt>path <code class="sourceCode python"><span class="dt">str</span></code></dt>
+<dd>Restrict the cookie to this path (default: ‘/’).
+</dd>
+<dt>domain <code class="sourceCode python"><span class="dt">str</span></code></dt>
+<dd>Restrict the cookie to his domain.
+</dd>
+<dt>secure <code class="sourceCode python"><span class="dt">bool</span></code></dt>
+<dd>When True, instruct the client to only sent the cookie over HTTPS.
+</dd>
+<dt>httponly <code class="sourceCode python"><span class="dt">bool</span></code></dt>
+<dd>When True, instruct the client to disallow javascript access to the cookie.
+</dd>
+<dt>expires: <code class="sourceCode python"><span class="dt">int</span></code>, <code>datetime.timdelta</code>, <code>datetime.datetime</code></dt>
+<dd>Another way of specifying the maximum age of the cookie. Accepts the same values as max_age (number of seconds, datetime.timedelta). Additionaly accepts a datetime.datetime instance. Note: a value of type int or float is interpreted as a number of seconds in the future, <em>not</em> as Unix timestamp.
+</dd>
+</dl>
+</div>
+</section>
+<section id="status" class="level4">
+<h4><code id="Response.status">status</code></h4>
+<div class="docstring">
+<p>The statusline as a string (status code + reason)</p>
+</div>
+</section>
+</section>
+<section id="ResponseBody" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> ResponseBody</code></h3>
+<div class="docstring">
+<p>A WSGI response iterator.</p>
+<p>Holds the response body and a list of callbacks to be called when the response is close()d by the WSGI server.</p>
+</div>
+<section id="ResponseBody.__init__" class="level4">
+<h4><code class="sourceCode python"><span class="ot">__init__</span>(body, callbacks=<span class="ot">None</span>)</code></h4>
+</section>
+<section id="ResponseBody.close" class="level4">
+<h4><code class="sourceCode python">close()</code></h4>
+</section>
+<section id="ResponseBody.next" class="level4">
+<h4><code class="sourceCode python"><span class="dt">next</span>()</code></h4>
+</section>
+</section>
+</section>
+<section id="functions" class="level2">
+<h2>Functions</h2>
+<section id="created" class="level3">
+<h3><code class="sourceCode python">created(body=<span class="st">&#39;&#39;</span>, **kw)</code></h3>
+<div class="docstring">
+<p>Shortcut for <code>response(201, ...)</code>.</p>
+</div>
+</section>
+<section id="filter_304_headers" class="level3">
+<h3><code class="sourceCode python">filter_304_headers(headers)</code></h3>
+<div class="docstring">
+<p>Filter a list of headers to include in a “304 Not Modified” response.</p>
+</div>
+</section>
+<section id="no_content" class="level3">
+<h3><code class="sourceCode python">no_content(**kw)</code></h3>
+<div class="docstring">
+<p>Shortcut for <code>response(204, body='', ...)</code>.</p>
+</div>
+</section>
+<section id="ok" class="level3">
+<h3><code class="sourceCode python">ok(body=<span class="st">&#39;&#39;</span>, code=<span class="dv">200</span>, **kw)</code></h3>
+<div class="docstring">
+<p>Shortcut for <code>response(200, ...)</code>.</p>
+<p>The status code must be in the 2xx range.</p>
+</div>
+</section>
+<section id="redirect" class="level3">
+<h3><code class="sourceCode python">redirect(location, code=<span class="dv">302</span>, **kw)</code></h3>
+<div class="docstring">
+<p>Shortcut for <code>response(302, location=location, ...)</code>.</p>
+<p>The status code must be in the 3xx range.</p>
+</div>
+</section>
+<section id="response" class="level3">
+<h3><code class="sourceCode python">response(code, body=<span class="st">&#39;&#39;</span>, etag=<span class="ot">None</span>, last_modified=<span class="ot">None</span>, expires=<span class="ot">None</span>, **kw)</code></h3>
+<div class="docstring">
+<p>Helper to build an HTTP response.</p>
+<p>Parameters:</p>
+<dl>
+<dt>code</dt>
+<dd>An integer status code.
+</dd>
+<dt>body</dt>
+<dd>The response body. See <a href="../api/rhino.response.html#Response"><code>Response</code></a> for details.
+</dd>
+<dt>etag</dt>
+<dd>A value for the Etag header. Double quotes will be added unless the string starts and ends with a double qote. If the value is callable, it will be called with <code>body</code> as argument and should return a string (quotes will be added to the returned string as described above).
+</dd>
+<dt>last_modified</dt>
+<dd>A value for the Last-Modified header as a datetime.datetime instance or Unix timestamp.
+</dd>
+<dt>expires</dt>
+<dd>A value for the Expires header as number of seconds, datetime.timedelta or datetime.datetime instance. Note: a value of type int or float is interpreted as a number of seconds in the future, <em>not</em> as Unix timestamp.
+</dd>
+<dt>**kw</dt>
+<dd>All other keyword arguments are interpreted as response headers. The names will be converted to header names by replacing underscores with hyphens and converting to title case (e.g. <code>x_powered_by</code> → <code>X-Powered-By</code>).
+</dd>
+</dl>
+</div>
+</section>
+</section>
+</section>
+</body>
+</html>
