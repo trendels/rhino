@@ -9,6 +9,12 @@ from .response import Response
 from .util import dual_use_decorator, dual_use_decorator_method, call_with_ctx
 from .vendor import mimeparse
 
+__all__ = [
+    'Resource',
+    'make_response',
+    'get', 'post', 'put', 'delete', 'patch', 'options',
+]
+
 class_types = (type, types.ClassType)  # new-style and old-style classes
 
 VIEW_SEPARATOR = ':'

@@ -31,6 +31,10 @@ from __future__ import absolute_import
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
+__all__ = [
+    'SessionProperty',
+]
+
 
 class SessionProperty(object):
     def __init__(self, url=None, delay_close=False, **session_args):

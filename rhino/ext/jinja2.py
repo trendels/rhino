@@ -28,6 +28,10 @@ from functools import partial
 import jinja2
 from rhino.response import Entity
 
+__all__ = [
+    'JinjaRenderer',
+]
+
 
 class JinjaRenderer(object):
     encoding = 'utf-8'

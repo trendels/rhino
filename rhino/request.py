@@ -8,6 +8,12 @@ from wsgiref.util import request_uri, application_uri
 
 from .urls import request_context, build_url
 
+__all__ = [
+    'Request',
+    'RequestHeaders',
+    'QueryDict',
+]
+
 
 class RequestHeaders(object):
     """A dictionary-like object to access request headers.

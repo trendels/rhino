@@ -20,6 +20,12 @@ from functools import partial
 import beaker.session
 from beaker.util import coerce_session_params
 
+__all__ = [
+    'BeakerSession',
+    'Session',
+    'SessionObject',
+]
+
 message = namedtuple('message', 'type text')
 
 

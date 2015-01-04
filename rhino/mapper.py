@@ -10,6 +10,15 @@ from .response import Response
 from .resource import Resource
 from .util import call_with_ctx
 
+__all__ = [
+    'Mapper',
+    'Route',
+    'Context',
+    'MapperException',
+    'InvalidArgumentError',
+    'InvalidTemplateError',
+]
+
 # template2regex function taken from Joe Gregorio's wsgidispatcher.py
 # (https://code.google.com/p/robaccia/) with minor modifications.
 

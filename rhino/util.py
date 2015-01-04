@@ -3,6 +3,11 @@ from __future__ import absolute_import
 import functools
 import inspect
 
+__all__ = [
+    'call_with_ctx',
+    'sse_event',
+]
+
 
 def _sse_encode(k, v):
     return ''.join('%s: %s\n' % (k, line) for line in v.split('\n'))

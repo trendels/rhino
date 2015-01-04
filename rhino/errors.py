@@ -5,6 +5,26 @@ from cgi import escape
 from .http import status_codes
 from .response import Response
 
+__all__ = [
+    'HTTPException',
+    'Redirection',
+    'ClientError',
+    'ServerError',
+    'MovedPermanently',
+    'Found',
+    'SeeOther',
+    'TemporaryRedirect',
+    'BadRequest',
+    'Unauthorized',
+    'Forbidden',
+    'NotFound',
+    'MethodNotAllowed',
+    'NotAcceptable',
+    'Gone',
+    'UnsupportedMediaType',
+    'InternalServerError',
+]
+
 # Default HTML error page, inspired by Django.
 html_template = '''<!DOCTYPE html>
 <html>
