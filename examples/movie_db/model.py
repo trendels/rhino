@@ -54,7 +54,7 @@ def init_db(url):
     starwars.roles = [
         Role("Luke Skywalker", Actor("Mark Hamill")),
         Role("Leia Organa", Actor("Carrie Fisher")),
-        Role("Obi-Wan Kenobi", Actor("Sir Alec Guiness")),
+        Role("Obi-Wan Kenobi", Actor("Sir Alec Guinness")),
         Role("Han Solo", Actor("Harrison Ford")),
     ]
     session.add(starwars)
