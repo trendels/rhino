@@ -201,7 +201,7 @@ class NotFound(ClientError):
 
 
 class MethodNotAllowed(ClientError):
-    """404 Method Not Allowed.
+    """405 Method Not Allowed.
 
     Required arguments:
 
