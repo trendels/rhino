@@ -55,6 +55,10 @@ def test_finalize_head():
     ]
     assert body == ''
 
+    status, headers, body = wsgi_response(
+            Response(200, body='test'), {'REQUEST_METHOD': 'head'})
+    assert body == ''
+
 
 def test_finalize_lazy():
     body = lambda: 'test'

@@ -323,7 +323,8 @@ class Response(object):
 
         start_response(self.status, header_list)
 
-        if code in (204, 304) or environ.get('REQUEST_METHOD') == 'HEAD':
+        if code in (204, 304) \
+                or environ.get('REQUEST_METHOD', '').upper() == 'HEAD':
             body = ''
 
         return ResponseBody(body, self._callbacks)
