@@ -35,7 +35,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="sidebar">
 <img alt="Rhino logo" src="../static/Rhinoceros.svg">
 <ul>
-<li><a href="../index.html">Welcome</a></li>
+<li><a href="../index.html">Documentation Index</a></li>
 <li><a href="../modules/index.html">Module Index</a></li>
 </ul>
 </div>
@@ -60,13 +60,14 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <h3><code class="sourceCode python">call_with_ctx(fn, ctx, *args, **kw)</code></h3>
 <div class="docstring">
 <p>Call fn with or without 'ctx', depending on its signature.</p>
-<p>If the <code>fn</code> callable accepts an argument named &quot;ctx&quot;, then <code>ctx</code> will be passed as a keyword argument, else <code>ctx</code> is ignored.</p>
+<p>If the <code>fn</code> callable accepts an argument named &quot;ctx&quot;, then <code>ctx</code> will be passed as a keyword argument, else it will be ignored.</p>
 </div>
 </section>
 <section id="sse_event" class="level3">
 <h3><code class="sourceCode python">sse_event(event=<span class="ot">None</span>, data=<span class="ot">None</span>, <span class="dt">id</span>=<span class="ot">None</span>, retry=<span class="ot">None</span>, comment=<span class="ot">None</span>)</code></h3>
 <div class="docstring">
 <p>Encode a Server-Sent Event (SSE).</p>
+<p>Returns the event as a string.</p>
 <p>At least one field must be present. All fields are strings, except retry, which should be an integer. The data and comment fields can contain newlines.</p>
 </div>
 </section>

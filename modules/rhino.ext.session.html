@@ -35,7 +35,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="sidebar">
 <img alt="Rhino logo" src="../static/Rhinoceros.svg">
 <ul>
-<li><a href="../index.html">Welcome</a></li>
+<li><a href="../index.html">Documentation Index</a></li>
 <li><a href="../modules/index.html">Module Index</a></li>
 </ul>
 </div>
@@ -47,7 +47,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#classes">Classes</a>
 <ul>
 <li><a href="../modules/rhino.ext.session.html#BeakerSession"><code>BeakerSession</code></a></li>
-<li><a href="../modules/rhino.ext.session.html#Session"><code>Session</code></a></li>
+<li><a href="../modules/rhino.ext.session.html#CookieSession"><code>CookieSession</code></a></li>
 <li><a href="../modules/rhino.ext.session.html#SessionObject"><code>SessionObject</code></a></li>
 </ul></li>
 </ul></li>
@@ -59,7 +59,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>This module contains classes that can be used to add session support for Rhino applications.</p>
 <p>This extension requires the Beaker module to be installed:</p>
 <pre class="sourceCode python"><code class="sourceCode python">$ pip install beaker</code></pre>
-<p>The <a href="../modules/rhino.ext.session.html#Session"><code>Session</code></a> class provides a simple and easy to use signed cookie-based session.</p>
+<p>The <a href="../modules/rhino.ext.session.html#CookieSession"><code>CookieSession</code></a> class provides a simple and easy to use signed cookie-based session.</p>
 <p>The <a href="../modules/rhino.ext.session.html#BeakerSession"><code>BeakerSession</code></a> class provides access to the different backends provided by beaker.session.</p>
 <p>Both classes use the <a href="../modules/rhino.ext.session.html#SessionObject"><code>SessionObject</code></a> class as the interface to the session that subclasses Beaker's SessionObject to add support for &quot;flashed&quot; messages.</p>
 </div>
@@ -77,15 +77,15 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <h4><code class="sourceCode python">finalize(session, request, response)</code></h4>
 </section>
 </section>
-<section id="Session" class="level3">
-<h3><code class="sourceCode python"><span class="kw">class</span> Session</code></h3>
+<section id="CookieSession" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> CookieSession</code></h3>
 <div class="docstring">
 <p>Adds a session based on signed cookies to the context.</p>
 </div>
-<section id="Session.__init__" class="level4">
+<section id="CookieSession.__init__" class="level4">
 <h4><code class="sourceCode python"><span class="ot">__init__</span>(secret, timeout=<span class="ot">None</span>, cookie_name=<span class="st">&#39;session_id&#39;</span>, cookie_expires=<span class="ot">True</span>, cookie_domain=<span class="ot">None</span>, cookie_path=<span class="st">&#39;/&#39;</span>, secure=<span class="ot">False</span>, httponly=<span class="ot">False</span>, auto=<span class="ot">True</span>)</code></h4>
 </section>
-<section id="Session.finalize" class="level4">
+<section id="CookieSession.finalize" class="level4">
 <h4><code class="sourceCode python">finalize(session, request, response)</code></h4>
 </section>
 </section>

@@ -35,7 +35,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="sidebar">
 <img alt="Rhino logo" src="../static/Rhinoceros.svg">
 <ul>
-<li><a href="../index.html">Welcome</a></li>
+<li><a href="../index.html">Documentation Index</a></li>
 <li><a href="../modules/index.html">Module Index</a></li>
 </ul>
 </div>
@@ -98,13 +98,13 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <dd>This indicates an empty response body.
 </dd>
 <dt>A str or unicode object</dt>
-<dd>Sent as-is, after encoding unicode using default_encoding
+<dd>Sent as-is, after encoding unicode using default_encoding.
 </dd>
 <dt>An iterator that yields str or unicode objects</dt>
 <dd>The response is streamed to the client using chunked transfer-encoding (when implemented by the WSGI server).
 </dd>
 <dt>A callable that returns a single str or unicode object</dt>
-<dd>This is only useful in combination with an 'Etag' or 'Last-Modified' header, to delay construction of the response body until after conditional request handling has taken place, and no &quot;304 Not Modified&quot; response has been sent.
+<dd>This is only useful in combination with an 'ETag' or 'Last-Modified' header, to delay construction of the response body until after conditional request handling has taken place, and no &quot;304 Not Modified&quot; response has been sent.
 </dd>
 <dt>An Entity instance</dt>
 <dd>The response body (which must be of one of the types listed above) will be taken from the entity instance, and any entity headers will be added to the response headers, with existing headers of the same name taking precedence.
@@ -214,10 +214,10 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <dd>An integer status code.
 </dd>
 <dt>body</dt>
-<dd>The response body. See <a href="../modules/rhino.response.html#Response.__init__"><code>Response.__init__</code></a> for details.
+<dd>The response body. See <code>Response.__init__</code> for details.
 </dd>
 <dt>etag</dt>
-<dd>A value for the Etag header. Double quotes will be added unless the string starts and ends with a double qote. If the value is callable, it will be called with <code>body</code> as argument and should return a string (quotes will be added to the returned string as described above).
+<dd>A value for the ETag header. Double quotes will be added unless the string starts and ends with a double quote. If the value is callable, it will be called with <code>body</code> as argument and should return a string (quotes will be added to the returned string as described above).
 </dd>
 <dt>last_modified</dt>
 <dd>A value for the Last-Modified header as a datetime.datetime instance or Unix timestamp.
