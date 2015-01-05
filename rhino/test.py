@@ -52,7 +52,7 @@ class TestClient(object):
         environ['PATH_INFO'] = path
         for k, v in kw.items():
             key = k.upper()
-            if k not in ('content_type', 'content_length'):
+            if key not in ('CONTENT_TYPE', 'CONTENT_LENGTH'):
                 key = 'HTTP_' + key
             environ[key] = str(v)
         start_response_rv = []
