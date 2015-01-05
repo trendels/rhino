@@ -76,12 +76,18 @@ def test_resolve_handler():
                 make_handler_metadata(verb='POST', accepts='text/plain', provides='text/plain'),
                 make_handler_metadata(verb='POST', accepts='application/xml', provides='image/png'),
             ],
+            'PUT': [
+                make_handler_metadata(verb='PUT', accepts='text/plain'),
+                make_handler_metadata(verb='PUT', accepts='*/*'),
+            ]
         }
     }
     get_handlers = handlers[None]['GET']
     post_handlers = handlers[None]['POST']
     put_handlers = handlers[None]['PUT']
     post_handlers_test_view = handlers['test']['POST']
+    put_handlers_test_view = handlers['test']['PUT']
+
     no_vary = set()
     vary_accept = set(['Accept'])
     vary_content_type = set(['Content-Type'])
@@ -135,6 +141,11 @@ def test_resolve_handler():
     req._add_context(root=None, mapper=None, route=Route('/', None, name=':test'))
     rv = resolve_handler(req, handlers)
     assert rv == (post_handlers_test_view[1], vary_both)
+
+    req = Request({'REQUEST_METHOD': 'PUT', 'CONTENT_TYPE': 'text/plain'})
+    req._add_context(root=None, mapper=None, route=Route('/', None, name=':test'))
+    rv = resolve_handler(req, handlers)
+    assert rv == (put_handlers_test_view[0], vary_content_type)
 
 
 def test_make_response():

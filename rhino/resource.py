@@ -119,7 +119,7 @@ def resolve_handler(request, view_handlers):
     vary = set()
     if len(set(h.provides for h in handlers if h.provides is not None)) > 1:
         vary.add('Accept')
-    if len(set(h.accepts for h in handlers if h.accepts != '*/*')) > 1:
+    if len(set(h.accepts for h in handlers)) > 1:
         vary.add('Content-Type')
 
     content_type = request.content_type
