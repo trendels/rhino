@@ -202,11 +202,11 @@ def template2path(template, params, ranges=None):
     """Converts a template and a dict of parameters to a path fragment.
 
     Converts a template, such as /{name}/ and a dictionary of parameter
-    values to a URL path (string). Parameter values will be converted to
-    strings and escaped.
+    values to a URL path (string).
 
-    Parameter values that are used are converted using `str()` and validated
-    against the paremter range. Unused parameters are ignored.
+    Parameter values that are used for buildig the path are converted to
+    strings using `str()` and URI-escaped, then validated against the their
+    range. Unused parameters are ignored.
 
     Any optional ([]) blocks in the template are skipped unless they contain at
     least one parameter and all parameters needed to fill the block (including
@@ -350,7 +350,7 @@ class Context(object):
             Arguments: request, response
 
         'finalize'
-          : Called from `Mapper`, before WSGI response is finalized.
+          : Called from `Mapper`, before the WSGI response is finalized.
 
             Arguments: request, response
 
