@@ -24,8 +24,8 @@ def sse_event(event=None, data=None, id=None, retry=None, comment=None):
         raise TypeError("Event must have at least one field")
     return ''.join([
         _sse_encode('', comment) if comment is not None else '',
-        _sse_encode('event', event) if event is not None else '',
         _sse_encode('id', id) if id is not None else '',
+        _sse_encode('event', event) if event is not None else '',
         _sse_encode('retry', str(retry)) if retry is not None else '',
         _sse_encode('data', data) if data is not None else '',
         '\n',

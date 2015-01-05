@@ -130,12 +130,30 @@ def test_get_args():
 
 def test_sse_event():
     assert sse_event('test', 'foo\nbar') == \
-            'event: test\ndata: foo\ndata: bar\n\n'
+'''\
+event: test
+data: foo
+data: bar
+
+'''
+
     assert sse_event(comment='a\nb\n') == \
-            ': a\n: b\n: \n\n'
+'''\
+: a
+: b
+: 
+
+'''
     assert sse_event(
             event='test', data='foo', id='id', retry=12, comment='hi') == \
-            ': hi\nevent: test\nid: id\nretry: 12\ndata: foo\n\n'
+'''\
+: hi
+id: id
+event: test
+retry: 12
+data: foo
+
+'''
 
 def test_sse_event_minimal():
     assert sse_event(comment='') == ': \n\n'
