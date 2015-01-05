@@ -31,9 +31,9 @@ status_codes = httplib.responses.copy()
 def parse_etag_header(header):
     """Parse a header containing one or more ETags or a wildcard ('*').
 
-    Returns the string '*' or a list of etags as (weak, etag) tuples.
-    `weak` is the prefix designating a weak etag, or the empty string.
-    `etag` is the etag (including quotes) with the weak prefix stripped
+    Returns the string '*' or a list of ETags as (weak, etag) tuples.
+    `weak` is the prefix designating a weak ETag, or the empty string.
+    `etag` is the ETag (including quotes) with the weak prefix stripped
     off. Returns an empty list if the header could not be parsed.
 
     Example:
@@ -66,7 +66,7 @@ def match_etag(etag, header, weak=False):
         return False
     m = etag_re.match(etag)
     if not m:
-        raise ValueError("Not a well-formed etag: '%s'" % etag)
+        raise ValueError("Not a well-formed ETag: '%s'" % etag)
     (is_weak, etag) = m.groups()
     parsed_header = parse_etag_header(header)
     if parsed_header == '*':

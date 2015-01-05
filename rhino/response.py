@@ -121,7 +121,7 @@ class Response(object):
                 transfer-encoding (when implemented by the WSGI server).
 
             A callable that returns a single str or unicode object
-              : This is only useful in combination with an 'Etag' or
+              : This is only useful in combination with an 'ETag' or
                 'Last-Modified' header, to delay construction of the
                 response body until after conditional request handling
                 has taken place, and no "304 Not Modified" response has
@@ -249,7 +249,7 @@ class Response(object):
         etag_ok, date_ok = False, False
 
         if if_none_match:
-            etag = response_headers.get('Etag')
+            etag = response_headers.get('ETag')
             if etag and match_etag(etag, if_none_match, weak=True):
                 etag_ok = True
 
@@ -339,7 +339,7 @@ def response(code, body='', etag=None, last_modified=None, expires=None, **kw):
     body
      :  The response body. See `Response.__init__` for details.
     etag
-     :  A value for the Etag header. Double quotes will be added unless the
+     :  A value for the ETag header. Double quotes will be added unless the
         string starts and ends with a double qote. If the value is callable,
         it will be called with `body` as argument and should return a string
         (quotes will be added to the returned string as described above).
