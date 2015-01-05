@@ -6,7 +6,7 @@ This extension requires the Beaker module to be installed:
 
     $ pip install beaker
 
-The `Session` class provides a simple and easy to use signed
+The `CookieSession` class provides a simple and easy to use signed
 cookie-based session.
 
 The `BeakerSession` class provides access to the different backends provided by
@@ -25,7 +25,7 @@ from beaker.util import coerce_session_params
 
 __all__ = [
     'BeakerSession',
-    'Session',
+    'CookieSession',
     'SessionObject',
 ]
 
@@ -104,7 +104,7 @@ class BeakerSession(object):
         return session
 
 
-class Session(BeakerSession):
+class CookieSession(BeakerSession):
     """Adds a session based on signed cookies to the context."""
     session_class = SessionObject
 
@@ -114,7 +114,7 @@ class Session(BeakerSession):
             self, secret, timeout=None, cookie_name='session_id',
             cookie_expires=True, cookie_domain=None, cookie_path='/',
             secure=False, httponly=False, auto=True):
-        super(Session, self).__init__(
+        super(CookieSession, self).__init__(
             type='cookie',
             validate_key=secret,
             key=cookie_name,

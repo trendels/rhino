@@ -1,5 +1,5 @@
 from rhino import Mapper, get
-from rhino.ext.session import Session, SessionObject, message
+from rhino.ext.session import CookieSession, SessionObject, message
 from rhino.test import TestClient
 
 def test_messages():
@@ -41,7 +41,7 @@ def test_session_property():
         return 'test'
 
     app = Mapper()
-    app.add_ctx_property('session', Session(secret='test'))
+    app.add_ctx_property('session', CookieSession(secret='test'))
     app.add('/', handler)
     client = TestClient(app.wsgi)
 
