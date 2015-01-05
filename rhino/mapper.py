@@ -491,7 +491,8 @@ class Mapper(object):
                     template, resource, name=name, ranges=self.ranges)
         obj_id = id(resource)
         if obj_id not in self._lookup:
-            # It's ok to have multiple routes for the same object id.
+            # It's ok to have multiple routes for the same object id, the
+            # lookup will return the first one.
             self._lookup[obj_id] = route
         if name is not None:
             if name in self.named_routes:
@@ -551,13 +552,13 @@ class Mapper(object):
                 # Build path for a named route
                 return self.named_routes[target].path(params)
         elif isinstance(target, Route):
-            # Build path for a route instance, used by for build_url('.')
+            # Build path for a route instance, used by build_url('.')
             for route in self.routes:
                 if route is target:
                     return route.path(params)
             raise InvalidArgumentError("Route '%s' not found in this %s instance." % (target, self.__class__.__name__))
         else:
-            # Build path for route resource instance
+            # Build path for resource by object id
             target_id = id(target)
             if target_id in self._lookup:
                 return self._lookup[target_id].path(params)

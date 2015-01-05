@@ -71,14 +71,18 @@ class StaticDirectory(object):
         # Interpret path_info as an OS path, resolve any non-leading '..', and
         # require resulting path to be absolute.
         # This is to prevent enumeration of directory names: If 'foo.txt' is
-        # a public file, and a request for '../bar/foo.txt' succeeds, we know
-        # that foo is in a directory named 'bar'.
+        # a public file in self.root, and a request for '../bar/foo.txt'
+        # succeeds, a client can learn that foo is in a directory named 'bar',
+        # and continue like this until it knows the entire path of the file,
+        # starting from '/'.
         request_path = os.path.normpath(path_info)
         if not os.path.isabs(request_path):
             raise NotFound
-        # Concatenate with root path and do prefix check
+        # Concatenate with root path and do a prefix check to prevent path
+        # traversal.
         prefix = os.path.abspath(self.root) + os.path.sep
-        # Use '+' instead of os.path.join because request_path is absolute.
+        # Use concatenation here instead of os.path.join because request_path
+        # is absolute.
         filepath = os.path.abspath(prefix + request_path)
         if os.path.commonprefix([prefix, filepath]) != prefix:
             raise NotFound

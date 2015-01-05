@@ -87,7 +87,7 @@ def resolve_handler(request, view_handlers):
 
     Returns a (handler, vary) tuple, where handler is a handler_metadata tuple
     and vary is a set containing header names that were used during content
-    negotiation and that should to be included in the 'Vary' header of the
+    negotiation and that should be included in the 'Vary' header of the
     outgoing response.
 
     When no suitable handler exists, raises NotFound, MethodNotAllowed,
@@ -178,9 +178,10 @@ def negotiate_accept(accept, handlers):
     else:
         # Not all handlers are annotated - disable content-negotiation
         # for Accept.
-        # TODO: Enable "Optimistic mode": If a fully qualified mime-type was
-        # requested and we have a specific handler it, return that instead of
-        # the default handler (depending on 'q' value).
+        # TODO: We could implement an "optimistic mode": If a fully qualified
+        # mime-type was requested and we have a specific handler that provides
+        # it, choose that handler instead of the default handler (depending on
+        # 'q' value).
         return [h for h in handlers if h.provides is None]
 
 

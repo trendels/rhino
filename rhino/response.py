@@ -23,7 +23,7 @@ __all__ = [
 
 # Include: etag, content-location, expires, cache-control, vary
 # TODO The revised HTTP RFCs (rfcs 7230-7235) have removed the distinction
-# between entity-headers and other heathers. We might need to revisit this.
+# between entity-headers and other headers. We might need to revisit this.
 entity_headers = set('''
        Allow Content-Encoding Content-Language Content-Length Content-Location
        Content-MD5 Content-Range Content-Type Expires Last-Modified
@@ -114,7 +114,7 @@ class Response(object):
               : This indicates an empty response body.
 
             A str or unicode object
-              : Sent as-is, after encoding unicode using default_encoding
+              : Sent as-is, after encoding unicode using default_encoding.
 
             An iterator that yields str or unicode objects
               : The response is streamed to the client using chunked
@@ -341,7 +341,7 @@ def response(code, body='', etag=None, last_modified=None, expires=None, **kw):
      :  The response body. See `Response.__init__` for details.
     etag
      :  A value for the ETag header. Double quotes will be added unless the
-        string starts and ends with a double qote. If the value is callable,
+        string starts and ends with a double quote. If the value is callable,
         it will be called with `body` as argument and should return a string
         (quotes will be added to the returned string as described above).
     last_modified

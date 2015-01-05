@@ -16,6 +16,8 @@ def _sse_encode(k, v):
 def sse_event(event=None, data=None, id=None, retry=None, comment=None):
     """Encode a Server-Sent Event (SSE).
 
+    Returns the event as a string.
+
     At least one field must be present. All fields are strings, except
     retry, which should be an integer. The data and comment fields can contain
     newlines.
@@ -74,7 +76,7 @@ def call_with_ctx(fn, ctx, *args, **kw):
     """Call fn with or without 'ctx', depending on its signature.
 
     If the `fn` callable accepts an argument named "ctx", then `ctx` will be
-    passed as a keyword argument, else `ctx` is ignored.
+    passed as a keyword argument, else it will be ignored.
     """
     if 'ctx' in get_args(fn):
         return fn(*args, ctx=ctx, **kw)
