@@ -71,10 +71,10 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>Class attributes:</p>
 <dl>
 <dt>default_encoding</dt>
-<dd>When finalizing the response and the response body is a unicode string, it is encoded using default_encoding (default: 'utf-8')
+<dd>When finalizing the response and the response body is a unicode string, it is encoded using default_encoding (default: ‘utf-8’)
 </dd>
 <dt>default_content_type</dt>
-<dd>When finalizing the response and the response body is not empty this is used as the default value for the Content-Type header, if none is provided (default: 'text/plain; charset=utf-8')
+<dd>When finalizing the response and the response body is not empty this is used as the default value for the Content-Type header, if none is provided (default: ‘text/plain; charset=utf-8’)
 </dd>
 </dl>
 </div>
@@ -94,7 +94,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <dd><p>a value for the response body. The body is only validated when the request is finalized (in <code>__call__</code>).</p>
 <p>Valid values for the response body are:</p>
 <dl>
-<dt>The empty string ('')</dt>
+<dt>The empty string (’’)</dt>
 <dd>This indicates an empty response body.
 </dd>
 <dt>A str or unicode object</dt>
@@ -104,7 +104,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <dd>The response is streamed to the client using chunked transfer-encoding (when implemented by the WSGI server).
 </dd>
 <dt>A callable that returns a single str or unicode object</dt>
-<dd>This is only useful in combination with an 'ETag' or 'Last-Modified' header, to delay construction of the response body until after conditional request handling has taken place, and no &quot;304 Not Modified&quot; response has been sent.
+<dd>This is only useful in combination with an ‘ETag’ or ‘Last-Modified’ header, to delay construction of the response body until after conditional request handling has taken place, and no “304 Not Modified” response has been sent.
 </dd>
 <dt>An Entity instance</dt>
 <dd>The response body (which must be of one of the types listed above) will be taken from the entity instance, and any entity headers will be added to the response headers, with existing headers of the same name taking precedence.
@@ -136,7 +136,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <h4><code class="sourceCode python">conditional_to(request)</code></h4>
 <div class="docstring">
 <p>Return a response that is conditional to a given request.</p>
-<p>Returns the Response instance unchanged, or a new Response instance with a &quot;304 Not Modified&quot; status code.</p>
+<p>Returns the Response instance unchanged, or a new Response instance with a “304 Not Modified” status code.</p>
 </div>
 </section>
 <section id="Response.delete_cookie" class="level4">
@@ -168,7 +168,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <dd>The maximum age of the cookie in seconds, or as a datetime.timedelta instance.
 </dd>
 <dt>path</dt>
-<dd>Restrict the cookie to this path (default: '/').
+<dd>Restrict the cookie to this path (default: ‘/’).
 </dd>
 <dt>domain</dt>
 <dd>Restrict the cookie to his domain.
@@ -214,7 +214,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <dd>An integer status code.
 </dd>
 <dt>body</dt>
-<dd>The response body. See <code>Response.__init__</code> for details.
+<dd>The response body. See <a href="../modules/rhino.response.html#Response.__init__"><code>Response.__init__</code></a> for details.
 </dd>
 <dt>etag</dt>
 <dd>A value for the ETag header. Double quotes will be added unless the string starts and ends with a double quote. If the value is callable, it will be called with <code>body</code> as argument and should return a string (quotes will be added to the returned string as described above).
@@ -234,26 +234,26 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <section id="ok" class="level3">
 <h3><code class="sourceCode python">ok(body=<span class="st">&#39;&#39;</span>, code=<span class="dv">200</span>, **kw)</code></h3>
 <div class="docstring">
-<p>Shortcut for response(200, ...).</p>
+<p>Shortcut for response(200, …).</p>
 <p>The status code must be in the 2xx range.</p>
 </div>
 </section>
 <section id="created" class="level3">
 <h3><code class="sourceCode python">created(body=<span class="st">&#39;&#39;</span>, **kw)</code></h3>
 <div class="docstring">
-<p>Shortcut for response(201, ...).</p>
+<p>Shortcut for response(201, …).</p>
 </div>
 </section>
 <section id="no_content" class="level3">
 <h3><code class="sourceCode python">no_content(**kw)</code></h3>
 <div class="docstring">
-<p>Shortcut for response(204, body='', ...).</p>
+<p>Shortcut for response(204, body=’’, …).</p>
 </div>
 </section>
 <section id="redirect" class="level3">
 <h3><code class="sourceCode python">redirect(location, code=<span class="dv">302</span>, **kw)</code></h3>
 <div class="docstring">
-<p>Shortcut for response(302, location=location, ...)</p>
+<p>Shortcut for response(302, location=location, …)</p>
 <p>The status code must be in the 3xx range.</p>
 </div>
 </section>

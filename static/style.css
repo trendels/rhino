@@ -16,11 +16,9 @@ h1 code, h2 code, h3 code, h4 code {
     text-indent: -40px;
 }
 dt { font-weight: bold; }
-.level3, .level4 { margin-left: 40px; }
 .docstring { margin-left: 40px; margin-bottom: 2em; }
 pre { background: #eee; padding: 10px 15px 10px 15px; margin-left: 10px; margin: 0 20px 0 20px; }
 a { text-decoration: none; }
-a, a:visited { color: blue; }
 #sidebar {
     position: fixed;
     top: 0;

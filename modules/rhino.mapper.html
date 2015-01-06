@@ -63,7 +63,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <h1>Module <a href="../modules/rhino.mapper.html#rhino.mapper"><code id="rhino.mapper">rhino.mapper</code></a></h1>
 <div class="docstring">
 <p>The mapper dispatches incoming requests based on URL templates and also provides a WSGI interface.</p>
-<p>The HTTP request's path is matched against a series of patterns in the order they were added. Patterns may be given as strings that must match the request path exactly, or they may be templates.</p>
+<p>The HTTP request’s path is matched against a series of patterns in the order they were added. Patterns may be given as strings that must match the request path exactly, or they may be templates.</p>
 <p>Groups of matching characters for templates are extracted from the URI and accessible via the <code>routing_args</code> property of <a href="../modules/rhino.html#Request"><code>rhino.Request</code></a>.</p>
 <p>A template is a string that can contain thee special kinds of markup:</p>
 <dl>
@@ -169,7 +169,7 @@ mapper.add(<span class="st">&#39;/foo|&#39;</span>, foo_mapper)</code></pre>
 <section id="Mapper.handle_error" class="level4">
 <h4><code class="sourceCode python">handle_error(request, exc_info)</code></h4>
 <div class="docstring">
-<p>Log the 'exc_info' tuple in the server log.</p>
+<p>Log the ‘exc_info’ tuple in the server log.</p>
 </div>
 </section>
 <section id="Mapper.path" class="level4">
@@ -179,7 +179,7 @@ mapper.add(<span class="st">&#39;/foo|&#39;</span>, foo_mapper)</code></pre>
 <p>Possible values for <code>target</code>:</p>
 <dl>
 <dt>A string that does not contain a <code>.</code></dt>
-<dd>If the string does not contain <code>.</code>, it will be used to look up a named route of this mapper instance and return it's path.
+<dd>If the string does not contain <code>.</code>, it will be used to look up a named route of this mapper instance and return it’s path.
 </dd>
 <dt>A string of the form <code>a.b</code>, <code>a.b.c</code>, etc.</dt>
 <dd>Follows the route to nested mappers by splitting off consecutive segments. Returns the path of the route found by looking up the final segment on the last mapper.
@@ -202,7 +202,7 @@ mapper.add(<span class="st">&#39;/foo|&#39;</span>, foo_mapper)</code></pre>
 <section id="Mapper.wsgi" class="level4">
 <h4><code class="sourceCode python">wsgi(environ, start_response)</code></h4>
 <div class="docstring">
-<p>Implements the mapper's WSGI interface.</p>
+<p>Implements the mapper’s WSGI interface.</p>
 </div>
 </section>
 </section>
@@ -232,23 +232,23 @@ mapper.add(<span class="st">&#39;/foo|&#39;</span>, foo_mapper)</code></pre>
 <p>Adds a callback to the context.</p>
 <p>The <code>phase</code> determines when and if the callback is executed, and which positional arguments are passed in:</p>
 <dl>
-<dt>'enter'</dt>
+<dt>‘enter’</dt>
 <dd><p>Called from <a href="../modules/rhino.html#Resource"><code>rhino.Resource</code></a>, after a handler for the current request has been resolved, but before the handler is called.</p>
 <p>Arguments: request</p>
 </dd>
-<dt>'leave'</dt>
+<dt>‘leave’</dt>
 <dd><p>Called from <a href="../modules/rhino.html#Resource"><code>rhino.Resource</code></a>, after the handler has returned successfully.</p>
 <p>Arguments: request, response</p>
 </dd>
-<dt>'finalize'</dt>
+<dt>‘finalize’</dt>
 <dd><p>Called from <a href="../modules/rhino.mapper.html#Mapper"><code>Mapper</code></a>, before the WSGI response is finalized.</p>
 <p>Arguments: request, response</p>
 </dd>
-<dt>'teardown'</dt>
+<dt>‘teardown’</dt>
 <dd><p>Called from <a href="../modules/rhino.mapper.html#Mapper"><code>Mapper</code></a>, before control is passed back to the WSGI layer.</p>
 <p>Arguments: -</p>
 </dd>
-<dt>'close'</dt>
+<dt>‘close’</dt>
 <dd><p>Called when the WSGI server calls <code>close()</code> on the response iterator.</p>
 <p>Arguments: -</p>
 </dd>

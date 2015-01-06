@@ -70,7 +70,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div class="docstring">
 <p>Represents a REST resource.</p>
 <p>This class can be used in multiple ways:</p>
-<p>As a standalone resource, using it's methods to register handlers:</p>
+<p>As a standalone resource, using it’s methods to register handlers:</p>
 <pre class="sourceCode python"><code class="sourceCode python">my_resource = Resource()
 
 <span class="ot">@my_resource.get</span>
@@ -94,7 +94,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 my_resource = Resource(MyClass())</code></pre>
 <p>When used as a wrapper or class decorator, handlers will be picked up from methods of the wrapped instance or class that have been decorated with one of the decorator functions provided by this module (<a href="../modules/rhino.resource.html#get"><code>get</code></a>, <a href="../modules/rhino.resource.html#post"><code>post</code></a>, etc.)</p>
 <p>Additionally, if the wrapped object implements <code>from_url</code>, that method will be called before any handler to filter the URL parameters that will be passed to the handler as keyword arguments.</p>
-<p>When used as a standalone instance, functions can be registered as handlers using the instance's methods, as shown above. The <code>from_url</code> method can be used in the same way to register a filter for URL parameters.</p>
+<p>When used as a standalone instance, functions can be registered as handlers using the instance’s methods, as shown above. The <code>from_url</code> method can be used in the same way to register a filter for URL parameters.</p>
 </div>
 <section id="Resource.__init__" class="level4">
 <h4><code class="sourceCode python"><span class="ot">__init__</span>(wrapped=<span class="ot">None</span>)</code></h4>

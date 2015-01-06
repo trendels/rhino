@@ -43,22 +43,22 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </ul>
 </div>
 
-<p><a href="https://travis-ci.org/trendels/rhino"><img src="https://travis-ci.org/trendels/rhino.svg?branch=github" alt="build-status-img" /></a></p>
+<p><a href="https://travis-ci.org/trendels/rhino"><img src="https://travis-ci.org/trendels/rhino.svg" alt="build-status-img" /></a></p>
 <p>Rhino is a python microframework for building RESTful web services.</p>
-<section id="installation" class="level1">
-<h1>Installation</h1>
+<section id="installation" class="level2">
+<h2>Installation</h2>
 <p>From pypi:</p>
-<pre><code>$ pip install rhino</code></pre>
+<pre class="sourceCode python"><code class="sourceCode python">$ pip install rhino</code></pre>
 <p>From a git checkout:</p>
-<pre><code>$ git clone https://github.com/trendels/rhino.git
+<pre class="sourceCode python"><code class="sourceCode python">$ git clone https://github.com/trendels/rhino.git
 $ cd rhino
 $ python setup.py install</code></pre>
 <p>To run the test suite, clone the repository as shown above, and run:</p>
-<pre><code>$ pip install -r requirements.txt
+<pre class="sourceCode python"><code class="sourceCode python">$ pip install -r requirements.txt
 $ make test</code></pre>
 </section>
-<section id="minimal-hello-world-example" class="level1">
-<h1>Minimal &quot;Hello World&quot; example</h1>
+<section id="minimal-hello-world-example" class="level2">
+<h2>Minimal “Hello World” example</h2>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> Mapper, get
 
 <span class="ot">@get</span>
@@ -68,12 +68,24 @@ $ make test</code></pre>
 app = Mapper()
 app.add(<span class="st">&#39;/&#39;</span>, hello)
 app.start_server()</code></pre>
+</section>
 <section id="documentation" class="level2">
 <h2>Documentation</h2>
 <ul>
+<li><a href="etags_and_caching.html">ETags and Caching</a></li>
+<li>API Documentation:
+<ul>
 <li><a href="modules/index.html">Module Index</a></li>
+</ul></li>
 </ul>
 </section>
+<section id="bugs" class="level2">
+<h2>Bugs</h2>
+<p>Please report bugs using the <a href="https://github.com/trendels/rhino/issues">github issue tracker</a>.</p>
+</section>
+<section id="license" class="level2">
+<h2>License</h2>
+<p>Rhino is licensed unter the MIT License. See the included file <code>LICENSE</code> for details.</p>
 </section>
 </body>
 </html>

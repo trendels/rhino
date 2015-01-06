@@ -94,7 +94,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <h4><code id="Request.form">form</code></h4>
 <div class="docstring">
 <p>Reads the request body and tries to parse it as a web form.</p>
-<p>Parsing is done using the stdlib's <code>cgi.FieldStorage</code> class which supports multipart forms (file uploads). Returns a <a href="../modules/rhino.request.html#QueryDict"><code>QueryDict</code></a> instance holding the form fields. Uploaded files are represented as form fields with a 'filename' attribute.</p>
+<p>Parsing is done using the stdlib’s <code>cgi.FieldStorage</code> class which supports multipart forms (file uploads). Returns a <a href="../modules/rhino.request.html#QueryDict"><code>QueryDict</code></a> instance holding the form fields. Uploaded files are represented as form fields with a ‘filename’ attribute.</p>
 </div>
 </section>
 <section id="method" class="level4">
@@ -124,7 +124,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <section id="remote_port" class="level4">
 <h4><code id="Request.remote_port">remote_port</code></h4>
 <div class="docstring">
-<p>The remote hosts's port number as an integer, or None (REMOTE_PORT).</p>
+<p>The remote hosts’s port number as an integer, or None (REMOTE_PORT).</p>
 </div>
 </section>
 <section id="routing_args" class="level4">
@@ -136,7 +136,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <section id="scheme" class="level4">
 <h4><code id="Request.scheme">scheme</code></h4>
 <div class="docstring">
-<p>The URL scheme, usually 'http' or 'https' (wsgi.url_scheme).</p>
+<p>The URL scheme, usually ‘http’ or ‘https’ (wsgi.url_scheme).</p>
 </div>
 </section>
 <section id="script_name" class="level4">
@@ -154,7 +154,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <section id="server_port" class="level4">
 <h4><code id="Request.server_port">server_port</code></h4>
 <div class="docstring">
-<p>The server's port number as an integer, or None (SERVER_PORT).</p>
+<p>The server’s port number as an integer, or None (SERVER_PORT).</p>
 </div>
 </section>
 <section id="server_protocol" class="level4">
@@ -185,17 +185,17 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>All other keyword arguments are treated as parameters for the URL template.</p>
 <p>The target can be any valid target for <code>Mapper.path</code>, which will be looked up on the current mapper instance and used to build the URL for that route. Additionally, it can be one of:</p>
 <dl>
-<dt>'.'</dt>
+<dt>‘.’</dt>
 <dd>Builds the URL for the current route.
 </dd>
-<dt>'/'</dt>
+<dt>‘/’</dt>
 <dd>Builds the URL for the root (top-most) mapper instance.
 </dd>
-<dt>'/a', '/a.b', etc.</dt>
+<dt>‘/a’, ‘/a.b’, etc.</dt>
 <dd>Builds the URL for a named route relative to the root mapper.
 </dd>
-<dt>'.a', '..a', '..a.b', etc.</dt>
-<dd>Builds a URL for a named route relative to the current mapper. Each additional leading '.' after the first one starts one level higher in the hierarchy of nested mappers (i.e. '.a' is equivalent to 'a').
+<dt>‘.a’, ‘..a’, ‘..a.b’, etc.</dt>
+<dd>Builds a URL for a named route relative to the current mapper. Each additional leading ‘.’ after the first one starts one level higher in the hierarchy of nested mappers (i.e. ‘.a’ is equivalent to ‘a’).
 </dd>
 </dl>
 </div>
