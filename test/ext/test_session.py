@@ -1,6 +1,9 @@
+from pytest import raises as assert_raises
 from rhino import Mapper, get
-from rhino.ext.session import CookieSession, SessionObject, message
+from rhino.ext.session import CookieSession, SessionObject, message, \
+        SessionError
 from rhino.test import TestClient
+
 
 def test_messages():
     session = SessionObject(environ={})
@@ -32,6 +35,11 @@ def test_messages_by_type():
     assert session.pop_messages() == [message(None, 'test')]
     assert session.pop_messages('foo') == []
     assert session.pop_messages('bar') == []
+
+
+def test_secret_required():
+    assert_raises(SessionError, CookieSession, None)
+    assert CookieSession(secret='foo')
 
 
 def test_session_property():

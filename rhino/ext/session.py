@@ -32,6 +32,9 @@ __all__ = [
 message = namedtuple('message', 'type text')
 
 
+class SessionError(Exception): pass
+
+
 class SessionObject(beaker.session.SessionObject):
     """A session object with support for "flashed" messages."""
 
@@ -114,6 +117,8 @@ class CookieSession(BeakerSession):
             self, secret, timeout=None, cookie_name='session_id',
             cookie_expires=True, cookie_domain=None, cookie_path='/',
             secure=False, httponly=False, auto=True):
+        if not secret:
+            raise SessionError("The secret cannot be empty.")
         super(CookieSession, self).__init__(
             type='cookie',
             validate_key=secret,
