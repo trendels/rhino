@@ -62,5 +62,5 @@ License
 Rhino is licensed unter the MIT License. See the included file
 ``LICENSE`` for details.
 
-.. |build-status-img| image:: https://travis-ci.org/trendels/rhino.svg?branch=github
+.. |build-status-img| image:: https://travis-ci.org/trendels/rhino.svg
    :target: https://travis-ci.org/trendels/rhino
