@@ -48,7 +48,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#getting-started">Getting started</a><ul>
-<li><a href="#hello-world">“Hello, World”</a></li>
+<li><a href="#hello-world">&quot;Hello, World&quot;</a></li>
 <li><a href="#resources-and-mappers">Resources and Mappers</a><ul>
 <li><a href="#creating-resources">Creating Resources</a></li>
 <li><a href="#named-routes">Named Routes</a></li>
@@ -80,7 +80,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
 <p>Rhino is a python microframework for building RESTful web services.</p>
-<p>It aims to …</p>
+<p>It aims to ...</p>
 <ul>
 <li><p>make building small web services as frictionless as possible, while providing features such as conditional request handling, content negotiation and generating URLs out of the box.</p></li>
 <li><p>make it easy to extend applications via a standard extension mechanism, to allow building more advanced web applications while keeping the framework core small and simple.</p></li>
@@ -92,19 +92,19 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <section id="installation" class="level1">
 <h1>Installation</h1>
 <p>From pypi:</p>
-<pre class="sourceCode python"><code class="sourceCode python">$ pip install rhino</code></pre>
+<pre><code>$ pip install rhino</code></pre>
 <p>From a git checkout:</p>
-<pre class="sourceCode python"><code class="sourceCode python">$ git clone https://github.com/trendels/rhino.git
+<pre><code>$ git clone https://github.com/trendels/rhino.git
 $ cd rhino
 $ python setup.py install</code></pre>
 <p>To run the test suite, clone the repository as shown above, and run:</p>
-<pre class="sourceCode python"><code class="sourceCode python">$ pip install -r requirements.txt
+<pre><code>$ pip install -r requirements.txt
 $ make test</code></pre>
 </section>
 <section id="getting-started" class="level1">
 <h1>Getting started</h1>
 <section id="hello-world" class="level2">
-<h2>“Hello, World”</h2>
+<h2>&quot;Hello, World&quot;</h2>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> Mapper, get
 
 <span class="ot">@get</span>
@@ -116,7 +116,7 @@ app.add(<span class="st">&#39;/&#39;</span>, hello)
 
 <span class="kw">if</span> <span class="ot">__name__</span> == <span class="st">&#39;__main__&#39;</span>:
     app.start_server(<span class="st">&#39;localhost&#39;</span>, <span class="dv">9000</span>)</code></pre>
-<p>Run this code and visit <a href="http://localhost:9000/" class="uri">http://localhost:9000/</a> in your browser. You should see text “hello, world!”.</p>
+<p>Run this code and visit <a href="http://localhost:9000/" class="uri">http://localhost:9000/</a> in your browser. You should see text &quot;hello, world!&quot;.</p>
 </section>
 <section id="resources-and-mappers" class="level2">
 <h2>Resources and Mappers</h2>
@@ -145,7 +145,7 @@ app.add(<span class="st">&#39;/todos&#39;</span>, todo_list)
 
 <span class="kw">if</span> <span class="ot">__name__</span> == <span class="st">&#39;__main__&#39;</span>:
     app.start_server()</code></pre>
-<p>The resource’s methods are used as decorators to register handler functions. A resource can have handlers for multiple methods, and even multiple handlers for the same method (see <a href="#content-negotiation">Content Negotiation</a> [TODO]). A handler is a regular Python function that receives the request as its first argument and produces an HTTP response.</p>
+<p>The resource's methods are used as decorators to register handler functions. A resource can have handlers for multiple methods, and even multiple handlers for the same method (see <a href="#content-negotiation">Content Negotiation</a> [TODO]). A handler is a regular Python function that receives the request as its first argument and produces an HTTP response.</p>
 <p>Resources are registered with a Mapper under a URL template. The mapper is the entry point for the application, and dispatches incoming requests to resources based on the request URL.</p>
 <p>The mapper knows the URLs of all resources, and can also construct URLs. This functionality is exposed through the <a href="./modules/rhino.request.html#Request.url_for">Request.url_for</a> method, as seen in the example above. This avoids having hardcoded URLs in different places of the code that are hard to change later.</p>
 </section>
@@ -181,8 +181,8 @@ todo_item = Resource()
     <span class="kw">return</span> ok(<span class="st">&quot;Information about todo item &#39;</span><span class="ot">%s</span><span class="st">&#39;.&quot;</span> % item)
 
 app.add(<span class="st">&#39;/todos/{item_id:digits}&#39;</span>, todo_item)</code></pre>
-<p>In this example, the part of the URL path after ‘/todos/’ will be extracted and passed as a named argument <code>item_id</code> to the <code>show_item</code> handler. It is also required to contain only digits or the route won’t match. See <a href="./modules/rhino.mapper.html#rhino.mapper"><code>rhino.mapper</code></a> for a list of default range names.</p>
-<p>When building a URL for a route who’s template contains URL parameters, all required parameters must be provided as keyword arguments to <a href="./modules/rhino.request.html#Request.url_for">Request.url_for()</a>. The arguments don’t need to be strings, but their string representation must match the parameter’s range (<code>digits</code>, in this case):</p>
+<p>In this example, the part of the URL path after '/todos/' will be extracted and passed as a named argument <code>item_id</code> to the <code>show_item</code> handler. It is also required to contain only digits or the route won't match. See <a href="./modules/rhino.mapper.html#rhino.mapper"><code>rhino.mapper</code></a> for a list of default range names.</p>
+<p>When building a URL for a route who's template contains URL parameters, all required parameters must be provided as keyword arguments to <a href="./modules/rhino.request.html#Request.url_for">Request.url_for()</a>. The arguments don't need to be strings, but their string representation must match the parameter's range (<code>digits</code>, in this case):</p>
 <pre class="sourceCode python"><code class="sourceCode python">request.url_for(todo_item, item_id=<span class="dv">1</span>)      <span class="co"># -&gt; http://localhost/items/1</span>
 request.url_for(todo_item, item_id=<span class="st">&#39;foo&#39;</span>)  <span class="co"># raises InvalidArgumentError</span></code></pre>
 <p>For appending a query string to the generated URL, use the special <code>_query</code> parameter:</p>
@@ -190,7 +190,7 @@ request.url_for(todo_item, item_id=<span class="st">&#39;foo&#39;</span>)  <span
 </section>
 <section id="validating-url-parameters" class="level3">
 <h3>Validating URL parameters</h3>
-<p>In resources which expect URL parameters, the parameter often refers to a internal object that is required for answering the request, such as a row in a database. Instead of fetching the object in each handler and exiting with an error if it doesn’t exist, you can register a special <code>from_url</code> handler to do this in one place:</p>
+<p>In resources which expect URL parameters, the parameter often refers to a internal object that is required for answering the request, such as a row in a database. Instead of fetching the object in each handler and exiting with an error if it doesn't exist, you can register a special <code>from_url</code> handler to do this in one place:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ot">@todo_item.from_url</span>
 <span class="kw">def</span> item_from_url(request, item_id):
     <span class="kw">try</span>:
@@ -216,10 +216,10 @@ request.url_for(todo_item, item_id=<span class="st">&#39;foo&#39;</span>)  <span
 </section>
 <section id="simple-resources" class="level3">
 <h3>Simple Resources</h3>
-<p>As the “Hello, world” example shows, there are some common shortcuts:</p>
+<p>As the &quot;Hello, world&quot; example shows, there are some common shortcuts:</p>
 <ul>
 <li><p>If a resource only handles one HTTP method (usually GET), which is quite common, you can create a standalone handler function using one of the decorators <a href="./modules/rhino.resource.html#get">get</a>, <a href="./modules/rhino.resource.html#post">post</a>, <a href="./modules/rhino.resource.html#post">put</a>, <a href="./modules/rhino.resource.html#post">patch</a>, <a href="./modules/rhino.resource.html#post">delete</a> or <a href="./modules/rhino.resource.html#options">options</a>.</p></li>
-<li><p>Instead of a <a href="./modules/rhino.response.html#Response">Response</a>, you can also return an arbitrary object that will be sent as the response body, using a default status code of “200 OK”.</p></li>
+<li><p>Instead of a <a href="./modules/rhino.response.html#Response">Response</a>, you can also return an arbitrary object that will be sent as the response body, using a default status code of &quot;200 OK&quot;.</p></li>
 </ul>
 </section>
 </section>
@@ -236,8 +236,8 @@ request.query.get_all(<span class="st">&#39;id&#39;</span>)          <span class
 </section>
 <section id="form-fields" class="level3">
 <h3>Form fields</h3>
-<p>The <code>form</code> property holds form fields as a <a href="./modules/rhino.request.html#QueryDict">QueryDict</a>. It is parsed when it is first accessed during a request using the stdlib’s <code>cgi.FieldStorage</code> class.</p>
-<p>File upload fields from multipart forms have the extra attributes ‘filename’, ‘type’ and ‘file’:</p>
+<p>The <code>form</code> property holds form fields as a <a href="./modules/rhino.request.html#QueryDict">QueryDict</a>. It is parsed when it is first accessed during a request using the stdlib's <code>cgi.FieldStorage</code> class.</p>
+<p>File upload fields from multipart forms have the extra attributes 'filename', 'type' and 'file':</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="co"># Accessing a regular form field</span>
 username = request.form[<span class="st">&#39;username&#39;</span>]
 
@@ -342,7 +342,7 @@ resp.set_cookie(<span class="st">&#39;color&#39;</span>, <span class="st">&#39;g
 <section id="extensions-and-the-context" class="level2">
 <h2>Extensions and the Context</h2>
 <p>The primary extension mechanism is the <a href="./modules/rhino.mapper.html#Context">Context</a>. This is an object that is created for each request, and has the same lifetime as the <a href="./modules/rhino.request.html#Request">Request</a> object.</p>
-<p>The context can be requested in a handler using dependency injection. To receive the context, add an argument named <code>ctx</code> to the handler function’s signature (by convention, this should be the 2nd argument after the request, although unlike the request, the context is always passed in by name).</p>
+<p>The context can be requested in a handler using dependency injection. To receive the context, add an argument named <code>ctx</code> to the handler function's signature (by convention, this should be the 2nd argument after the request, although unlike the request, the context is always passed in by name).</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ot">@get</span>
 <span class="kw">def</span> hello_with_ctx(request, ctx):
     <span class="co"># This handler has access to the context ...</span></code></pre>
@@ -354,12 +354,12 @@ resp.set_cookie(<span class="st">&#39;color&#39;</span>, <span class="st">&#39;g
 app = Mapper()
 app.add_ctx_property(<span class="st">&#39;app_name&#39;</span>, <span class="st">&quot;My Application&quot;</span>)
 app.add(<span class="st">&#39;/&#39;</span>, hello_with_ctx)</code></pre>
-<p>In this example, all context instances within this Mapper will have an ‘app_name’ attribute containing the string “My Application”. Usually, the second argument to <code>add_ctx_property</code> will be a factory function to provide a lazily initialized property. See <a href="#extending">Extending Rhino Applications</a> [TODO] for details.</p>
-<p>Some default extensions are included to add common functionality. These usually require additional python modules to be installed (those are listed at the top of the extension’s documentation)</p>
+<p>In this example, all context instances within this Mapper will have an 'app_name' attribute containing the string &quot;My Application&quot;. Usually, the second argument to <code>add_ctx_property</code> will be a factory function to provide a lazily initialized property. See <a href="#extending">Extending Rhino Applications</a> [TODO] for details.</p>
+<p>Some default extensions are included to add common functionality. These usually require additional python modules to be installed (those are listed at the top of the extension's documentation)</p>
 <ul>
-<li><a href="./modules/rhino.ext.jinja2.html#rhino.ext.jinja2"><code>rhino.ext.jinja2</code></a> – Extension for rendering jinja templates.</li>
-<li><a href="./modules/rhino.ext.session.html#rhino.ext.session"><code>rhino.ext.session</code></a> – Cookie-based session support, and other backends provided by beaker.session.</li>
-<li><a href="./modules/rhino.ext.sqlalchemy.html#rhino.ext.sqlalchemy"><code>rhino.ext.sqlalchemy</code></a> – Provides a lazily initialized sqlalchemy Session object via the context.</li>
+<li><a href="./modules/rhino.ext.jinja2.html#rhino.ext.jinja2"><code>rhino.ext.jinja2</code></a> -- Extension for rendering jinja templates.</li>
+<li><a href="./modules/rhino.ext.session.html#rhino.ext.session"><code>rhino.ext.session</code></a> -- Cookie-based session support, and other backends provided by beaker.session.</li>
+<li><a href="./modules/rhino.ext.sqlalchemy.html#rhino.ext.sqlalchemy"><code>rhino.ext.sqlalchemy</code></a> -- Provides a lazily initialized sqlalchemy Session object via the context.</li>
 </ul>
 <p>Here is an example app using jinja2 templates and cookie-based sessions. Save the following code to a file named <code>webapp.py</code>:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> Mapper, get
@@ -389,10 +389,10 @@ app.add(<span class="st">&#39;/&#39;</span>, index)
   <span class="kw">&lt;/body&gt;</span>
 <span class="kw">&lt;/html&gt;</span></code></pre>
 <p>To test the application, first make sure the prerequisites are installed:</p>
-<pre class="sourceCode python"><code class="sourceCode python">$ pip install beaker jinja2</code></pre>
+<pre><code>$ pip install beaker jinja2</code></pre>
 <p>Then start the development server:</p>
-<pre class="sourceCode python"><code class="sourceCode python">$ python webapp.py
-Server listening at http://localhost:<span class="dv">9000</span>/</code></pre>
+<pre><code>$ python webapp.py
+Server listening at http://localhost:9000/</code></pre>
 <p>Point your browser at <a href="http://localhost:9000/" class="uri">http://localhost:9000/</a> and reload the page a few times, and you should see the counter go up.</p>
 </section>
 <section id="serving-static-files" class="level2">
@@ -407,8 +407,8 @@ app.add(<span class="st">&#39;/static/{path:any}&#39;</span>, StaticDirectory(<s
 <section id="using-a-wsgi-server" class="level2">
 <h2>Using a WSGI Server</h2>
 <p>For production uses, you should run the app using a WSGI server of your choice.</p>
-<p>The mappers <code>rhino.mapper.Mapper..wsgi</code> method is the WSGI entry point. For example, to run <a href="#hello-world">the “hello, world” example</a> using the <a href="http://gunicorn.org/">gunicorn</a> WSGI server, save the code to a file named <code>hello.py</code> and run</p>
-<pre class="sourceCode python"><code class="sourceCode python">$ gunicorn --bind=localhost:<span class="dv">8000</span> hello:app.wsgi</code></pre>
+<p>The mappers <code>rhino.mapper.Mapper..wsgi</code> method is the WSGI entry point. For example, to run <a href="#hello-world">the &quot;hello, world&quot; example</a> using the <a href="http://gunicorn.org/">gunicorn</a> WSGI server, save the code to a file named <code>hello.py</code> and run</p>
+<pre><code>$ gunicorn --bind=localhost:8000 hello:app.wsgi</code></pre>
 </section>
 </section>
 <section id="advanced-topics" class="level1">
