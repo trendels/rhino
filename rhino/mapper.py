@@ -410,6 +410,14 @@ class Route(object):
         regex, params = template2regex(template, ranges)
         self.regex = re.compile(regex)
         self.params = set(params)
+
+        if 'ctx' in params:
+            raise InvalidArgumentError(
+                "The name 'ctx' is not allowed as a parameter name.")
+        if any(x.startswith('_') for x in params):
+            raise InvalidArgumentError(
+                "Parameter names must not start with underscores.")
+
         self.template = template
         self.resource = resource
         self.ranges = ranges
