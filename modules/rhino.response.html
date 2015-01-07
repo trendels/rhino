@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Module rhino.response</title>
+  <title>rhino.response</title>
+  <link href="../static/favicon.ico" rel="icon" type="image/x-icon">
   <style type="text/css">code{white-space: pre;}</style>
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -33,10 +34,10 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <body>
 
 <div id="sidebar">
-<img alt="Rhino logo" src="../static/Rhinoceros.svg">
+<a href="../index.html"><img alt="Rhino logo" src="../static/Rhinoceros.svg"></a>
 <ul>
-<li><a href="../index.html">Documentation Index</a></li>
-<li><a href="../modules/index.html">Module Index</a></li>
+<li><a href="../index.html">Documentation</a></li>
+<li><a href="../modules/index.html">Module index</a></li>
 </ul>
 </div>
 
@@ -149,7 +150,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <section id="headers" class="level4">
 <h4><code id="Response.headers">headers</code></h4>
 <div class="docstring">
-<p>A <code>wsgiref.headers.ResponseHeaders</code> instance.</p>
+<p>A <code>wsgiref.headers.Headers</code> instance.</p>
 </div>
 </section>
 <section id="Response.set_cookie" class="level4">
@@ -179,7 +180,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <dt>httponly</dt>
 <dd>When True, instruct the client to disallow javascript access to the cookie.
 </dd>
-<dt>expires:</dt>
+<dt>expires</dt>
 <dd>Another way of specifying the maximum age of the cookie. Accepts the same values as max_age (number of seconds, datetime.timedelta). Additionaly accepts a datetime.datetime instance. Note: a value of type int or float is interpreted as a number of seconds in the future, <em>not</em> as Unix timestamp.
 </dd>
 </dl>
@@ -188,7 +189,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <section id="status" class="level4">
 <h4><code id="Response.status">status</code></h4>
 <div class="docstring">
-<p>The statusline as a string (status code + reason)</p>
+<p>The status line as a string (status code + reason)</p>
 </div>
 </section>
 </section>

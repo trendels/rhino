@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Module rhino.request</title>
+  <title>rhino.request</title>
+  <link href="../static/favicon.ico" rel="icon" type="image/x-icon">
   <style type="text/css">code{white-space: pre;}</style>
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -33,10 +34,10 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <body>
 
 <div id="sidebar">
-<img alt="Rhino logo" src="../static/Rhinoceros.svg">
+<a href="../index.html"><img alt="Rhino logo" src="../static/Rhinoceros.svg"></a>
 <ul>
-<li><a href="../index.html">Documentation Index</a></li>
-<li><a href="../modules/index.html">Module Index</a></li>
+<li><a href="../index.html">Documentation</a></li>
+<li><a href="../modules/index.html">Module index</a></li>
 </ul>
 </div>
 
@@ -124,7 +125,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <section id="remote_port" class="level4">
 <h4><code id="Request.remote_port">remote_port</code></h4>
 <div class="docstring">
-<p>The remote hosts’s port number as an integer, or None (REMOTE_PORT).</p>
+<p>The client’s port number as an integer, or None (REMOTE_PORT).</p>
 </div>
 </section>
 <section id="routing_args" class="level4">
@@ -166,24 +167,14 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <section id="url" class="level4">
 <h4><code id="Request.url">url</code></h4>
 <div class="docstring">
-<p>The reconstructed request URI (absolute).</p>
+<p>The reconstructed request URL (absolute).</p>
 </div>
 </section>
 <section id="Request.url_for" class="level4">
 <h4><code class="sourceCode python">url_for(*args, **kw)</code></h4>
 <div class="docstring">
-<p>Build the URL for a target.</p>
-<p>Special keyword arguments:</p>
-<dl>
-<dt><code>_query</code></dt>
-<dd>Append query string (dict or list of tuples)
-</dd>
-<dt><code>_relative</code></dt>
-<dd>When True, build a relative URL (default: False)
-</dd>
-</dl>
-<p>All other keyword arguments are treated as parameters for the URL template.</p>
-<p>The target can be any valid target for <code>Mapper.path</code>, which will be looked up on the current mapper instance and used to build the URL for that route. Additionally, it can be one of:</p>
+<p>Build the URL for a target route.</p>
+<p>The target is the first positional argument, and can be any valid target for <code>Mapper.path</code>, which will be looked up on the current mapper instance and used to build the URL for that route. Additionally, it can be one of:</p>
 <dl>
 <dt>‘.’</dt>
 <dd>Builds the URL for the current route.
@@ -198,6 +189,16 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <dd>Builds a URL for a named route relative to the current mapper. Each additional leading ‘.’ after the first one starts one level higher in the hierarchy of nested mappers (i.e. ‘.a’ is equivalent to ‘a’).
 </dd>
 </dl>
+<p>Special keyword arguments:</p>
+<dl>
+<dt><code>_query</code></dt>
+<dd>Append a query string to the URL (dict or list of tuples)
+</dd>
+<dt><code>_relative</code></dt>
+<dd>When True, build a relative URL (default: False)
+</dd>
+</dl>
+<p>All other keyword arguments are treated as parameters for the URL template.</p>
 </div>
 </section>
 </section>

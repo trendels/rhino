@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Module rhino.util</title>
+  <title>rhino.util</title>
+  <link href="../static/favicon.ico" rel="icon" type="image/x-icon">
   <style type="text/css">code{white-space: pre;}</style>
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -33,10 +34,10 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <body>
 
 <div id="sidebar">
-<img alt="Rhino logo" src="../static/Rhinoceros.svg">
+<a href="../index.html"><img alt="Rhino logo" src="../static/Rhinoceros.svg"></a>
 <ul>
-<li><a href="../index.html">Documentation Index</a></li>
-<li><a href="../modules/index.html">Module Index</a></li>
+<li><a href="../index.html">Documentation</a></li>
+<li><a href="../modules/index.html">Module index</a></li>
 </ul>
 </div>
 
@@ -64,10 +65,9 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </div>
 </section>
 <section id="sse_event" class="level3">
-<h3><code class="sourceCode python">sse_event(event=<span class="ot">None</span>, data=<span class="ot">None</span>, <span class="dt">id</span>=<span class="ot">None</span>, retry=<span class="ot">None</span>, comment=<span class="ot">None</span>)</code></h3>
+<h3><code class="sourceCode python">sse_event(event=<span class="ot">None</span>, data=<span class="ot">None</span>, <span class="dt">id</span>=<span class="ot">None</span>, retry=<span class="ot">None</span>, comment=<span class="ot">None</span>, encoding=<span class="st">&#39;utf-8&#39;</span>)</code></h3>
 <div class="docstring">
 <p>Encode a Server-Sent Event (SSE).</p>
-<p>Returns the event as a string.</p>
 <p>At least one field must be present. All fields are strings, except retry, which should be an integer. The data and comment fields can contain newlines.</p>
 </div>
 </section>

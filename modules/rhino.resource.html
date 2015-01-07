@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Module rhino.resource</title>
+  <title>rhino.resource</title>
+  <link href="../static/favicon.ico" rel="icon" type="image/x-icon">
   <style type="text/css">code{white-space: pre;}</style>
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -33,10 +34,10 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <body>
 
 <div id="sidebar">
-<img alt="Rhino logo" src="../static/Rhinoceros.svg">
+<a href="../index.html"><img alt="Rhino logo" src="../static/Rhinoceros.svg"></a>
 <ul>
-<li><a href="../index.html">Documentation Index</a></li>
-<li><a href="../modules/index.html">Module Index</a></li>
+<li><a href="../index.html">Documentation</a></li>
+<li><a href="../modules/index.html">Module index</a></li>
 </ul>
 </div>
 
@@ -75,21 +76,21 @@ code > span.er { color: #ff0000; font-weight: bold; }
 
 <span class="ot">@my_resource.get</span>
 <span class="kw">def</span> get_resource(request):
-    <span class="kw">pass</span></code></pre>
+    <span class="co"># ...</span></code></pre>
 <p>As a class decorator for class-based resources:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ot">@Resource</span>
 <span class="kw">class</span> MyResource(<span class="dt">object</span>):
     <span class="ot">@get</span>
     <span class="kw">def</span> index(<span class="ot">self</span>, request):
-        <span class="kw">pass</span></code></pre>
+        <span class="co"># ...</span></code></pre>
 <p>As a wrapper to create resouces from custom objects:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="kw">class</span> MyClass(<span class="dt">object</span>):
     <span class="kw">def</span> __init_(<span class="ot">self</span>, *args):
-        <span class="kw">pass</span>
+        <span class="co"># ...</span>
 
     <span class="ot">@get</span>
     <span class="kw">def</span> index(<span class="ot">self</span>, request):
-        <span class="kw">pass</span>
+        <span class="co"># ...</span>
 
 my_resource = Resource(MyClass())</code></pre>
 <p>When used as a wrapper or class decorator, handlers will be picked up from methods of the wrapped instance or class that have been decorated with one of the decorator functions provided by this module (<a href="../modules/rhino.resource.html#get"><code>get</code></a>, <a href="../modules/rhino.resource.html#post"><code>post</code></a>, etc.)</p>
