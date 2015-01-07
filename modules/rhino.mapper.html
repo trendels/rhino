@@ -47,15 +47,15 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <ul>
 <li><a href="#classes">Classes</a>
 <ul>
-<li><a href="../modules/rhino.mapper.html#Mapper"><code>Mapper</code></a></li>
-<li><a href="../modules/rhino.mapper.html#Route"><code>Route</code></a></li>
-<li><a href="../modules/rhino.mapper.html#Context"><code>Context</code></a></li>
+<li><a href="../modules/rhino.mapper.html#Mapper"><code>rhino.mapper.Mapper</code></a></li>
+<li><a href="../modules/rhino.mapper.html#Route"><code>rhino.mapper.Route</code></a></li>
+<li><a href="../modules/rhino.mapper.html#Context"><code>rhino.mapper.Context</code></a></li>
 </ul></li>
 <li><a href="#exceptions">Exceptions</a>
 <ul>
-<li><a href="../modules/rhino.mapper.html#MapperException"><code>MapperException</code></a></li>
-<li><a href="../modules/rhino.mapper.html#InvalidArgumentError"><code>InvalidArgumentError</code></a></li>
-<li><a href="../modules/rhino.mapper.html#InvalidTemplateError"><code>InvalidTemplateError</code></a></li>
+<li><a href="../modules/rhino.mapper.html#MapperException"><code>rhino.mapper.MapperException</code></a></li>
+<li><a href="../modules/rhino.mapper.html#InvalidArgumentError"><code>rhino.mapper.InvalidArgumentError</code></a></li>
+<li><a href="../modules/rhino.mapper.html#InvalidTemplateError"><code>rhino.mapper.InvalidTemplateError</code></a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -164,7 +164,7 @@ mapper.add(<span class="st">&#39;/foo|&#39;</span>, foo_mapper)</code></pre>
 <h4><code class="sourceCode python">add_ctx_property(name, fn, cached=<span class="ot">True</span>)</code></h4>
 <div class="docstring">
 <p>Install a context property.</p>
-<p>A context property is a callable that will be called on first access of the property named <code>name</code> on <a href="../modules/rhino.mapper.html#Context"><code>Context</code></a> instances passing through this mapper. The result will be cached unless <code>cached</code> is False.</p>
+<p>A context property is a callable that will be called on first access of the property named <code>name</code> on <a href="../modules/rhino.mapper.html#Context"><code>rhino.mapper.Context</code></a> instances passing through this mapper. The result will be cached unless <code>cached</code> is False.</p>
 <p>If the context property is not callable, it will be installed as-is, otherwise, it will be called with the context instance as first argument.</p>
 </div>
 </section>
@@ -186,7 +186,7 @@ mapper.add(<span class="st">&#39;/foo|&#39;</span>, foo_mapper)</code></pre>
 <dt>A string of the form <code>a.b</code>, <code>a.b.c</code>, etc.</dt>
 <dd>Follows the route to nested mappers by splitting off consecutive segments. Returns the path of the route found by looking up the final segment on the last mapper.
 </dd>
-<dt>A <a href="../modules/rhino.mapper.html#Route"><code>Route</code></a> instance</dt>
+<dt>A <a href="../modules/rhino.mapper.html#Route"><code>rhino.mapper.Route</code></a> instance</dt>
 <dd>Returns the path for the route.
 </dd>
 <dt>A resource that was added previously</dt>
@@ -243,11 +243,11 @@ mapper.add(<span class="st">&#39;/foo|&#39;</span>, foo_mapper)</code></pre>
 <p>Arguments: request, response</p>
 </dd>
 <dt>‘finalize’</dt>
-<dd><p>Called from <a href="../modules/rhino.mapper.html#Mapper"><code>Mapper</code></a>, before the WSGI response is finalized.</p>
+<dd><p>Called from <a href="../modules/rhino.mapper.html#Mapper"><code>rhino.mapper.Mapper</code></a>, before the WSGI response is finalized.</p>
 <p>Arguments: request, response</p>
 </dd>
 <dt>‘teardown’</dt>
-<dd><p>Called from <a href="../modules/rhino.mapper.html#Mapper"><code>Mapper</code></a>, before control is passed back to the WSGI layer.</p>
+<dd><p>Called from <a href="../modules/rhino.mapper.html#Mapper"><code>rhino.mapper.Mapper</code></a>, before control is passed back to the WSGI layer.</p>
 <p>Arguments: -</p>
 </dd>
 <dt>‘close’</dt>

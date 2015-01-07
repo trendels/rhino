@@ -83,11 +83,11 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>It aims to …</p>
 <ul>
 <li><p>make building small web services as frictionless as possible, while providing features such as conditional request handling, content negotiation and generating URLs out of the box.</p></li>
-<li><p>make it easy to extend application with features like templating engines, sessions or managed database connections via a standard extension mechanism, to allow building more advanced web applications while keeping the framework core small and simple.</p></li>
+<li><p>make it easy to extend applications via a standard extension mechanism, to allow building more advanced web applications while keeping the framework core small and simple.</p></li>
 <li><p>encourage code re-use by structuring services into small, self-contained applications that can be nested within each other or run as standalone services.</p></li>
 </ul>
 <p>Rhino is MIT licensed and runs under Python 2.6+. The Source code and bug tracker are hosted at <a href="https://github.com/trendels/rhino">github</a>.</p>
-<p><strong>Note: This is a beta release. APIs may change at any time until version 1.0 is released.</strong></p>
+<p><strong>Note: This is a beta release. APIs may change at any time.</strong></p>
 </section>
 <section id="installation" class="level1">
 <h1>Installation</h1>
@@ -122,7 +122,7 @@ app.add(<span class="st">&#39;/&#39;</span>, hello)
 <h2>Resources and Mappers</h2>
 <section id="creating-resources" class="level3">
 <h3>Creating Resources</h3>
-<p>Resources are the building blocks or RESTful web services. In Rhino, we create resources using instances of the <a href="./modules/rhino.resource.html#Resource"><code>rhino.resource.Resource</code></a> class:</p>
+<p>Resources are the building blocks or RESTful web services. In Rhino, we create resources using instances of the <a href="./modules/rhino.resource.html#Resource">Resource</a> class:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> Resource, Mapper, ok
 
 TODOS = [<span class="st">&quot;Read the Rhino documentation&quot;</span>, <span class="st">&quot;???&quot;</span>, <span class="st">&quot;Profit!&quot;</span>]
@@ -145,13 +145,13 @@ app.add(<span class="st">&#39;/todos&#39;</span>, todo_list)
 
 <span class="kw">if</span> <span class="ot">__name__</span> == <span class="st">&#39;__main__&#39;</span>:
     app.start_server()</code></pre>
-<p>The resource’s methods are used as decorators to register handler functions. A resource can have handlers for multiple methods, and even multiple handlers for the same method (see <a href="#content-negotiation">Content Negotiation</a> [TODO]). A handler is a regular python function that receives the request as its first argument and produces an HTTP response.</p>
+<p>The resource’s methods are used as decorators to register handler functions. A resource can have handlers for multiple methods, and even multiple handlers for the same method (see <a href="#content-negotiation">Content Negotiation</a> [TODO]). A handler is a regular Python function that receives the request as its first argument and produces an HTTP response.</p>
 <p>Resources are registered with a Mapper under a URL template. The mapper is the entry point for the application, and dispatches incoming requests to resources based on the request URL.</p>
-<p>The mapper knows the URLs of all resources, and can also construct URLs. This functionality is exposed through the <a href="./modules/rhino.request.html#Request.url_for"><code>rhino.request.Request.url_for</code></a> method, as seen in the example above. This avoids having to hardcode URLs inside the application.</p>
+<p>The mapper knows the URLs of all resources, and can also construct URLs. This functionality is exposed through the <a href="./modules/rhino.request.html#Request.url_for">Request.url_for</a> method, as seen in the example above. This avoids having hardcoded URLs in different places of the code that are hard to change later.</p>
 </section>
 <section id="named-routes" class="level3">
 <h3>Named Routes</h3>
-<p>When building URLs, it may not always be possible or practical to refer to resources directly. For this reason, routes can be assigned unique names which can be used when building URLs:</p>
+<p>When building URLs, it may not always be possible or practical to refer to resources directly. For this reason, routes can be assigned a unique name in <a href="./modules/rhino.mapper.html#Mapper.add">Mapper.add()</a> by which they can be referred to later:</p>
 <pre class="sourceCode python"><code class="sourceCode python">mapper.add(<span class="st">&#39;/todos&#39;</span>, todo_list, name=<span class="st">&#39;todos&#39;</span>)
 
 <span class="co"># Now we can refer to the route like this:</span>
@@ -181,8 +181,8 @@ todo_item = Resource()
     <span class="kw">return</span> ok(<span class="st">&quot;Information about todo item &#39;</span><span class="ot">%s</span><span class="st">&#39;.&quot;</span> % item)
 
 app.add(<span class="st">&#39;/todos/{item_id:digits}&#39;</span>, todo_item)</code></pre>
-<p>In this example, the part of the URL path after ‘/todos/’ will be extracted and passed as a named argument <code>item_id</code> to the <code>show_item</code> handler. It is also required to contain only digits or the route won’t match (See <a href="./modules/rhino.mapper.html#rhino.mapper"><code>rhino.mapper</code></a> for a list of default range names).</p>
-<p>When building a URL for a route who’s template contains URL parameters, all required parameters must be provided as keyword arguments. The arguments don’t need to be strings, but their string representation must match the parameter’s range (<code>digits</code>, in this case):</p>
+<p>In this example, the part of the URL path after ‘/todos/’ will be extracted and passed as a named argument <code>item_id</code> to the <code>show_item</code> handler. It is also required to contain only digits or the route won’t match. See <a href="./modules/rhino.mapper.html#rhino.mapper"><code>rhino.mapper</code></a> for a list of default range names.</p>
+<p>When building a URL for a route who’s template contains URL parameters, all required parameters must be provided as keyword arguments to <a href="./modules/rhino.request.html#Request.url_for">Request.url_for()</a>. The arguments don’t need to be strings, but their string representation must match the parameter’s range (<code>digits</code>, in this case):</p>
 <pre class="sourceCode python"><code class="sourceCode python">request.url_for(todo_item, item_id=<span class="dv">1</span>)      <span class="co"># -&gt; http://localhost/items/1</span>
 request.url_for(todo_item, item_id=<span class="st">&#39;foo&#39;</span>)  <span class="co"># raises InvalidArgumentError</span></code></pre>
 <p>For appending a query string to the generated URL, use the special <code>_query</code> parameter:</p>
@@ -190,7 +190,7 @@ request.url_for(todo_item, item_id=<span class="st">&#39;foo&#39;</span>)  <span
 </section>
 <section id="validating-url-parameters" class="level3">
 <h3>Validating URL parameters</h3>
-<p>In resources which expect URL parameters, the parameter often refers to a internal object that must exist to answer the request, such as a row in a database. Instead of fetching the object in each handler and exiting with an error if it doesn’t exist, you can register a special <code>from_url</code> handler to do this:</p>
+<p>In resources which expect URL parameters, the parameter often refers to a internal object that is required for answering the request, such as a row in a database. Instead of fetching the object in each handler and exiting with an error if it doesn’t exist, you can register a special <code>from_url</code> handler to do this in one place:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ot">@todo_item.from_url</span>
 <span class="kw">def</span> item_from_url(request, item_id):
     <span class="kw">try</span>:
@@ -198,9 +198,9 @@ request.url_for(todo_item, item_id=<span class="st">&#39;foo&#39;</span>)  <span
     <span class="kw">except</span> <span class="ot">IndexError</span>:
         <span class="kw">raise</span> NotFound(<span class="st">&quot;Todo item with id </span><span class="ot">%s</span><span class="st"> not found.&quot;</span> % item_id)
     <span class="kw">return</span> {<span class="st">&#39;item&#39;</span>: item}</code></pre>
-<p>The handler is called before the actual request handler, and must return a new dictionary, which replaces the URL parameters passed to the handler. Alternatively it can stop further processing by raising an HTTPException.</p>
+<p>The handler is called before the actual request handler, and must return a new dictionary, which replaces the URL parameters passed to the handler. Alternatively it can stop further processing by raising an HTTPException (See <a href="#http-exceptions">HTTP Exceptions</a>).</p>
 <p>In resources supporting many request methods, this simplifies handlers considerably:</p>
-<pre class="sourceCode python"><code class="sourceCode python"><span class="co"># Continuing from above ...</span>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="co"># Continued from above ...</span>
 
 <span class="ot">@todo_item.get</span>
 <span class="kw">def</span> show_item(request, item):  <span class="co"># Instead of item_id, we now get an item</span>
@@ -218,27 +218,26 @@ request.url_for(todo_item, item_id=<span class="st">&#39;foo&#39;</span>)  <span
 <h3>Simple Resources</h3>
 <p>As the “Hello, world” example shows, there are some common shortcuts:</p>
 <ul>
-<li><p>If a resource only handles one HTTP method (usually GET), which is quite common, you can create a standalone handler function using one of the decorators defined in <a href="./modules/rhino.resource.html#rhino.resource"><code>rhino.resource</code></a>, such as <a href="./modules/rhino.resource.html#get"><code>rhino.resource.get</code></a>.</p></li>
-<li><p>Instead of a Response, you can also return an arbitrary object that will be sent as the response body, using a default status code of “200 OK”.</p></li>
+<li><p>If a resource only handles one HTTP method (usually GET), which is quite common, you can create a standalone handler function using one of the decorators <a href="./modules/rhino.resource.html#get">get</a>, <a href="./modules/rhino.resource.html#post">post</a>, <a href="./modules/rhino.resource.html#post">put</a>, <a href="./modules/rhino.resource.html#post">patch</a>, <a href="./modules/rhino.resource.html#post">delete</a> or <a href="./modules/rhino.resource.html#options">options</a>.</p></li>
+<li><p>Instead of a <a href="./modules/rhino.response.html#Response">Response</a>, you can also return an arbitrary object that will be sent as the response body, using a default status code of “200 OK”.</p></li>
 </ul>
 </section>
 </section>
 <section id="accessing-request-data" class="level2">
 <h2>Accessing request data</h2>
-<p>The request data from the WSGI environment is stored in a <a href="./modules/rhino.request.html#Request"><code>rhino.request.Request</code></a> instance.</p>
+<p>The request data from the WSGI environment is stored in a <a href="./modules/rhino.request.html#Request">Request</a> instance.</p>
 <section id="query-parameters" class="level3">
 <h3>Query parameters</h3>
-<p>Request parameters are stored as a <a href="./modules/rhino.request.html#QueryDict"><code>rhino.request.QueryDict</code></a> in the <code>query</code> property. The QueryDict’s <code>get_all()</code> method can be used to get all values for a parameter that appears multiple times.</p>
+<p>Request parameters are stored as a <a href="./modules/rhino.request.html#QueryDict">QueryDict</a> in the <code>query</code> property:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="co"># Example: given a query string of &#39;a=b&amp;id=1&amp;id=2&#39;</span>
 request.query[<span class="st">&#39;a&#39;</span>]                   <span class="co"># -&gt; &#39;a&#39;</span>
 request.query.get(<span class="st">&#39;name&#39;</span>, <span class="st">&#39;default&#39;</span>) <span class="co"># -&gt; &#39;default&#39;</span>
-request.query[<span class="st">&#39;id&#39;</span>]                  <span class="co"># -&gt; &#39;1&#39;</span>
 request.query.get_all(<span class="st">&#39;id&#39;</span>)          <span class="co"># -&gt; [&#39;1&#39;, &#39;2&#39;]</span></code></pre>
 </section>
 <section id="form-fields" class="level3">
 <h3>Form fields</h3>
-<p>The <code>form</code> property holds form fields as a <a href="./modules/rhino.request.html#QueryDict"><code>rhino.request.QueryDict</code></a>. It is parsed when it is first accessed during a request using the stdlib’s <code>cgi.FieldStorage</code> class.</p>
-<p>File upload fields from multipart forms have the extra attributes <code>filename</code>, <code class="sourceCode python"><span class="dt">type</span></code> and <code class="sourceCode python"><span class="dt">file</span></code>:</p>
+<p>The <code>form</code> property holds form fields as a <a href="./modules/rhino.request.html#QueryDict">QueryDict</a>. It is parsed when it is first accessed during a request using the stdlib’s <code>cgi.FieldStorage</code> class.</p>
+<p>File upload fields from multipart forms have the extra attributes ‘filename’, ‘type’ and ‘file’:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="co"># Accessing a regular form field</span>
 username = request.form[<span class="st">&#39;username&#39;</span>]
 
@@ -249,19 +248,19 @@ file_data = request.form[<span class="st">&#39;upload&#39;</span>].<span class="
 </section>
 <section id="request-headers" class="level3">
 <h3>Request headers</h3>
-<p>The <code>headers</code> property contains a dict-like object that provides case-insensitive access to the request headers. Accessing a missing request header returns None instead of raising KeyError:</p>
+<p>The <code>headers</code> property contains a dict-like object that provides case-insensitive access to the request headers. Also, accessing a non-existing request header returns <code class="sourceCode python"><span class="ot">None</span></code> instead of raising <code class="sourceCode python"><span class="ot">KeyError</span></code>:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="co"># The following are equivalent:</span>
 request.headers[<span class="st">&#39;user-agent&#39;</span>]
 request.headers[<span class="st">&#39;USER-AGENT&#39;</span>]
 request.headers.get(<span class="st">&#39;User-Agent&#39;</span>)</code></pre>
-<p>For more request properties, see the API documentation for <a href="./modules/rhino.request.html#Request"><code>rhino.request.Request</code></a>.</p>
+<p>For more request properties, see the API documentation for <a href="./modules/rhino.request.html#Request">Request</a>.</p>
 </section>
 </section>
 <section id="sending-a-response" class="level2">
 <h2>Sending a response</h2>
 <section id="building-http-responses" class="level3">
 <h3>Building HTTP responses</h3>
-<p>To return a response from a handler function, use one of the helper functions defined in <a href="./modules/rhino.response.html#rhino.response"><code>rhino.response</code></a> or construct a <a href="./modules/rhino.response.html#Response"><code>rhino.response.Response</code></a> instance directly. The helper functions allow passing headers as keyword arguments, and accept non-string values for <code>etag</code>, <code>last_modified</code>, and <code>expires</code> (See <a href="./modules/rhino.response.html#response"><code>rhino.response.response</code></a> for details).</p>
+<p>To return a response from a handler function, use one of the helper functions (<a href="./modules/rhino.response.html#ok">ok</a>, <a href="./modules/rhino.response.html#created">created</a>, <a href="./modules/rhino.response.html#no_content">no_content</a>, <a href="./modules/rhino.response.html#redirect">redirect</a> or <a href="./modules/rhino.response.html#response">response</a>), or construct a <a href="./modules/rhino.response.html#Response">Response</a> instance directly. The helper functions allow passing headers as keyword arguments, and accept non-string values for <code>etag</code>, <code>last_modified</code>, and <code>expires</code> (See <a href="./modules/rhino.response.html#response">response()</a> for details).</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> response, ok, redirect
 
 <span class="co"># Common response codes</span>
@@ -282,7 +281,7 @@ ok(<span class="st">&#39;hello, world!&#39;</span>, expires=<span class="dv">300
 </section>
 <section id="entities" class="level3">
 <h3>Entities</h3>
-<p>Instead of manually specifying a Content-Type header, it is often easier to have the content-producing function return a <a href="./modules/rhino.response.html#Entity"><code>rhino.response.Entity</code></a> instead, which represents a response body with entity headers, but no status code:</p>
+<p>Instead of manually specifying a Content-Type header, it is often easier to have the content-producing function return a <a href="./modules/rhino.response.html#Entity">Entity</a> instead, which represents a response body with entity headers, but no status code:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> Entity
 
 <span class="kw">def</span> json_entity(obj):
@@ -291,8 +290,8 @@ ok(<span class="st">&#39;hello, world!&#39;</span>, expires=<span class="dv">300
 <span class="ot">@get</span>
 <span class="kw">def</span> get_status(request):
     <span class="kw">return</span> json_entity({<span class="st">&#39;status&#39;</span>: <span class="st">&#39;supergreen&#39;</span>})</code></pre>
-<p><a href="./modules/rhino.response.html#Entity"><code>rhino.response.Entity</code></a> accepts the same keyword arguments as <a href="./modules/rhino.response.html#response"><code>rhino.response.response</code></a>.</p>
-<p>When used as a response body, the entity headers will be combined with any response headers. Headers passed to the response take precedence and can override entity headers if needed:</p>
+<p>The <a href="./modules/rhino.response.html#Entity">Entity</a> constructor accepts the same keyword arguments as <a href="./modules/rhino.response.html#response">response()</a>.</p>
+<p>When used as a response body, the entity body and headers will be used to populate the response. Headers passed to the response directly take precedence and can override entity headers if needed:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ot">@get</span>
 <span class="kw">def</span> get_legacy_status(request):
     <span class="kw">return</span> ok(json_entity({<span class="st">&#39;status&#39;</span>: <span class="st">&#39;green&#39;</span>}), content_type=<span class="st">&#39;text/x-json&#39;</span>)</code></pre>
@@ -316,7 +315,7 @@ ok(<span class="st">&#39;hello, world!&#39;</span>, expires=<span class="dv">300
 </section>
 <section id="http-exceptions" class="level3">
 <h3>HTTP Exceptions</h3>
-<p>Sometimes it is useful to stop further processing of a request from a place where you cannot simply return a response, such as a hook or a <code>from_url</code> handler. For this reason, responses that are errors or redirects (3xx, 4xx, 5xx) can also be generated by raising subclasses of <a href="./modules/rhino.errors.html#HTTPException"><code>rhino.errors.HTTPException</code></a>:</p>
+<p>Sometimes it is useful to stop further processing of a request from a place where you cannot simply return a response, such as a hook or a <code>from_url</code> handler. For this reason, responses that are errors or redirects (3xx, 4xx, 5xx) can also be generated by raising subclasses of <a href="./modules/rhino.errors.html#HTTPException">HTTPException</a>:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino.errors <span class="ch">import</span> NotFound
 
 <span class="ot">@get</span>
@@ -326,12 +325,12 @@ ok(<span class="st">&#39;hello, world!&#39;</span>, expires=<span class="dv">300
         <span class="kw">raise</span> NotFound(<span class="st">&quot;The user could not be found.&quot;</span>)
     <span class="kw">return</span> ok(<span class="st">&quot;Information about user </span><span class="ot">%s</span><span class="st">&quot;</span> %  user.name)</code></pre>
 <p>Some common HTTP Exceptions are defined in the <a href="./modules/rhino.errors.html#rhino.errors"><code>rhino.errors</code></a> module, as well as base classes for the different types of errors that can be subclassed to create new kinds.</p>
-<p>By convention, the Rhino documentation and code examples use exceptions for all HTTP errors (4xx and 5xx), even if they occur in a request handler, and regular response objects for everything else.</p>
+<p><strong>Note</strong>: By convention, the Rhino documentation and code examples use exceptions for all HTTP errors (4xx and 5xx), even if they occur in a request handler, and regular response objects for everything else.</p>
 </section>
 </section>
 <section id="cookies" class="level2">
 <h2>Cookies</h2>
-<p>Incoming cookies are stored as a dictionary in the <a href="./modules/rhino.request.html#Request.cookies"><code>rhino.request.Request.cookies</code></a> attribute. Outgoing cookies can be set and deleted using the <a href="./modules/rhino.response.html#Response.set_cookie"><code>rhino.response.Response.set_cookie</code></a> and <a href="./modules/rhino.response.html#Response.delete_cookie"><code>rhino.response.Response.delete_cookie</code></a> methods.</p>
+<p>Incoming cookies are stored as a dictionary in the <a href="./modules/rhino.request.html#Request.cookies">Request.cookies</a> attribute. Outgoing cookies can be set and deleted using the <a href="./modules/rhino.response.html#Response.set_cookie">Response.set_cookie()</a> and <a href="./modules/rhino.response.html#Response.delete_cookie">Response.delete_cookie()</a> methods.</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="co"># Accessing a request cookie</span>
 request.cookies.get(<span class="st">&#39;user-font-size&#39;</span>, <span class="st">&#39;12px&#39;</span>)
 
@@ -342,12 +341,12 @@ resp.set_cookie(<span class="st">&#39;color&#39;</span>, <span class="st">&#39;g
 </section>
 <section id="extensions-and-the-context" class="level2">
 <h2>Extensions and the Context</h2>
-<p>The primary extension mechanism is the <a href="./modules/rhino.mapper.html#Context"><code>rhino.mapper.Context</code></a>. This is an object that is created for each request, and has the same lifetime as the request object.</p>
+<p>The primary extension mechanism is the <a href="./modules/rhino.mapper.html#Context">Context</a>. This is an object that is created for each request, and has the same lifetime as the <a href="./modules/rhino.request.html#Request">Request</a> object.</p>
 <p>The context can be requested in a handler using dependency injection. To receive the context, add an argument named <code>ctx</code> to the handler function’s signature (by convention, this should be the 2nd argument after the request, although unlike the request, the context is always passed in by name).</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ot">@get</span>
 <span class="kw">def</span> hello_with_ctx(request, ctx):
     <span class="co"># This handler has access to the context ...</span></code></pre>
-<p>By default, the context is empty, and only serves as an interface to install <a href="#hooks">Hooks</a> [TODO]. However, it can be extended by using the Mapper’s <a href="./modules/rhino.mapper.html#Mapper.add_ctx_property"><code>rhino.mapper.Mapper.add_ctx_property</code></a> method:</p>
+<p>By default, the context is empty, and only serves as an interface to install <a href="#hooks">Hooks</a> [TODO]. However, it can be extended by using the <a href="./modules/rhino.mapper.html#Mapper.add_ctx_property">Mapper.add_ctx_property()</a> method:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ot">@get</span>
 <span class="kw">def</span> hello_with_ctx(request, ctx):
     <span class="kw">return</span> ok(<span class="st">&quot;The app name is </span><span class="ot">%s</span><span class="st">&quot;</span> % ctx.app_name)
@@ -391,13 +390,14 @@ app.add(<span class="st">&#39;/&#39;</span>, index)
 <span class="kw">&lt;/html&gt;</span></code></pre>
 <p>To test the application, first make sure the prerequisites are installed:</p>
 <pre class="sourceCode python"><code class="sourceCode python">$ pip install beaker jinja2</code></pre>
-<p>Then start the development server and point your browser at <a href="http://localhost:9000/" class="uri">http://localhost:9000/</a>.</p>
+<p>Then start the development server:</p>
 <pre class="sourceCode python"><code class="sourceCode python">$ python webapp.py
 Server listening at http://localhost:<span class="dv">9000</span>/</code></pre>
+<p>Point your browser at <a href="http://localhost:9000/" class="uri">http://localhost:9000/</a> and reload the page a few times, and you should see the counter go up.</p>
 </section>
 <section id="serving-static-files" class="level2">
 <h2>Serving static files</h2>
-<p>To serve static files, you can use the <a href="./modules/rhino.static.html#StaticDirectory"><code>rhino.static.StaticDirectory</code></a> and <a href="./modules/rhino.static.html#StaticFile"><code>rhino.static.StaticFile</code></a> resources:</p>
+<p>To serve static files, you can use the <a href="./modules/rhino.static.html#StaticDirectory">StaticDirectory</a> and <a href="./modules/rhino.static.html#StaticFile">StaticFile</a> resources:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> Mapper, StaticDirectory, StaticFile
 
 app = Mapper()
@@ -407,7 +407,7 @@ app.add(<span class="st">&#39;/static/{path:any}&#39;</span>, StaticDirectory(<s
 <section id="using-a-wsgi-server" class="level2">
 <h2>Using a WSGI Server</h2>
 <p>For production uses, you should run the app using a WSGI server of your choice.</p>
-<p>The mappers <code>.wsgi</code> method is the WSGI entry point. For example, to run <a href="#hello-world">the “hello, world” example</a> using the <a href="http://gunicorn.org/">gunicorn</a> WSGI server, save the code to a file named <code>hello.py</code> and run</p>
+<p>The mappers <code>rhino.mapper.Mapper..wsgi</code> method is the WSGI entry point. For example, to run <a href="#hello-world">the “hello, world” example</a> using the <a href="http://gunicorn.org/">gunicorn</a> WSGI server, save the code to a file named <code>hello.py</code> and run</p>
 <pre class="sourceCode python"><code class="sourceCode python">$ gunicorn --bind=localhost:<span class="dv">8000</span> hello:app.wsgi</code></pre>
 </section>
 </section>
