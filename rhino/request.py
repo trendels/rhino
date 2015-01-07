@@ -122,6 +122,7 @@ class Request(object):
     """Represents an HTTP request built from a WSGI environment."""
 
     def __init__(self, environ):
+        environ.setdefault('wsgiorg.routing_args', ([], {}))
         self.environ = environ
         self.headers = RequestHeaders(environ)
         self._url = None
@@ -271,7 +272,6 @@ class Request(object):
     @property
     def routing_args(self):
         """Returns named parameters extracted from the URL during routing."""
-        self.environ.setdefault('wsgiorg.routing_args', ([], {}))
         return self.environ['wsgiorg.routing_args'][1]
 
     # TODO more CGI variables? See: <http://web.archive.org/web/20131002054457/http://ken.coar.org/cgi/draft-coar-cgi-v11-03.txt>

@@ -258,8 +258,8 @@ class Response(object):
             if last_modified:
                 try:
                     modified_ts = httpdate_to_timestamp(last_modified)
-                    last_ok_ts = httpdate_to_timestamp(if_modified_since)
-                    if modified_ts <= last_ok_ts:
+                    last_valid_ts = httpdate_to_timestamp(if_modified_since)
+                    if modified_ts <= last_valid_ts:
                         date_ok = True
                 except:
                     pass
@@ -284,6 +284,7 @@ class Response(object):
         code = self._code
         headers = self._headers
         body = self._body
+        request_method = environ.get('REQUEST_METHOD', '').upper()
 
         # Resolve lazy response body
         if callable(body):
@@ -320,13 +321,10 @@ class Response(object):
         # Send response
         header_list = [(k.encode('ascii'), v.encode('latin-1'))
                        for k, v in headers.items()]
-
-        start_response(self.status, header_list)
-
-        if code in (204, 304) \
-                or environ.get('REQUEST_METHOD', '').upper() == 'HEAD':
+        if code in (204, 304) or request_method == 'HEAD':
             body = ''
 
+        start_response(self.status, header_list)
         return ResponseBody(body, self._callbacks)
 
 

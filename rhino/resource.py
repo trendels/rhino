@@ -104,7 +104,7 @@ def resolve_handler(request, view_handlers):
 
     method_handlers = view_handlers[view]
 
-    verb = request.method.upper()
+    verb = request.method
     if verb not in method_handlers:
         if verb == 'HEAD' and 'GET' in method_handlers:
             verb = 'GET'
@@ -165,7 +165,15 @@ def negotiate_accept(accept, handlers):
     those handlers that provide the matching mime-type.
     """
     provided = [h.provides for h in handlers]
-    if None not in provided:
+    if None in provided:
+        # Not all handlers are annotated - disable content-negotiation
+        # for Accept.
+        # TODO: We could implement an "optimistic mode": If a fully qualified
+        # mime-type was requested and we have a specific handler that provides
+        # it, choose that handler instead of the default handler (depending on
+        # 'q' value).
+        return [h for h in handlers if h.provides is None]
+    else:
         # All handlers are annotated with the mime-type they
         # provide: find the best match.
         #
@@ -175,14 +183,6 @@ def negotiate_accept(accept, handlers):
         # TODO: add "priority" parameter for user-defined priorities.
         best_match = mimeparse.best_match(reversed(provided), accept)
         return [h for h in handlers if h.provides == best_match]
-    else:
-        # Not all handlers are annotated - disable content-negotiation
-        # for Accept.
-        # TODO: We could implement an "optimistic mode": If a fully qualified
-        # mime-type was requested and we have a specific handler that provides
-        # it, choose that handler instead of the default handler (depending on
-        # 'q' value).
-        return [h for h in handlers if h.provides is None]
 
 
 class Resource(object):
@@ -261,7 +261,7 @@ class Resource(object):
             allowed_methods = set([s.strip() for s in allow.split(',')])
             allowed_methods.add('OPTIONS')
             allow = ', '.join(sorted(allowed_methods))
-            if request.method.upper() == 'OPTIONS':
+            if request.method == 'OPTIONS':
                 return Response(200, headers=[('Allow', allow)])
             else:
                 e.response.headers['Allow'] = allow
@@ -276,9 +276,10 @@ class Resource(object):
 
         fn = self._handler_lookup[handler]
         if resource_is_class:
-            response = make_response(call_with_ctx(fn, ctx, resource, request, **kw))
+            rv = call_with_ctx(fn, ctx, resource, request, **kw)
         else:
-            response = make_response(call_with_ctx(fn, ctx, request, **kw))
+            rv = call_with_ctx(fn, ctx, request, **kw)
+        response = make_response(rv)
 
         ctx._run_callbacks('leave', request, response)
 

@@ -319,7 +319,7 @@ def template2path(template, params, ranges=None):
 
 
 
-_callback_phases = ['enter', 'leave', 'finalize', 'teardown', 'close']
+_callback_phases = ('enter', 'leave', 'finalize', 'teardown', 'close')
 
 def _callback_dict():
     return dict((k, []) for k in _callback_phases)
