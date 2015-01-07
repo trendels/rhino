@@ -1,3 +1,4 @@
+# encoding: utf-8
 import functools
 
 from pytest import raises as assert_raises
@@ -161,3 +162,7 @@ def test_sse_event_minimal():
 
 def test_sse_event_empty():
     assert_raises(TypeError, sse_event)
+
+
+def test_sse_event_unicode():
+    assert sse_event(comment=u'★') == u': ★\n\n'.encode('utf-8')

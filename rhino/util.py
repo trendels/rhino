@@ -13,10 +13,9 @@ def _sse_encode(k, v):
     return ''.join('%s: %s\n' % (k, line) for line in v.split('\n'))
 
 
-def sse_event(event=None, data=None, id=None, retry=None, comment=None):
+def sse_event(event=None, data=None, id=None, retry=None, comment=None,
+        encoding='utf-8'):
     """Encode a Server-Sent Event (SSE).
-
-    Returns the event as a string.
 
     At least one field must be present. All fields are strings, except
     retry, which should be an integer. The data and comment fields can contain
@@ -31,7 +30,7 @@ def sse_event(event=None, data=None, id=None, retry=None, comment=None):
         _sse_encode('retry', str(retry)) if retry is not None else '',
         _sse_encode('data', data) if data is not None else '',
         '\n',
-    ])
+    ]).encode(encoding)
 
 
 def dual_use_decorator(fn):
