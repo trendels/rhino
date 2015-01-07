@@ -142,22 +142,12 @@ class Request(object):
         self._context[-1] = self._context[-1]._replace(**kw)
 
     def url_for(*args, **kw):
-        """Build the URL for a target.
+        """Build the URL for a target route.
 
-        Special keyword arguments:
-
-        `_query`
-          : Append query string (dict or list of tuples)
-
-        `_relative`
-          : When True, build a relative URL (default: False)
-
-        All other keyword arguments are treated as parameters for the URL
-        template.
-
-        The target can be any valid target for `Mapper.path`, which will be
-        looked up on the current mapper instance and used to build the URL for
-        that route. Additionally, it can be one of:
+        The target is the first positional argument, and can be any valid
+        target for `Mapper.path`, which will be looked up on the current
+        mapper instance and used to build the URL for that route.
+        Additionally, it can be one of:
 
         '.'
           : Builds the URL for the current route.
@@ -174,6 +164,16 @@ class Request(object):
             level higher in the hierarchy of nested mappers (i.e. '.a' is
             equivalent to 'a').
 
+        Special keyword arguments:
+
+        `_query`
+          : Append a query string to the URL (dict or list of tuples)
+
+        `_relative`
+          : When True, build a relative URL (default: False)
+
+        All other keyword arguments are treated as parameters for the URL
+        template.
         """
         # Allow passing 'self' as named parameter
         self, target = args
@@ -219,7 +219,7 @@ class Request(object):
 
     @property
     def url(self):
-        """The reconstructed request URI (absolute)."""
+        """The reconstructed request URL (absolute)."""
         if self._url is None:
             self._url = request_uri(self.environ, include_query=1)
         return self._url
@@ -260,7 +260,7 @@ class Request(object):
 
     @property
     def remote_port(self):
-        """The remote hosts's port number as an integer, or None (REMOTE_PORT)."""
+        """The client's port number as an integer, or None (REMOTE_PORT)."""
         port = self.environ.get('REMOTE_PORT')
         return int(port) if port is not None else None
 

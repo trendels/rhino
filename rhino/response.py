@@ -154,7 +154,7 @@ class Response(object):
 
     @property
     def headers(self):
-        """A `wsgiref.headers.ResponseHeaders` instance."""
+        """A `wsgiref.headers.Headers` instance."""
         return self._headers
 
     @property
@@ -164,7 +164,7 @@ class Response(object):
 
     @property
     def status(self):
-        """The statusline as a string (status code + reason)"""
+        """The status line as a string (status code + reason)"""
         reason = status_codes.get(self.code, "Unknown")
         return "%s %s" % (self._code, reason)
 
@@ -194,7 +194,7 @@ class Response(object):
         httponly
           : When True, instruct the client to disallow javascript access to
             the cookie.
-        expires:
+        expires
           : Another way of specifying the maximum age of the cookie. Accepts
             the same values as max_age (number of seconds, datetime.timedelta).
             Additionaly accepts a datetime.datetime instance.

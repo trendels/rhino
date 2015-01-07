@@ -58,7 +58,7 @@ def dual_use_decorator_method(fn):
 
 
 def get_args(obj):
-    """Get a list of argument names for a given callable."""
+    """Get a list of argument names for a callable."""
     if inspect.isfunction(obj):
         return inspect.getargspec(obj).args
     elif inspect.ismethod(obj):

@@ -19,7 +19,7 @@ def build_url(context, target, params=None):
             return c.root + c.mapper.path(c.route, params)
         elif target == '/':  # The root mapper instance
             return context[0].root or '/'
-        elif target[0] == '/':  # A dotted route name anchored at the root level
+        elif target[0] == '/':  # A dotted route name anchored at the root
             c = context[0]
             return c.root + c.mapper.path(target[1:], params)
         else:  # A route name relative to the current mapper

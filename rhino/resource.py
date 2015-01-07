@@ -20,6 +20,7 @@ class_types = (type, types.ClassType)  # new-style and old-style classes
 VIEW_SEPARATOR = ':'
 MIMEPARSE_NO_MATCH = (-1, 0)
 
+
 class handler_metadata(namedtuple(
         'handler_metadata', 'verb view accepts provides')):
     @classmethod
@@ -197,7 +198,7 @@ class Resource(object):
 
         @my_resource.get
         def get_resource(request):
-            pass
+            # ...
 
     As a class decorator for class-based resources:
 
@@ -205,17 +206,17 @@ class Resource(object):
         class MyResource(object):
             @get
             def index(self, request):
-                pass
+                # ...
 
     As a wrapper to create resouces from custom objects:
 
         class MyClass(object):
             def __init_(self, *args):
-                pass
+                # ...
 
             @get
             def index(self, request):
-                pass
+                # ...
 
         my_resource = Resource(MyClass())
 

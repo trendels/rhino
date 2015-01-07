@@ -37,6 +37,7 @@ __all__ = [
 
 
 class SessionProperty(object):
+    # TODO add option to autocommit before close
     def __init__(self, url=None, delay_close=False, **session_args):
         if url is not None:
             session_args['bind'] = create_engine(url)

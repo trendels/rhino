@@ -6,7 +6,7 @@ The HTTP request's path is matched against a series of patterns in the order
 they were added. Patterns may be given as strings that must match the request
 path exactly, or they may be templates.
 
-Groups of matching characters for templates are extracted from the URI and
+Groups of matching characters for templates are extracted from the URL and
 accessible via the `routing_args` property of `rhino.Request`.
 
 A template is a string that can contain thee special kinds of markup:
@@ -14,7 +14,7 @@ A template is a string that can contain thee special kinds of markup:
 `{name}` or `{name:range}`
 
   : Whatever matches this part of the path will be available in the
-    `Request.routing_args` dict of named parameters.
+    `Request.routing_args` dict of named parameters under the key `name`.
 
 `[]`
 
@@ -31,8 +31,8 @@ A template is a string that can contain thee special kinds of markup:
     `environ['PATH_INFO']`, where it can be used by nested mappers.
 
 A named parameter can contain an optional named range specifier after a `:`.
-which restricts what characters the parameter can match. If no range is
-specified a parameter matches `segment`. The default ranges are as follows:
+which restricts what characters the parameter can match. The default ranges are
+as follows:
 
 Range       Regular Expression
 ----------  ---------------------
@@ -44,7 +44,9 @@ segment     `[^/]+`
 unreserved  `[a-zA-Z\d\-\.\_\~]+`
 any         `.+`
 
-The default ranges can be extended or overwritten by passing a dict mapping
+If no range is specified a parameter matches `segment`.
+
+Default ranges can be extended or overwritten by passing a dict mapping
 range names to regular expressions to the Mapper constructor. The regular
 expressions should be strings:
 
@@ -504,8 +506,8 @@ class Mapper(object):
     def add_ctx_property(self, name, fn, cached=True):
         """Install a context property.
 
-        A context property is a callable that will be called on first access of
-        the property named `name` on `Context` instances passing through
+        A context property is a callable that will be called on first access
+        of the property named `name` on `Context` instances passing through
         this mapper. The result will be cached unless `cached` is False.
 
         If the context property is not callable, it will be installed
