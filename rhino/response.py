@@ -278,7 +278,7 @@ class Response(object):
     def __call__(self, environ, start_response):
         """WSGI interface
 
-        Finalizes the request, calls `start_response` and returns a
+        Finalizes the response body, calls `start_response` and returns a
         response iterator.
         """
         code = self._code
