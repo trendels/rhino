@@ -188,6 +188,7 @@ class Request(object):
         self.environ = environ
         self.headers = RequestHeaders(environ)
         self._url = None
+        self._input = None
         self._body = None
         self._form = None
         self._query = None
@@ -339,15 +340,24 @@ class Request(object):
     # TODO more CGI variables? See: <http://web.archive.org/web/20131002054457/http://ken.coar.org/cgi/draft-coar-cgi-v11-03.txt>
 
     @property
-    def body(self):
+    def input(self):
         """Returns a file-like object representing the request body."""
-        if self._body is None:
+        if self._input is None:
             input_file = self.environ['wsgi.input']
             if self.wrap_wsgi_input:
                 content_length = self.content_length or 0
-                self._body = WsgiInput(input_file, self.content_length)
+                self._input = WsgiInput(input_file, self.content_length)
             else:
-                self._body = input_file
+                self._input = input_file
+        return self._input
+
+    @property
+    def body(self):
+        """Reads and returns the entire request body.
+
+        The return value is cached after the first access."""
+        if self._body is None:
+            self._body = self.input.read()
         return self._body
 
     @property
@@ -377,9 +387,10 @@ class Request(object):
                         (f.name.decode('utf-8'), f.value.decode('utf-8'))
                     )
             self._form = QueryDict(fields)
-            # Make sure calling body.read() doesn't read from 'wsgi.input'
-            # anymore, as it's been depleted already.
-            self._body = StringIO('')
+            # Make sure calling input.read() or accessing .body
+            # doesn't read from 'wsgi.input' anymore, as it's been depleted
+            # already.
+            self._input = StringIO('')
         return self._form
 
     @property

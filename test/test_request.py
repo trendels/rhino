@@ -67,18 +67,39 @@ def test_bad_content_length():
     assert req.content_length == None
 
 
+def test_request_input(environ):
+    req = Request(environ)
+    assert isinstance(req.input, WsgiInput)
+    assert req.input.read() == body
+    assert req.input.read() == ''
+    assert req.form.items() == []
+    assert req.body == ''
+
+
+def test_request_input_no_wrap(environ):
+    req = Request(environ)
+    req.wrap_wsgi_input = False
+    assert isinstance(req.input, StringIO)
+    assert req.input.read() == body
+    assert req.input.read() == ''
+    assert req.form.items() == []
+    assert req.body == ''
+
+
 def test_request_body(environ):
     req = Request(environ)
-    assert isinstance(req.body, WsgiInput)
-    assert req.body.read() == body
-    assert req.body.read() == ''
+    assert req.body == body
+    assert req.body == body
+    assert req.form.items() == []
+    assert req.input.read() == ''
 
 
-def test_request_body_form(environ):
+def test_request_form(environ):
     req = Request(environ)
-    form = req.form
-    assert form.items()
-    assert req.body.read() == ''
+    assert req.form.items() == [('x', '1'), ('x', '2'), (u'★', u'☃')]
+    assert req.form.items() == [('x', '1'), ('x', '2'), (u'★', u'☃')]
+    assert req.body == ''
+    assert req.input.read() == ''
 
 
 def test_accessors(environ):
@@ -95,12 +116,10 @@ def test_accessors(environ):
     assert req.server_protocol == 'HTTP/1.0'
     assert req.scheme == 'http'
     assert req.query.items() == [('a', '1'), ('a', '2'), ('b', u'☃')]
-    assert req.form.items() == [('x', '1'), ('x', '2'), (u'★', u'☃')]
     assert req.cookies['x'] == u'☃'
     assert req.cookies['a'] == 'b'
     assert req.remote_addr == '1.2.3.4'
     assert req.remote_port == 12345
-    #assert req.body.read() == '' # req.form has already eaten the request body
 
 
 def test_request_headers(environ):

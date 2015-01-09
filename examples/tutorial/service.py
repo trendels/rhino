@@ -39,7 +39,7 @@ def list_todos_json(request):
 @todo_list.post(accepts='application/json')
 def add_todo_json(request):
     try:
-        data = json.load(request.body)
+        data = json.loads(request.body)
         item = model.add_item(data['text'])
     except Exception:
         raise BadRequest
@@ -63,7 +63,7 @@ def get_item_json(request, item):
 @todo_item.put(accepts='application/json', provides='application/json')
 def update_item_json(request, item):
     try:
-        data = json.load(request.body)
+        data = json.loads(request.body)
         new_item = model.update_item(item.id, data['text'], data['done'])
     except Exception as e:
         raise BadRequest(str(e))
