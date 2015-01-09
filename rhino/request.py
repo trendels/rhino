@@ -197,6 +197,7 @@ class Request(object):
         self._cookies = None
         self._context = []
         self._application_uri = None
+        self._body_reader = None
 
     def _add_context(self, **kw):
         self._context.append(request_context(**kw))
@@ -359,7 +360,10 @@ class Request(object):
 
         The return value is cached after the first access."""
         if self._body is None:
-            self._body = self.input.read()
+            if self._body_reader is None:
+                self._body = self.input.read()
+            else:
+                self._body = self._body_reader(self.input)
         return self._body
 
     @property

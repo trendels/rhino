@@ -22,13 +22,24 @@ MIMEPARSE_NO_MATCH = (-1, 0)
 
 
 class handler_metadata(namedtuple(
-        'handler_metadata', 'verb view accepts provides')):
+        'handler_metadata', 'verb view accepts provides produces consumes')):
     @classmethod
-    def create(cls, verb, view=None, accepts='*/*', provides=None):
+    def create(cls, verb, view=None, accepts=None, provides=None,
+                consumes=None, produces=None):
+        if (accepts and consumes):
+            raise ValueError("accepts and consumes are mutually exclusive")
+        if (provides and produces):
+            raise ValueError("provides and produces are mutually exclusive")
+        if consumes:
+            accepts = consumes.accepts
+        if produces:
+            provides = produces.provides
+        if accepts is None:
+            accepts = '*/*'
         if view and VIEW_SEPARATOR in view:
             raise ValueError("View name cannot contain '%s': %s"
                     % (VIEW_SEPARATOR, view))
-        return cls(verb, view, accepts, provides)
+        return cls(verb, view, accepts, provides, produces, consumes)
 
 
 def _make_handler_decorator(*args, **kw):
@@ -270,6 +281,9 @@ class Resource(object):
                 e.response.headers['Allow'] = allow
                 raise
 
+        if handler.consumes:
+            request._body_reader = handler.consumes.deserialize
+
         ctx._run_callbacks('enter', request)
 
         url_args_filter = self._from_url or getattr(resource, 'from_url', None)
@@ -285,6 +299,9 @@ class Resource(object):
         response = make_response(rv)
 
         ctx._run_callbacks('leave', request, response)
+
+        if handler.produces:
+            response._body = handler.produces.serialize(response._body)
 
         if handler.provides:
             response.headers.setdefault('Content-Type', handler.provides)
