@@ -15,11 +15,11 @@ def test_call():
 
     resource = TestResource()
     resource.fn1 = lambda r: Response(200, headers=[('Vary', 'User-Agent')], body='test')
-    resource.fn1._rhino_meta = make_handler_metadata(verb='GET', provides='text/plain')
+    resource.fn1._rhino_meta = [make_handler_metadata(verb='GET', provides='text/plain')]
     resource.fn2 = lambda r: Response(200, body='test')
-    resource.fn2._rhino_meta = make_handler_metadata(verb='GET', provides='text/html')
+    resource.fn2._rhino_meta = [make_handler_metadata(verb='GET', provides='text/html')]
     resource.fn3 = lambda r: Response(200, body='test')
-    resource.fn3._rhino_meta = make_handler_metadata(verb='POST')
+    resource.fn3._rhino_meta = [make_handler_metadata(verb='POST')]
 
     ctx = Context()
     wrapped = Resource(resource)

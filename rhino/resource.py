@@ -33,7 +33,9 @@ class handler_metadata(namedtuple(
 
 def _make_handler_decorator(*args, **kw):
     def decorator(fn):
-        fn._rhino_meta = handler_metadata.create(*args, **kw)
+        if not hasattr(fn, '_rhino_meta'):
+            fn._rhino_meta = []
+        fn._rhino_meta.append(handler_metadata.create(*args, **kw))
         return fn
     return decorator
 
@@ -240,16 +242,16 @@ class Resource(object):
         self._from_url = None
         if wrapped is not None:
             if hasattr(wrapped, '_rhino_meta'):
-                meta = wrapped._rhino_meta
-                self._handlers[meta.view][meta.verb].append(meta)
-                self._handler_lookup[meta] = wrapped
+                for meta in wrapped._rhino_meta:
+                    self._handlers[meta.view][meta.verb].append(meta)
+                    self._handler_lookup[meta] = wrapped
             else:
                 for name in dir(wrapped):
                     prop = getattr(wrapped, name)
                     if hasattr(prop, '_rhino_meta'):
-                        meta = prop._rhino_meta
-                        self._handlers[meta.view][meta.verb].append(meta)
-                        self._handler_lookup[meta] = prop
+                        for meta in prop._rhino_meta:
+                            self._handlers[meta.view][meta.verb].append(meta)
+                            self._handler_lookup[meta] = prop
 
     def __call__(self, request, ctx):
         resource_is_class = type(self._wrapped) in class_types
