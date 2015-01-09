@@ -67,6 +67,27 @@ def test_bad_content_length():
     assert req.content_length == None
 
 
+def test_wsgi_input():
+    data = 'foo\nbar'
+    f = WsgiInput(StringIO(data), content_length=len(data))
+    assert f.read() == 'foo\nbar'
+
+    f = WsgiInput(StringIO(data), content_length=len(data))
+    assert f.read(3) == 'foo'
+    assert f.read() == '\nbar'
+
+    f = WsgiInput(StringIO(data), content_length=len(data))
+    assert f.readline() == 'foo\n'
+    assert f.readline() == 'bar'
+    assert f.readline() == ''
+
+    f = WsgiInput(StringIO(data), content_length=len(data))
+    assert f.readlines() == ['foo\n', 'bar']
+
+    f = WsgiInput(StringIO(data), content_length=len(data))
+    assert list(f) == ['foo\n', 'bar']
+
+
 def test_request_input(environ):
     req = Request(environ)
     assert isinstance(req.input, WsgiInput)

@@ -133,12 +133,14 @@ class WsgiInput(object):
         if self.content_length is None:
             return ''
         bytes_left = self.content_length - self.bytes_read
-        if size is None or size > bytes_left:
+        if size is None:
+            size = bytes_left
+        elif size > bytes_left:
             size = bytes_left
         if not size:
             return ''
-        self.bytes_read += size
-        chunk = self.rfile.read(size)
+        chunk = reader(size)
+        self.bytes_read += len(chunk)
         if len(chunk) < size:
             if (use_readline and not chunk.endswith('\n')) or not use_readline:
                 raise IOError("unexpected end of file while reading request at position %s" % self.bytes_read)
