@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import collections
 import urllib
 import urlparse
 import time
@@ -293,13 +294,13 @@ class Response(object):
         # Validate response body
         if isinstance(body, unicode):
             body = body.encode(self.default_encoding)
-        elif hasattr(body, '__iter__'):
+        elif isinstance(body, collections.Iterator):
             body = (s.encode(self.default_encoding)
                     if isinstance(s, unicode) else s
                     for s in body)
         elif not isinstance(body, str):
             raise TypeError("response body must be of type unicode, str,"
-                            " or an iterator, not '%s'" % type(body))
+                            " or Iterator, not '%s'" % type(body))
 
         # Make sure we have Content-Type and Content-Length headers if needed.
         if code != 304:

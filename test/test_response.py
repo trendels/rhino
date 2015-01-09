@@ -45,6 +45,13 @@ def test_finalize():
     assert body == ''
 
 
+def test_finalize_invalid():
+    assert_raises(TypeError, wsgi_response, Response(200, body=dict()))
+    assert_raises(TypeError, wsgi_response, Response(200, body=list()))
+    assert_raises(TypeError, wsgi_response, Response(200, body=tuple()))
+    assert_raises(TypeError, wsgi_response, Response(200, body=object()))
+
+
 def test_finalize_head():
     status, headers, body = wsgi_response(
             Response(200, body='test'), {'REQUEST_METHOD': 'HEAD'})
