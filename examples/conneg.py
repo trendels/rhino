@@ -18,7 +18,7 @@ def get_json(request, ctx):
 @greeting.put(accepts='application/json')
 def put_json(request, ctx):
     try:
-        data = json.loads(request.body)
+        data = json.load(request.body)
         greeting.text = data['greeting']
     except Exception:
         raise BadRequest

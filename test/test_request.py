@@ -4,8 +4,8 @@ from wsgiref.util import setup_testing_defaults
 
 import rhino
 from mock import patch
-from pytest import raises as assert_raises
-from rhino.request import Request, QueryDict
+from pytest import fixture, raises as assert_raises
+from rhino.request import Request, QueryDict, WsgiInput
 
 body = 'x=1&x=2&%E2%98%85=%E2%98%83'
 body_multipart = u'''--xxx
@@ -19,49 +19,69 @@ Content-Type: text/plain
 ☃☃☃
 --xxx--'''.encode('utf-8')
 
-environ = {
-    'REQUEST_METHOD': 'post',
-    # SCRIPT_NAME and PATH_INFO are unquoted in the WSGI environment
-    'SCRIPT_NAME': u'/☃'.encode('utf-8'),
-    'PATH_INFO': u'/★'.encode('utf-8'),
-    'QUERY_STRING': 'a=1&a=2&b=%E2%98%83',
-    'HTTP_X_FOO': u'Smørebrød'.encode('latin-1'),
-    'HTTP_COOKIE': 'x="\\342\\230\\203"; a=b',
-    'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-    'CONTENT_LENGTH': str(len(body)),
-    'REMOTE_ADDR': '1.2.3.4',
-    'REMOTE_PORT': '12345',
-    'wsgi.input': StringIO(body),
-}
-setup_testing_defaults(environ)
+@fixture
+def environ():
+    environ = {
+        'REQUEST_METHOD': 'post',
+        # SCRIPT_NAME and PATH_INFO are unquoted in the WSGI environment
+        'SCRIPT_NAME': u'/☃'.encode('utf-8'),
+        'PATH_INFO': u'/★'.encode('utf-8'),
+        'QUERY_STRING': 'a=1&a=2&b=%E2%98%83',
+        'HTTP_X_FOO': u'Smørebrød'.encode('latin-1'),
+        'HTTP_COOKIE': 'x="\\342\\230\\203"; a=b',
+        'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+        'CONTENT_LENGTH': str(len(body)),
+        'REMOTE_ADDR': '1.2.3.4',
+        'REMOTE_PORT': '12345',
+        'wsgi.input': StringIO(body),
+    }
+    setup_testing_defaults(environ)
+    return environ
 
-environ_multipart = {
-    'REQUEST_METHOD': 'POST',
-    'CONTENT_TYPE': 'multipart/form-data; boundary=xxx',
-    'CONTENT_LENGTH': str(len(body_multipart)),
-    'wsgi.input': StringIO(body_multipart),
-}
-setup_testing_defaults(environ_multipart)
+@fixture
+def environ_multipart():
+    environ_multipart = {
+        'REQUEST_METHOD': 'POST',
+        'CONTENT_TYPE': 'multipart/form-data; boundary=xxx',
+        'CONTENT_LENGTH': str(len(body_multipart)),
+        'wsgi.input': StringIO(body_multipart),
+    }
+    setup_testing_defaults(environ_multipart)
+    return environ_multipart
 
 
 def test_defaults():
     req = Request({})
     assert req.method == 'GET'
     assert 'Content-Length' not in req.headers
-    assert req.content_length == 0
+    assert req.content_length == None
 
 
 def test_empty_content_length():
     req = Request({'CONTENT_LENGTH': ''})
-    assert req.content_length == 0
+    assert req.content_length == None
 
 
 def test_bad_content_length():
     req = Request({'CONTENT_LENGTH': 'test'})
-    assert req.content_length == 0
+    assert req.content_length == None
 
 
-def test_accessors():
+def test_request_body(environ):
+    req = Request(environ)
+    assert isinstance(req.body, WsgiInput)
+    assert req.body.read() == body
+    assert req.body.read() == ''
+
+
+def test_request_body_form(environ):
+    req = Request(environ)
+    form = req.form
+    assert form.items()
+    assert req.body.read() == ''
+
+
+def test_accessors(environ):
     req = Request(environ)
     assert req.method == 'POST'
     assert req.script_name == u'/☃'
@@ -80,10 +100,10 @@ def test_accessors():
     assert req.cookies['a'] == 'b'
     assert req.remote_addr == '1.2.3.4'
     assert req.remote_port == 12345
-    assert req.body == ''
+    #assert req.body.read() == '' # req.form has already eaten the request body
 
 
-def test_request_headers():
+def test_request_headers(environ):
     headers = Request(environ).headers
     content_length = str(len(body))
     assert headers['Host'] == '127.0.0.1'
@@ -139,7 +159,7 @@ def test_querydict():
     assert q['foo'] is None
 
 
-def test_file_upload():
+def test_file_upload(environ_multipart):
     req = Request(environ_multipart)
     assert set(req.form.keys()) == set([u'★', u'★★'])
     assert req.form[u'★'] == u'☃'
@@ -148,7 +168,7 @@ def test_file_upload():
     assert req.form[u'★★'].file.read() == u'☃☃☃'.encode('utf-8')
 
 
-def test_url_for():
+def test_url_for(environ):
     req = Request(environ)
     with patch.object(rhino.request, 'build_url') as mock_url:
         mock_url.return_value = '/'

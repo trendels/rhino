@@ -4,6 +4,7 @@ import cgi
 import urllib
 import urlparse
 from Cookie import SimpleCookie
+from StringIO import StringIO
 from wsgiref.util import request_uri, application_uri
 
 from .urls import request_context, build_url
@@ -12,6 +13,7 @@ __all__ = [
     'Request',
     'RequestHeaders',
     'QueryDict',
+    'WsgiInput',
 ]
 
 
@@ -118,8 +120,68 @@ class QueryDict(object):
         return self._items[:]
 
 
+# Implementation taken from gevent.pywsgi.Input
+class WsgiInput(object):
+    """Represents a WSGI input filehandle that is safe to use read() on"""
+    def __init__(self, rfile, content_length=None):
+        self.rfile = rfile
+        self.content_length = content_length
+        self.bytes_read = 0
+
+    def _do_read(self, size=None, use_readline=False):
+        reader = self.rfile.readline if use_readline else self.rfile.read
+        if self.content_length is None:
+            return ''
+        bytes_left = self.content_length - self.bytes_read
+        if size is None or size > bytes_left:
+            size = bytes_left
+        if not size:
+            return ''
+        self.bytes_read += size
+        chunk = self.rfile.read(size)
+        if len(chunk) < size:
+            if (use_readline and not chunk.endswith('\n')) or not use_readline:
+                raise IOError("unexpected end of file while reading request at position %s" % self.bytes_read)
+        return chunk
+
+    def read(self, size=None):
+        return self._do_read(size)
+
+    def readline(self, size=None):
+        return self._do_read(size, use_readline=True)
+
+    def readlines(self, hint=None):
+        return list(self)
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        line = self.readline()
+        if not line:
+            raise StopIteration
+        return line
+
+
 class Request(object):
-    """Represents an HTTP request built from a WSGI environment."""
+    """Represents an HTTP request built from a WSGI environment.
+
+    Class variables:
+
+    wrap_wsgi_input
+      : When `True` (the default), `Request.body` returns
+        `environ['wsgi.input']` wrapped in `WsgiInput`, to make it safe to call
+        `body.read()` without providing the content length. This is required
+        for servers like `wsgiref.simple_server`, which is also used by
+        `Rhino.mapper.start_server()`.
+
+        Some WSGI servers (e.g. `gevent.pywsgi`) provide a safe `wsgi.input`
+        that also supports chunked encoding (a.k.a streamed uploads). To
+        be able to benefit from this functionality, `wrap_wsgi_input` needs
+        to be set to `False`. Alternatively, the original input file can
+        always be found in `Request.environ['wsgi.input']`.
+    """
+    wrap_wsgi_input = True
 
     def __init__(self, environ):
         environ.setdefault('wsgiorg.routing_args', ([], {}))
@@ -231,11 +293,11 @@ class Request(object):
 
     @property
     def content_length(self):
-        """The value of the Content-Length header as an integer, or 0"""
+        """The value of the Content-Length header as an integer, or None"""
         try:
             return int(self.environ['CONTENT_LENGTH'])
         except (KeyError, ValueError):
-            return 0
+            return None
 
     @property
     def server_name(self):
@@ -276,15 +338,16 @@ class Request(object):
 
     # TODO more CGI variables? See: <http://web.archive.org/web/20131002054457/http://ken.coar.org/cgi/draft-coar-cgi-v11-03.txt>
 
-    # TODO file-like object that reads no more than content_length bytes
-    # from wsgi.environ
     @property
     def body(self):
-        """Reads content_length bytes from wsgi.input and returns the result.
-
-        Cached after first access."""
+        """Returns a file-like object representing the request body."""
         if self._body is None:
-            self._body = self.environ['wsgi.input'].read(self.content_length)
+            input_file = self.environ['wsgi.input']
+            if self.wrap_wsgi_input:
+                content_length = self.content_length or 0
+                self._body = WsgiInput(input_file, self.content_length)
+            else:
+                self._body = input_file
         return self._body
 
     @property
@@ -314,6 +377,9 @@ class Request(object):
                         (f.name.decode('utf-8'), f.value.decode('utf-8'))
                     )
             self._form = QueryDict(fields)
+            # Make sure calling body.read() doesn't read from 'wsgi.input'
+            # anymore, as it's been depleted already.
+            self._body = StringIO('')
         return self._form
 
     @property

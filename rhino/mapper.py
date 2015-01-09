@@ -466,9 +466,14 @@ class Mapper(object):
       : When set, is used to override the `default_content_type` of outgoing
         Responses. See `rhino.Response` for details. Does not affect responses
         returned via exceptions.
+
+    wrap_wsgi_input (default `True`):
+      : Used to set the `wrap_wsgi_input` property on `rhino.request.Request`
+        instances created by this mapper.
     """
     default_encoding = None
     default_content_type = None
+    wrap_wsgi_input = True
 
     # TODO 'root' parameter for manually specifying a URL prefix not reflected
     # in SCRIPT_NAME (e.g. when proxying).
@@ -577,6 +582,7 @@ class Mapper(object):
     def wsgi(self, environ, start_response):
         """Implements the mapper's WSGI interface."""
         request = Request(environ)
+        request.wrap_wsgi_input = self.wrap_wsgi_input
         ctx = Context(request)
         try:
             response = self(request, ctx)
