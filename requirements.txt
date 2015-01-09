@@ -16,4 +16,4 @@ jinja2
 sqlalchemy
 
 # Install requirements for building the documentation
-sphinx
+pandocfilters
