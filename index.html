@@ -35,7 +35,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <header>
 <h1 class="title">Rhino Documentation</h1>
 </header>
-
 <div id="sidebar">
 <a href="./index.html"><img alt="Rhino logo" src="./static/Rhinoceros.svg"></a>
 <ul>
@@ -76,7 +75,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#api-documentation">API Documentation</a></li>
 </ul>
 </nav>
-
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
 <p>Rhino is a python microframework for building RESTful web services.</p>
@@ -264,9 +262,9 @@ request.headers.get(<span class="st">&#39;User-Agent&#39;</span>)</code></pre>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> response, ok, redirect
 
 <span class="co"># Common response codes</span>
-ok(<span class="st">&#39;hello&#39;</span>)                     <span class="co"># 200 OK</span>
-redirect(<span class="st">&#39;/foo/bar&#39;</span>)            <span class="co"># 302 Found</span>
-redirect(code=<span class="dv">303</span>, <span class="st">&#39;/foo/quux&#39;</span>) <span class="co"># 303 See Other</span>
+ok(<span class="st">&#39;hello&#39;</span>)                          <span class="co"># 200 OK</span>
+redirect(<span class="st">&#39;/foo/bar&#39;</span>)                 <span class="co"># 302 Found</span>
+redirect(code=<span class="dv">303</span>, location=<span class="st">&#39;/quux&#39;</span>) <span class="co"># 303 See Other</span>
 
 <span class="co"># Custom responses</span>
 response(code=<span class="dv">418</span>, body=<span class="st">&quot;I&#39;m a teapot!&quot;</span>, x_tea=<span class="st">&quot;Earl Grey&quot;</span>)</code></pre>
