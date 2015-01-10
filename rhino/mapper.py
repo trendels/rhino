@@ -490,6 +490,7 @@ class Mapper(object):
         self.named_routes = {}
         self._lookup = {}  # index of routes by object ID for faster path(obj)
         self._ctx_properties = {}
+        self._wrapped = self.dispatch
 
     def add(self, template, resource, name=None):
         """Add a route to a resource.
@@ -515,6 +516,42 @@ class Mapper(object):
                         % (name, self.__class__.__name__))
             self.named_routes[name] = route
         self.routes.append(route)
+
+    def add_wrapper(self, wrapper):
+        """Install a wrapper.
+
+        A wrapper is a piece of middleware not unlike WSGI middelware but
+        working with Request and Response objects instead. The argument to
+        add_wrapper is callable that is called with the wrapped app as argument
+        and should return another callable that accepts a Request and Context
+        instance as arguments and returns a Response. The wrapper has full
+        control over the execution. It can call the wrapped app to pass the
+        request on, modify the response, etc.
+
+        Mappers can be nested. This:
+
+            app = Mapper()
+            app.add_mapper(mapper1)
+            app.add_mapper(mapper2)
+
+        Could also be achieved like this:
+
+            app = Mapper()
+            app = mapper2(mapper1(app))
+
+        Except that in the first version 'app' still has all methods of Mapper.
+
+        Example for a wrapper that adds an X-Powered-By header to outgoing
+        responses:
+
+            def add_x_powered_by_wrapper(app):
+                def wrap(request, ctx):
+                    response = app(request)
+                    response.headers['X-Powered-By'] = 'Unicorns'
+                    return response
+                return wrap
+        """
+        self._wrapped = wrapper(self._wrapped)
 
     def add_ctx_property(self, name, fn, cached=True):
         """Install a context property.
@@ -610,8 +647,11 @@ class Mapper(object):
             exc_info = None  # Clear traceback to avoid circular reference
 
     def __call__(self, request, ctx=None):
-        if ctx is None:
+        if ctx is None:  # For easier testing
             ctx = Context(request=request)
+        return self._wrapped(request, ctx)
+
+    def dispatch(self, request, ctx):
         for name, (fn, cached) in self._ctx_properties.items():
             ctx.add_property(name, fn, cached=cached)
         # TODO here is were we would have to prepend self.root
