@@ -282,7 +282,8 @@ class Resource(object):
                 raise
 
         if handler.consumes:
-            request._body_reader = handler.consumes.deserialize
+            reader = handler.consumes.deserialize
+            request._body_reader = lambda f: call_with_ctx(reader, ctx, f)
 
         ctx._run_callbacks('enter', request)
 
@@ -301,7 +302,8 @@ class Resource(object):
         ctx._run_callbacks('leave', request, response)
 
         if handler.produces:
-            response._body = handler.produces.serialize(response._body)
+            writer = handler.produces.serialize
+            response.body = call_with_ctx(writer, ctx, response.body)
 
         if handler.provides:
             response.headers.setdefault('Content-Type', handler.provides)
