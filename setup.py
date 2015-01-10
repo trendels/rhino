@@ -25,5 +25,4 @@ setup(
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
     ],
-    install_requires=['uritemplate'],
 )
