@@ -1,7 +1,9 @@
 #!/usr/bin/env python
+import re
 from setuptools import setup, find_packages
 
-version = '0.0.2'
+with open('rhino/__init__.py') as f:
+    version = re.findall(r"^__version__ = '(.*)'", f.read(), re.M)[0]
 
 with open('README.rst') as f:
     README = f.read()
@@ -23,4 +25,5 @@ setup(
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
     ],
+    install_requires=['uritemplate'],
 )
