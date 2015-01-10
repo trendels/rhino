@@ -3,6 +3,8 @@ import json
 from rhino import Mapper, Resource, ok
 from rhino.errors import BadRequest
 
+# Helper function to parse JSON from a file-like object.
+# Raises BadRequest if the content is not valid JSON.
 def read_json(f):
     try:
         obj = json.load(f)
@@ -10,7 +12,9 @@ def read_json(f):
         raise BadRequest("Invalid JSON: %s" % e)
     return obj
 
-
+# Example wrapper that automatically parses Request.body as JSON if the request
+# has an 'application/json' Content-Type, and also serializes dicts, lists and
+# tuples returned from handlers as json.
 def json_api_wrapper(app):
     def wrap(request, ctx):
         if request.content_type == 'application/json':
