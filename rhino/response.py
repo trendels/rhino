@@ -163,6 +163,10 @@ class Response(object):
         """The response body."""
         return self._body
 
+    @body.setter
+    def body(self, value):
+        self._body = value
+
     @property
     def status(self):
         """The status line as a string (status code + reason)"""
