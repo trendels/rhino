@@ -3,6 +3,7 @@ import time
 from datetime import datetime, timedelta
 from wsgiref.util import setup_testing_defaults
 
+import mock
 from mock import patch
 from pytest import raises as assert_raises
 from rhino.response import Entity, Response, \
@@ -378,57 +379,18 @@ def test_redirect():
     assert_raises(ValueError, redirect, '/', code=400)
 
 
-#def test_conditional_lazy_body():
-#    class Resource(object):
-#        def __init__(self):
-#            self.body_called = False
-#
-#        def __call__(self, request):
-#            def body():
-#                self.body_called = True
-#                return 'test'
-#            return ok(body, etag="0xdecafbad")
-#
-#    resource = Resource()
-#    app = Mapper()
-#    app.add('/', resource)
-#    client = TestClient(app.wsgi)
-#
-#    res = client.get('/')
-#    assert res.headers['Content-Length'] == '4'
-#    assert res.body == 'test'
-#    assert resource.body_called
-#
-#    resource.body_called = False
-#    res = client.get('/', if_none_match='"0xdecafbad"')
-#    assert res.status == "304 Not Modified"
-#    assert res.body == ''
-#    assert not resource.body_called
-#
-#def test_conditional_lazy_body_iter():
-#    class Resource(object):
-#        def __init__(self):
-#            self.body_called = False
-#
-#        def __call__(self, request):
-#            def body():
-#                self.body_called = True
-#                yield 'foo'
-#                yield 'bar'
-#            return ok(body(), etag="0xdecafbad")
-#
-#    resource = Resource()
-#    app = Mapper()
-#    app.add('/', resource)
-#    client = TestClient(app.wsgi)
-#
-#    res = client.get('/')
-#    assert 'Content-Length' not in res.headers
-#    assert res.body == 'foobar'
-#    assert resource.body_called
-#
-#    resource.body_called = False
-#    res = client.get('/', if_none_match='"0xdecafbad"')
-#    assert res.status == "304 Not Modified"
-#    assert res.body == ''
-#    assert not resource.body_called
+def test_conditional_lazy_body():
+    mock_body = mock.create_autospec(lambda: None, return_value='ok')
+    res = response(200, body=mock_body, etag='1')
+
+    req = Request({'HTTP_IF_NONE_MATCH': '"1"'})
+    status, _, body = wsgi_response(res.conditional_to(req), req.environ)
+    assert status == "304 Not Modified"
+    assert body == ''
+    assert not mock_body.called
+
+    req = Request({'HTTP_IF_NONE_MATCH': '"2"'})
+    status, _, body = wsgi_response(res.conditional_to(req), req.environ)
+    assert status == "200 OK"
+    assert body == 'ok'
+    assert mock_body.called
