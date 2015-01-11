@@ -4,38 +4,31 @@ from rhino import Mapper, get
 
 # Our internal representation
 report = {
-    'id': 1,
     'title': 'foo',
+    'author': 'Fred',
+    'date': '2015-01-09',
     'tags': ['a', 'b', 'c'],
-    'date_published': '2015-01-09',
 }
 
-# Versioned content-types
-mime_type = 'application/vnd.acme.report+json'
-mime_type_v1 = mime_type + ';v=1'
-mime_type_v2 = mime_type + ';v=2'
-mime_type_v3 = mime_type + ';v=3'
-
-# Base class for representations
+# Base class for our representations
 class report_repr(object):
     @classmethod
     def serialize(cls, report):
         obj = dict([(k, report[k]) for k in cls.fields])
         return json.dumps(obj, sort_keys=True)
 
-# Different versions of the representation, e.g. with different fields
-
+# Different versions of the representation
 class report_v1(report_repr):
-    provides = mime_type_v1
-    fields = ['id', 'title']
+    provides = 'application/vnd.acme.report+json;v=1'
+    fields = ['title', 'author']
 
 class report_v2(report_repr):
-    provides = mime_type_v2
-    fields = ['id', 'title', 'tags']
+    provides = 'application/vnd.acme.report+json;v=2'
+    fields = ['title', 'author', 'date']
 
 class report_v3(report_repr):
-    provides = mime_type_v3
-    fields = ['id', 'title', 'tags', 'date_published']
+    provides = 'application/vnd.acme.report+json;v=3'
+    fields = ['title', 'author', 'date', 'tags']
 
 
 # One handler can handle multiple representations.
