@@ -48,6 +48,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="../modules/rhino.request.html#Request"><code>Request</code></a></li>
 <li><a href="../modules/rhino.request.html#RequestHeaders"><code>RequestHeaders</code></a></li>
 <li><a href="../modules/rhino.request.html#QueryDict"><code>QueryDict</code></a></li>
+<li><a href="../modules/rhino.request.html#WsgiInput"><code>WsgiInput</code></a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -60,6 +61,13 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <h3><code class="sourceCode python"><span class="kw">class</span> Request</code></h3>
 <div class="docstring">
 <p>Represents an HTTP request built from a WSGI environment.</p>
+<p>Class variables:</p>
+<dl>
+<dt>wrap_wsgi_input</dt>
+<dd><p>When <code class="sourceCode python"><span class="ot">True</span></code> (the default), <a href="../modules/rhino.request.html#Request.body"><code>Request.body</code></a> returns <code>environ['wsgi.input']</code> wrapped in <a href="../modules/rhino.request.html#WsgiInput"><code>WsgiInput</code></a>, to make it safe to call <code>body.read()</code> without providing the content length. This is required for servers like <code>wsgiref.simple_server</code>, which is also used by <code>Rhino.mapper.start_server()</code>.</p>
+<p>Some WSGI servers (e.g. <code>gevent.pywsgi</code>) provide a safe <code>wsgi.input</code> that also supports chunked encoding (a.k.a streamed uploads). To be able to benefit from this functionality, <code>wrap_wsgi_input</code> needs to be set to <code class="sourceCode python"><span class="ot">False</span></code>. Alternatively, the original input file can always be found in <code>Request.environ['wsgi.input']</code>.</p>
+</dd>
+</dl>
 </div>
 <section id="Request.__init__" class="level4">
 <h4><code class="sourceCode python"><span class="ot">__init__</span>(environ)</code></h4>
@@ -67,14 +75,14 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <section id="body" class="level4">
 <h4><code id="Request.body">body</code></h4>
 <div class="docstring">
-<p>Reads content_length bytes from wsgi.input and returns the result.</p>
-<p>Cached after first access.</p>
+<p>Reads and returns the entire request body.</p>
+<p>The return value is cached after the first access.</p>
 </div>
 </section>
 <section id="content_length" class="level4">
 <h4><code id="Request.content_length">content_length</code></h4>
 <div class="docstring">
-<p>The value of the Content-Length header as an integer, or 0</p>
+<p>The value of the Content-Length header as an integer, or None</p>
 </div>
 </section>
 <section id="content_type" class="level4">
@@ -94,6 +102,12 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div class="docstring">
 <p>Reads the request body and tries to parse it as a web form.</p>
 <p>Parsing is done using the stdlib's <code>cgi.FieldStorage</code> class which supports multipart forms (file uploads). Returns a <a href="../modules/rhino.request.html#QueryDict"><code>QueryDict</code></a> instance holding the form fields. Uploaded files are represented as form fields with a 'filename' attribute.</p>
+</div>
+</section>
+<section id="input" class="level4">
+<h4><code class="sourceCode python" id="Request.input"><span class="dt">input</span></code></h4>
+<div class="docstring">
+<p>Returns a file-like object representing the request body.</p>
 </div>
 </section>
 <section id="method" class="level4">
@@ -225,6 +239,15 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div class="docstring">
 <p>Return a list of values for the given key.</p>
 </div>
+</section>
+</section>
+<section id="WsgiInput" class="level3">
+<h3><code class="sourceCode python"><span class="kw">class</span> WsgiInput</code></h3>
+<div class="docstring">
+<p>Represents a WSGI input filehandle that is safe to use read() on</p>
+</div>
+<section id="WsgiInput.__init__" class="level4">
+<h4><code class="sourceCode python"><span class="ot">__init__</span>(rfile, content_length=<span class="ot">None</span>)</code></h4>
 </section>
 </section>
 </section>

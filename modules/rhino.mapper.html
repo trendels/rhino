@@ -142,6 +142,9 @@ mapper.add(<span class="st">&#39;/foo|&#39;</span>, foo_mapper)</code></pre>
 <dt>default_content_type (default <code class="sourceCode python"><span class="ot">None</span></code>):</dt>
 <dd>When set, is used to override the <code>default_content_type</code> of outgoing Responses. See <a href="../modules/rhino.html#Response"><code>rhino.Response</code></a> for details. Does not affect responses returned via exceptions.
 </dd>
+<dt>wrap_wsgi_input (default <code class="sourceCode python"><span class="ot">True</span></code>):</dt>
+<dd>Used to set the <code>wrap_wsgi_input</code> property on <a href="../modules/rhino.request.html#Request"><code>rhino.request.Request</code></a> instances created by this mapper.
+</dd>
 </dl>
 </div>
 <section id="Mapper.__init__" class="level4">
@@ -164,6 +167,28 @@ mapper.add(<span class="st">&#39;/foo|&#39;</span>, foo_mapper)</code></pre>
 <p>Install a context property.</p>
 <p>A context property is a callable that will be called on first access of the property named <code>name</code> on <a href="../modules/rhino.mapper.html#Context"><code>Context</code></a> instances passing through this mapper. The result will be cached unless <code>cached</code> is False.</p>
 <p>If the context property is not callable, it will be installed as-is, otherwise, it will be called with the context instance as first argument.</p>
+</div>
+</section>
+<section id="Mapper.add_wrapper" class="level4">
+<h4><code class="sourceCode python">add_wrapper(wrapper)</code></h4>
+<div class="docstring">
+<p>Install a wrapper.</p>
+<p>A wrapper is a piece of middleware not unlike WSGI middelware but working with Request and Response objects instead. The argument to add_wrapper is callable that is called with the wrapped app as argument and should return another callable that accepts a Request and Context instance as arguments and returns a Response. The wrapper has full control over the execution. It can call the wrapped app to pass the request on, modify the response, etc.</p>
+<p>Mappers can be nested. This:</p>
+<pre class="sourceCode python"><code class="sourceCode python">app = Mapper()
+app.add_mapper(mapper1)
+app.add_mapper(mapper2)</code></pre>
+<p>Could also be achieved like this:</p>
+<pre class="sourceCode python"><code class="sourceCode python">app = Mapper()
+app = mapper2(mapper1(app))</code></pre>
+<p>Except that in the first version 'app' still has all methods of Mapper.</p>
+<p>Example for a wrapper that adds an X-Powered-By header to outgoing responses:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> add_x_powered_by_wrapper(app):
+    <span class="kw">def</span> wrap(request, ctx):
+        response = app(request)
+        response.headers[<span class="st">&#39;X-Powered-By&#39;</span>] = <span class="st">&#39;Unicorns&#39;</span>
+        <span class="kw">return</span> response
+    <span class="kw">return</span> wrap</code></pre>
 </div>
 </section>
 <section id="Mapper.handle_error" class="level4">
