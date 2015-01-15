@@ -79,12 +79,14 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </ul></li>
 <li><a href="#content-negotiation">Content Negotiation</a></li>
 <li><a href="#representations">Representations</a></li>
-<li><a href="#extending-rhino-applications">Extending Rhino Applications</a><ul>
+<li><a href="#extending">Extending Rhino Applications</a><ul>
 <li><a href="#callbacks">Callbacks</a></li>
 <li><a href="#wrappers">Wrappers</a></li>
 <li><a href="#context-properties">Context Properties</a></li>
 </ul></li>
-<li><a href="#nesting-mappers">Nesting Mappers</a></li>
+<li><a href="#nesting-mappers">Nesting Mappers</a><ul>
+<li><a href="#building-urls-for-nested-resources.">Building URLs for nested resources.</a></li>
+</ul></li>
 </ul></li>
 <li><a href="#api-documentation">API Documentation</a></li>
 </ul>
@@ -157,9 +159,9 @@ app.add(<span class="st">&#39;/todos&#39;</span>, todo_list)
 
 <span class="kw">if</span> <span class="ot">__name__</span> == <span class="st">&#39;__main__&#39;</span>:
     app.start_server()</code></pre>
-<p>The resource's methods are used as decorators to register handler functions. A resource can have handlers for multiple methods, and even multiple handlers for the same method (see <a href="#content-negotiation">Content Negotiation</a> [TODO]). A handler is a regular Python function that receives the request as its first argument and produces an HTTP response.</p>
+<p>The resource's methods are used as decorators to register handler functions. A resource can have handlers for multiple methods, and even multiple handlers for the same method (see <a href="#content-negotiation">Content Negotiation</a>). A handler is a regular Python function that receives the request as its first argument and produces an HTTP response.</p>
 <p>Resources are registered with a Mapper under a URL template. The mapper is the entry point for the application, and dispatches incoming requests to resources based on the request URL.</p>
-<p>The mapper knows the URLs of all resources, and can also construct URLs. This functionality is exposed through the <a href="./modules/rhino.request.html#Request.url_for">Request.url_for</a> method, as seen in the example above. This avoids having hardcoded URLs in different places of the code that are hard to change later.</p>
+<p>The mapper knows the URLs of all resources, and can also construct URLs. This functionality is exposed through the <a href="./modules/rhino.request.html#Request.url_for">Request.url_for()</a> method, as seen in the example above. This avoids having hardcoded URLs in different places of the code that are hard to change later.</p>
 </section>
 <section id="named-routes" class="level3">
 <h3>Named Routes</h3>
@@ -230,7 +232,7 @@ request.url_for(todo_item, item_id=<span class="st">&#39;foo&#39;</span>)  <span
 <h3>Simple Resources</h3>
 <p>As the &quot;Hello, world&quot; example shows, there are some common shortcuts:</p>
 <ul>
-<li><p>If a resource only handles one HTTP method (usually GET), which is quite common, you can create a standalone handler function using one of the decorators <a href="./modules/rhino.resource.html#get">get</a>, <a href="./modules/rhino.resource.html#post">post</a>, <a href="./modules/rhino.resource.html#post">put</a>, <a href="./modules/rhino.resource.html#post">patch</a>, <a href="./modules/rhino.resource.html#post">delete</a> or <a href="./modules/rhino.resource.html#options">options</a>.</p></li>
+<li><p>If a resource only handles one HTTP method (usually GET), which is quite common, you can create a standalone handler function using one of the decorators <a href="./modules/rhino.resource.html#get">get()</a>, <a href="./modules/rhino.resource.html#post">post()</a>, <a href="./modules/rhino.resource.html#put">put()</a>, <a href="./modules/rhino.resource.html#patch">patch()</a>, <a href="./modules/rhino.resource.html#delete">delete()</a> or <a href="./modules/rhino.resource.html#options">options()</a>.</p></li>
 <li><p>Instead of a <a href="./modules/rhino.response.html#Response">Response</a>, you can also return an arbitrary object that will be sent as the response body, using a default status code of &quot;200 OK&quot;.</p></li>
 </ul>
 </section>
@@ -272,7 +274,7 @@ request.headers.get(<span class="st">&#39;User-Agent&#39;</span>)</code></pre>
 <h2>Sending a response</h2>
 <section id="building-http-responses" class="level3">
 <h3>Building HTTP responses</h3>
-<p>To return a response from a handler function, use one of the helper functions (<a href="./modules/rhino.response.html#ok">ok</a>, <a href="./modules/rhino.response.html#created">created</a>, <a href="./modules/rhino.response.html#no_content">no_content</a>, <a href="./modules/rhino.response.html#redirect">redirect</a> or <a href="./modules/rhino.response.html#response">response</a>), or construct a <a href="./modules/rhino.response.html#Response">Response</a> instance directly. The helper functions allow passing headers as keyword arguments, and accept non-string values for <code>etag</code>, <code>last_modified</code>, and <code>expires</code> (See <a href="./modules/rhino.response.html#response">response()</a> for details).</p>
+<p>To return a response from a handler function, use one of the helper functions (<a href="./modules/rhino.response.html#ok">ok()</a>, <a href="./modules/rhino.response.html#created">created()</a>, <a href="./modules/rhino.response.html#no_content">no_content()</a>, <a href="./modules/rhino.response.html#redirect">redirect()</a> or <a href="./modules/rhino.response.html#response">response()</a>), or construct a <a href="./modules/rhino.response.html#Response">Response</a> instance directly. The helper functions allow passing headers as keyword arguments, and accept non-string values for <code>etag</code>, <code>last_modified</code>, and <code>expires</code> (See <a href="./modules/rhino.response.html#response">response()</a> for details).</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> response, ok, redirect
 
 <span class="co"># Common response codes</span>
@@ -358,7 +360,7 @@ resp.set_cookie(<span class="st">&#39;color&#39;</span>, <span class="st">&#39;g
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ot">@get</span>
 <span class="kw">def</span> hello_with_ctx(request, ctx):
     <span class="co"># This handler has access to the context ...</span></code></pre>
-<p>By default, the context is empty, and only serves as an interface to install <a href="#callbacks">Callbacks</a> [TODO]. However, it can be extended by using the <a href="./modules/rhino.mapper.html#Mapper.add_ctx_property">Mapper.add_ctx_property()</a> method:</p>
+<p>By default, the context is empty, and only serves as an interface to install <a href="#callbacks">Callbacks</a>. However, it can be extended by using the <a href="./modules/rhino.mapper.html#Mapper.add_ctx_property">Mapper.add_ctx_property()</a> method:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ot">@get</span>
 <span class="kw">def</span> hello_with_ctx(request, ctx):
     <span class="kw">return</span> ok(<span class="st">&quot;The app name is </span><span class="ot">%s</span><span class="st">&quot;</span> % ctx.app_name)
@@ -366,7 +368,7 @@ resp.set_cookie(<span class="st">&#39;color&#39;</span>, <span class="st">&#39;g
 app = Mapper()
 app.add_ctx_property(<span class="st">&#39;app_name&#39;</span>, <span class="st">&quot;My Application&quot;</span>)
 app.add(<span class="st">&#39;/&#39;</span>, hello_with_ctx)</code></pre>
-<p>In this example, all context instances within this Mapper will have an 'app_name' attribute containing the string &quot;My Application&quot;. Usually, the second argument to <code>add_ctx_property</code> will be a factory function to provide a lazily initialized property. See <a href="#extending">Extending Rhino Applications</a> [TODO] for details.</p>
+<p>In this example, all context instances within this Mapper will have an 'app_name' attribute containing the string &quot;My Application&quot;. Usually, the second argument to <code>add_ctx_property</code> will be a factory function to provide a lazily initialized property. See <a href="#extending">Extending Rhino Applications</a> for details.</p>
 <p>Some default extensions are included to add common functionality. These usually require additional python modules to be installed (those are listed at the top of the extension's documentation)</p>
 <ul>
 <li><a href="./modules/rhino.ext.jinja2.html#rhino.ext.jinja2"><code>rhino.ext.jinja2</code></a> -- Extension for rendering jinja templates.</li>
@@ -419,7 +421,7 @@ app.add(<span class="st">&#39;/static/{path:any}&#39;</span>, StaticDirectory(<s
 <section id="using-a-wsgi-server" class="level2">
 <h2>Using a WSGI Server</h2>
 <p>For production uses, you should run the app using a WSGI server of your choice.</p>
-<p>The mappers <code>rhino.mapper.Mapper..wsgi</code> method is the WSGI entry point. For example, to run <a href="#hello-world">the &quot;hello, world&quot; example</a> using the <a href="http://gunicorn.org/">gunicorn</a> WSGI server, save the code to a file named <code>hello.py</code> and run</p>
+<p>The mappers <a href="./modules/rhino.mapper.html#Mapper.wsgi">Mapper.wsgi()</a> method is the WSGI entry point. For example, to run <a href="#hello-world">the &quot;hello, world&quot; example</a> using the <a href="http://gunicorn.org/">gunicorn</a> WSGI server, save the code to a file named <code>hello.py</code> and run</p>
 <pre><code>$ gunicorn --bind=localhost:8000 hello:app.wsgi</code></pre>
 </section>
 </section>
@@ -490,7 +492,7 @@ greeting = Resource()
 </section>
 <section id="representations" class="level2">
 <h2>Representations</h2>
-<p>Instead of choosing handlers using Content-Negotiation, you can also define &quot;Representations&quot;. In Rhino, a representation is any object that has &quot;provides&quot; an &quot;serizalize&quot; attributes (if used for output), and/or &quot;accepts&quot; and &quot;deserialize&quot; (if used for input). Representations are used with the <code>produces</code> nd <code>consumes</code> arguments to handler decorators. They provide Content-Negotiation, just like <code>accepts</code>/<code>provides</code>, but also methods to serialize the response body or deserialize the request body on demand.</p>
+<p>Instead of choosing handlers using Content-Negotiation, you can also define &quot;Representations&quot;. In Rhino, a representation is any object that has &quot;provides&quot; an &quot;serialize&quot; attributes (if used for output), and/or &quot;accepts&quot; and &quot;deserialize&quot; (if used for input). Representations are used with the <code>produces</code> nd <code>consumes</code> arguments to handler decorators. They provide Content-Negotiation, just like <code>accepts</code>/<code>provides</code>, but also methods to serialize the response body or deserialize the request body on demand.</p>
 <p>Here is an example of a generic JSON representation:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">import</span> json
 
@@ -539,34 +541,89 @@ greeting.message = <span class="st">&quot;hello, world!&quot;</span>
     doc = get_document()
     <span class="kw">return</span> doc</code></pre>
 </section>
-<section id="extending-rhino-applications" class="level2">
+<section id="extending" class="level2">
 <h2>Extending Rhino Applications</h2>
 <section id="callbacks" class="level3">
 <h3>Callbacks</h3>
+<p>Callbacks are functions that can be installed on the <a href="./modules/rhino.mapper.html#Context">Context</a> and that are called by the framework at different stages during request processing. See <a href="./modules/rhino.mapper.html#Context.add_callback">Context.add_callback()</a> for more information.</p>
 </section>
 <section id="wrappers" class="level3">
 <h3>Wrappers</h3>
+<p>A wrapper is a kind of middleware that wraps a mapper and has full control over how request processing proceeds. It can inspect the incoming request, decide whether to pass them on to the mapped wrapper, and modify the response. See <a href="./modules/rhino.mapper.html#Mapper.add_wrapper">Mapper.add_wrapper()</a> for details.</p>
 </section>
 <section id="context-properties" class="level3">
 <h3>Context Properties</h3>
+<p>The Context can be extended via the <a href="./modules/rhino.mapper.html#Mapper.add_ctx_property">Mapper.add_ctx_property()</a> method.</p>
 </section>
 </section>
 <section id="nesting-mappers" class="level2">
 <h2>Nesting Mappers</h2>
+<p>To build re-usable applications, or to structure larger applications into smaller parts, mappers can be nested:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> Mapper
+
+<span class="ch">import</span> app_one
+<span class="ch">import</span> app_two
+
+main_app = Mapper()
+main_app.add(<span class="st">&#39;/one|&#39;</span>, app_one, name=<span class="st">&#39;one&#39;</span>)
+main_app.add(<span class="st">&#39;/two|&#39;</span>, app_two, name=<span class="st">&#39;two&#39;</span>)</code></pre>
+<p>The <code>|</code> marker at the end of the pattern causes the pattern to only be matched against the beginning of <code>PATH_INFO</code>. The rest of the path will be preserved and consumed by nested mappers.</p>
+<section id="building-urls-for-nested-resources." class="level3">
+<h3>Building URLs for nested resources.</h3>
+<p>Building URLs for routes in other mappers that are nested under a common root is possible if all routes on the way have a name.</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="ot">@get</span>
+<span class="kw">def</span> hello1(request):
+    <span class="kw">return</span> <span class="st">&#39;hello 1&#39;</span>
+
+<span class="ot">@get</span>
+<span class="kw">def</span> hello2(request):
+    <span class="kw">return</span> <span class="st">&#39;hello 2&#39;</span>
+
+red_mapper = Mapper()
+red_mapper.add(<span class="st">&#39;/hello&#39;</span>, hello1, name=<span class="st">&#39;hello&#39;</span>)
+
+green_mapper = Mapper()
+green_mapper.add(<span class="st">&#39;/hello&#39;</span>, hello2, name=<span class="st">&#39;hello&#39;</span>)
+
+red_mapper.add(<span class="st">&#39;/green|&#39;</span>, green_mapper, name=<span class="st">&#39;green&#39;</span>)
+
+root_mapper = Mapper()
+root_mapper.add(<span class="st">&#39;/red|&#39;</span>, red_mapper, name=<span class="st">&#39;red&#39;</span>)</code></pre>
+<p>This creates the following URL structure (only resources are shown):</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">URL</th>
+<th style="text-align: left;">Resource</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">/red/hello</td>
+<td style="text-align: left;"><code>hello1</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">/red/green/hello</td>
+<td style="text-align: left;"><code>hello2</code></td>
+</tr>
+</tbody>
+</table>
+<p>From anywhere within the app, a URL the <code>hello1</code> and <code>hello2</code> resources can be can be created like this, using the absolute path starting at <code>root_mapper</code>:</p>
+<pre class="sourceCode python"><code class="sourceCode python">request.url_for(<span class="st">&#39;/red.hello&#39;</span>)        <span class="co"># for hello1</span>
+request.url_for(<span class="st">&#39;/red.green.hello&#39;</span>)  <span class="co"># for hello2</span></code></pre>
+<p>Using a relative path, we can build a URL for <code>hello2</code> from within <code>hello1</code> like this:</p>
+<pre class="sourceCode python"><code class="sourceCode python">request.url_for(<span class="st">&#39;green.hello&#39;</span>)</code></pre>
+<p>And from within <code>hello2</code>, the URL for <code>hello1</code> like this:</p>
+<pre class="sourceCode python"><code class="sourceCode python">request.url_for(<span class="st">&#39;..hello&#39;</span>)</code></pre>
+<p>The last two cases would keep working even if <code>red_mapper</code> is run as a standalone app, or nested under a different mapper. See <a href="./modules/rhino.request.html#Request.url_for">Request.url_for()</a> for more information.</p>
 <!--
+   More topics to cover (in no particular order):
 
-    Topics to cover (in no particular order):
-    - Unicode, default_encoding and default_content_type
-    - more ways to build resources (classes, objects, non-handler functions)
-    - views
-    - conditional GET and HEAD requests
-    - content negotiation
-    - callbacks
-    - extending apps (context properties and wrappers)
-    - applications as building blocks (splitting mappers, advanced URLs,
-      standalone and nestable apps)
-
+   - Unicode, default_encoding and default_content_type
+   - more ways to build resources (classes, objects, non-handler functions)
+   - views
 -->
+</section>
 </section>
 </section>
 <section id="api-documentation" class="level1">
