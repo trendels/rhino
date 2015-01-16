@@ -173,14 +173,14 @@ mapper.add(<span class="st">&#39;/foo|&#39;</span>, foo_mapper)</code></pre>
 <h4><code class="sourceCode python">add_wrapper(wrapper)</code></h4>
 <div class="docstring">
 <p>Install a wrapper.</p>
-<p>A wrapper is a piece of middleware not unlike WSGI middelware but working with Request and Response objects instead. The argument to add_wrapper is callable that is called with the wrapped app as argument and should return another callable that accepts a Request and Context instance as arguments and returns a Response. The wrapper has full control over the execution. It can call the wrapped app to pass the request on, modify the response, etc.</p>
-<p>Mappers can be nested. This:</p>
+<p>A wrapper is a piece of middleware not unlike WSGI middelware but working with Request and Response objects instead. The argument to add_wrapper must be a callable that is called with the wrapped app as argument and should return another callable that accepts a Request and Context instance as arguments and returns a Response. The wrapper has full control over the execution. It can call the wrapped app to pass on the request, modify the response, etc.</p>
+<p>Wrappers can be nested. This:</p>
 <pre class="sourceCode python"><code class="sourceCode python">app = Mapper()
-app.add_mapper(mapper1)
-app.add_mapper(mapper2)</code></pre>
+app.add_wrapper(wrapper1)
+app.add_wrapper(wrapper2)</code></pre>
 <p>Could also be achieved like this:</p>
 <pre class="sourceCode python"><code class="sourceCode python">app = Mapper()
-app = mapper2(mapper1(app))</code></pre>
+app = wrapper2(wrapper1(app))</code></pre>
 <p>Except that in the first version 'app' still has all methods of Mapper.</p>
 <p>Example for a wrapper that adds an X-Powered-By header to outgoing responses:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> add_x_powered_by_wrapper(app):
@@ -203,10 +203,10 @@ app = mapper2(mapper1(app))</code></pre>
 <p>Build a URL path fragment for a resource or route.</p>
 <p>Possible values for <code>target</code>:</p>
 <dl>
-<dt>A string that does not contain a <code>.</code></dt>
-<dd>If the string does not contain <code>.</code>, it will be used to look up a named route of this mapper instance and return it's path.
+<dt>A string that does not contain a '.'</dt>
+<dd>If the string does not contain a dot, it will be used to look up a named route of this mapper instance and return it's path.
 </dd>
-<dt>A string of the form <code>a.b</code>, <code>a.b.c</code>, etc.</dt>
+<dt>A string of the form 'a.b', 'a.b.c', etc.</dt>
 <dd>Follows the route to nested mappers by splitting off consecutive segments. Returns the path of the route found by looking up the final segment on the last mapper.
 </dd>
 <dt>A <a href="../modules/rhino.mapper.html#Route"><code>Route</code></a> instance</dt>
@@ -278,6 +278,13 @@ app = mapper2(mapper1(app))</code></pre>
 <p>Arguments: -</p>
 </dd>
 </dl>
+</div>
+</section>
+<section id="Context.add_property" class="level4">
+<h4><code class="sourceCode python">add_property(name, fn, cached=<span class="ot">True</span>)</code></h4>
+<div class="docstring">
+<p>Adds a lazily initialized property to the Context.</p>
+<p>See also <a href="../modules/rhino.mapper.html#Mapper.add_ctx_property"><code>Mapper.add_ctx_property</code></a>, which uses this method to install the properties added on the Mapper level.</p>
 </div>
 </section>
 </section>

@@ -295,7 +295,7 @@ ok(<span class="st">&#39;hello, world!&#39;</span>, expires=<span class="dv">300
 </section>
 <section id="entities" class="level3">
 <h3>Entities</h3>
-<p>Instead of manually specifying a Content-Type header, it is often easier to have the content-producing function return a <a href="./modules/rhino.response.html#Entity">Entity</a> instead, which represents a response body with entity headers, but no status code:</p>
+<p>Instead of manually specifying a Content-Type header, it is often easier to have the content-producing function return an <a href="./modules/rhino.response.html#Entity">Entity</a> instead, which represents a response body with entity headers, but no status code:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> Entity
 
 <span class="kw">def</span> json_entity(obj):
@@ -441,7 +441,7 @@ app.add(<span class="st">&#39;/static/{path:any}&#39;</span>, StaticDirectory(<s
 <span class="ot">@get</span>
 <span class="kw">def</span> resource_with_last_modified(request):
     <span class="kw">return</span> ok(<span class="st">&quot;hello, world&quot;</span>, last_modified=datetime.now())</code></pre>
-<p>Note that you don't have to put quotes around the ETag value, as they will be added automatically (but you can if you want). In most cases, ETag is preferable to a Last-Modified, since the HTTP date format only has 1-second precision.</p>
+<p>Note that you don't have to put quotes around the ETag value, as they will be added automatically (but you can if you want). In most cases, ETag is preferable to Last-Modified, since the HTTP date format only has 1-second precision.</p>
 </section>
 <section id="generating-etags-automatically" class="level3">
 <h3>Generating ETags automatically</h3>
@@ -481,7 +481,7 @@ greeting = Resource()
     <span class="kw">return</span> ok(<span class="st">&quot;hello, world&quot;</span>)
 
 <span class="ot">@greeting.get</span>(provides=<span class="st">&#39;application/json&#39;</span>)
-<span class="kw">def</span> greeting_text(request):
+<span class="kw">def</span> greeting_json(request):
     <span class="kw">return</span> ok(json.dumps({<span class="st">&quot;message&quot;</span>: <span class="st">&quot;hello, world&quot;</span>}))</code></pre>
 <p>A few important things to note:</p>
 <ul>
@@ -492,7 +492,7 @@ greeting = Resource()
 </section>
 <section id="representations" class="level2">
 <h2>Representations</h2>
-<p>Instead of choosing handlers using Content-Negotiation, you can also define &quot;Representations&quot;. In Rhino, a representation is any object that has &quot;provides&quot; an &quot;serialize&quot; attributes (if used for output), and/or &quot;accepts&quot; and &quot;deserialize&quot; (if used for input). Representations are used with the <code>produces</code> nd <code>consumes</code> arguments to handler decorators. They provide Content-Negotiation, just like <code>accepts</code>/<code>provides</code>, but also methods to serialize the response body or deserialize the request body on demand.</p>
+<p>Instead of choosing handlers using Content-Negotiation, you can also define &quot;Representations&quot;. In Rhino, a representation is any object that has &quot;provides&quot; and &quot;serialize&quot; attributes (if used for output), and/or &quot;accepts&quot; and &quot;deserialize&quot; (if used for input). Representations are used with the <code>produces</code> and <code>consumes</code> arguments to handler decorators. They provide Content-Negotiation, just like <code>accepts</code>/<code>provides</code>, but also methods to serialize the response body or deserialize the request body on demand.</p>
 <p>Here is an example of a generic JSON representation:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">import</span> json
 
@@ -530,7 +530,7 @@ greeting.message = <span class="st">&quot;hello, world!&quot;</span>
     <span class="co"># ...</span>
 
 <span class="kw">class</span> v2_repr(<span class="dt">object</span>):
-    produces = <span class="st">&#39;application/vnd.myorg.document+json;v=1&#39;</span>
+    produces = <span class="st">&#39;application/vnd.myorg.document+json;v=2&#39;</span>
     <span class="co"># ...</span>
 
 <span class="co"># etc.</span>
@@ -549,7 +549,7 @@ greeting.message = <span class="st">&quot;hello, world!&quot;</span>
 </section>
 <section id="wrappers" class="level3">
 <h3>Wrappers</h3>
-<p>A wrapper is a kind of middleware that wraps a mapper and has full control over how request processing proceeds. It can inspect the incoming request, decide whether to pass them on to the mapped wrapper, and modify the response. See <a href="./modules/rhino.mapper.html#Mapper.add_wrapper">Mapper.add_wrapper()</a> for details.</p>
+<p>A wrapper is a kind of middleware that wraps a mapper and has full control over how request processing proceeds. It can inspect the incoming request, decide whether or not to pass it on to the mapped wrapper, and modify the response. See <a href="./modules/rhino.mapper.html#Mapper.add_wrapper">Mapper.add_wrapper()</a> for details.</p>
 </section>
 <section id="context-properties" class="level3">
 <h3>Context Properties</h3>
