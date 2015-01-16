@@ -171,9 +171,9 @@ class Request(object):
     Class variables:
 
     wrap_wsgi_input
-      : When `True` (the default), `Request.body` returns
+      : When `True` (the default), `Request.input` returns
         `environ['wsgi.input']` wrapped in `WsgiInput`, to make it safe to call
-        `body.read()` without providing the content length. This is required
+        `read()` on it without providing the content length. This is required
         for servers like `wsgiref.simple_server`, which is also used by
         `Rhino.mapper.start_server()`.
 
@@ -358,7 +358,10 @@ class Request(object):
     def body(self):
         """Reads and returns the entire request body.
 
-        The return value is cached after the first access."""
+        On first access, reads `content_length` bytes from `input` and stores
+        the result on the request instance. On subsequent access, returns the
+        cached value.
+        """
         if self._body is None:
             if self._body_reader is None:
                 self._body = self.input.read(self.content_length or 0)
