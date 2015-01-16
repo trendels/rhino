@@ -379,6 +379,11 @@ class Context(object):
             fn(*args)
 
     def add_property(self, name, fn, cached=True):
+        """Adds a lazily initialized property to the Context.
+
+        See also `Mapper.add_ctx_property`, which uses this method to install
+        the properties added on the Mapper level.
+        """
         if name in self.__properties:
             raise KeyError("Trying to add a property '%s' that already exists on this %s instance." % (name, self.__class__.__name__))
         self.__properties[name] = (fn, cached)
@@ -522,22 +527,22 @@ class Mapper(object):
 
         A wrapper is a piece of middleware not unlike WSGI middelware but
         working with Request and Response objects instead. The argument to
-        add_wrapper is callable that is called with the wrapped app as argument
-        and should return another callable that accepts a Request and Context
-        instance as arguments and returns a Response. The wrapper has full
-        control over the execution. It can call the wrapped app to pass the
-        request on, modify the response, etc.
+        add_wrapper must be a callable that is called with the wrapped app as
+        argument and should return another callable that accepts a Request and
+        Context instance as arguments and returns a Response. The wrapper has
+        full control over the execution. It can call the wrapped app to pass on
+        the request, modify the response, etc.
 
-        Mappers can be nested. This:
+        Wrappers can be nested. This:
 
             app = Mapper()
-            app.add_mapper(mapper1)
-            app.add_mapper(mapper2)
+            app.add_wrapper(wrapper1)
+            app.add_wrapper(wrapper2)
 
         Could also be achieved like this:
 
             app = Mapper()
-            app = mapper2(mapper1(app))
+            app = wrapper2(wrapper1(app))
 
         Except that in the first version 'app' still has all methods of Mapper.
 
@@ -573,11 +578,11 @@ class Mapper(object):
 
         Possible values for `target`:
 
-        A string that does not contain a `.`
-          : If the string does not contain `.`, it will be used to look up
+        A string that does not contain a '.'
+          : If the string does not contain a dot, it will be used to look up
             a named route of this mapper instance and return it's path.
 
-        A string of the form `a.b`, `a.b.c`, etc.
+        A string of the form 'a.b', 'a.b.c', etc.
           : Follows the route to nested mappers by splitting off consecutive
             segments. Returns the path of the route found by looking up the
             final segment on the last mapper.
