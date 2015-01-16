@@ -64,7 +64,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <p>Class variables:</p>
 <dl>
 <dt>wrap_wsgi_input</dt>
-<dd><p>When <code class="sourceCode python"><span class="ot">True</span></code> (the default), <a href="../modules/rhino.request.html#Request.body"><code>Request.body</code></a> returns <code>environ['wsgi.input']</code> wrapped in <a href="../modules/rhino.request.html#WsgiInput"><code>WsgiInput</code></a>, to make it safe to call <code>body.read()</code> without providing the content length. This is required for servers like <code>wsgiref.simple_server</code>, which is also used by <code>Rhino.mapper.start_server()</code>.</p>
+<dd><p>When <code class="sourceCode python"><span class="ot">True</span></code> (the default), <a href="../modules/rhino.request.html#Request.input"><code>Request.input</code></a> returns <code>environ['wsgi.input']</code> wrapped in <a href="../modules/rhino.request.html#WsgiInput"><code>WsgiInput</code></a>, to make it safe to call <code>read()</code> on it without providing the content length. This is required for servers like <code>wsgiref.simple_server</code>, which is also used by <code>Rhino.mapper.start_server()</code>.</p>
 <p>Some WSGI servers (e.g. <code>gevent.pywsgi</code>) provide a safe <code>wsgi.input</code> that also supports chunked encoding (a.k.a streamed uploads). To be able to benefit from this functionality, <code>wrap_wsgi_input</code> needs to be set to <code class="sourceCode python"><span class="ot">False</span></code>. Alternatively, the original input file can always be found in <code>Request.environ['wsgi.input']</code>.</p>
 </dd>
 </dl>
@@ -76,7 +76,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <h4><code id="Request.body">body</code></h4>
 <div class="docstring">
 <p>Reads and returns the entire request body.</p>
-<p>The return value is cached after the first access.</p>
+<p>On first access, reads <code>content_length</code> bytes from <code class="sourceCode python"><span class="dt">input</span></code> and stores the result on the request instance. On subsequent access, returns the cached value.</p>
 </div>
 </section>
 <section id="content_length" class="level4">
