@@ -361,7 +361,7 @@ class Request(object):
         The return value is cached after the first access."""
         if self._body is None:
             if self._body_reader is None:
-                self._body = self.input.read()
+                self._body = self.input.read(self.content_length or 0)
             else:
                 self._body = self._body_reader(self.input)
         return self._body
