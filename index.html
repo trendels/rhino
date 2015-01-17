@@ -84,6 +84,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#wrappers">Wrappers</a></li>
 <li><a href="#context-properties">Context Properties</a></li>
 </ul></li>
+<li><a href="#resource-views">Resource Views</a></li>
 <li><a href="#nesting-mappers">Nesting Mappers</a><ul>
 <li><a href="#building-urls-for-nested-resources.">Building URLs for nested resources.</a></li>
 </ul></li>
@@ -556,6 +557,55 @@ greeting.message = <span class="st">&quot;hello, world!&quot;</span>
 <p>The Context can be extended via the <a href="./modules/rhino.mapper.html#Mapper.add_ctx_property">Mapper.add_ctx_property()</a> method.</p>
 </section>
 </section>
+<section id="resource-views" class="level2">
+<h2>Resource Views</h2>
+<p>Views are an optional feature that allows you to have a single resource act in different ways depending on which route the request came from:</p>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="ch">import</span> json
+
+message = Resource()
+message.text = <span class="st">&quot;hello, world!&quot;</span>
+
+<span class="co"># By default, the resource supports GET and returns plain text.</span>
+<span class="ot">@message.get</span>
+<span class="kw">def</span> get_message(request):
+    <span class="kw">return</span> message.text
+
+<span class="co"># The &#39;json&#39; view supports GET and returns json</span>
+<span class="ot">@message.get</span>(<span class="st">&#39;json&#39;</span>)
+<span class="kw">def</span> get_message_json(request):
+    <span class="kw">return</span> ok(json.dumps({<span class="st">&#39;text&#39;</span>: message.text}),
+              content_type=<span class="st">&#39;application/json&#39;</span>)
+
+<span class="co"># The &#39;edit-form&#39; view supports GET and POST and returns an HTML form</span>
+<span class="ot">@message.get</span>(<span class="st">&#39;edit-form&#39;</span>, provides=<span class="st">&#39;text/html&#39;</span>)
+<span class="kw">def</span> message_edit_form(request):
+    <span class="kw">return</span> <span class="st">&#39;&#39;&#39;</span>
+<span class="st">        &lt;form method=&quot;post&quot; action=&quot;</span><span class="ot">{{</span><span class="st"> url_for(&#39;message:edit&#39;) </span><span class="ot">}}</span><span class="st">&quot;&gt;</span>
+<span class="st">          &lt;input type=&quot;text&quot; name=&quot;text&quot;&gt;</span>
+<span class="st">          &lt;input type=&quot;submit&quot; value=&quot;Update&gt;</span>
+<span class="st">        &lt;/form&gt;</span>
+<span class="st">        &#39;&#39;&#39;</span>
+
+<span class="ot">@message.post</span>(<span class="st">&#39;edit-form&#39;</span>)
+<span class="kw">def</span> edit_message(request):
+    message.text = request.form[<span class="st">&#39;text&#39;</span>]
+    <span class="kw">return</span> redirect(message)
+
+app = Mapper()
+
+<span class="co"># Each route to the resource is associated with a different view (the part</span>
+<span class="co"># of the name after the &#39;:&#39;)</span>
+app.add(<span class="st">&#39;/message&#39;</span>, message)
+app.add(<span class="st">&#39;/message.json&#39;</span>, message, <span class="st">&#39;:json&#39;</span>)
+app.add(<span class="st">&#39;/message/edit&#39;</span>, message, name=<span class="st">&#39;message:edit-form&#39;</span>)</code></pre>
+<p>All handler decorators accept a <code>view</code> argument that associates the handler with this view. A route is associated with a view when the name includes a colon (<code>:</code>). The part after the <code>:</code> is the view name. When the resource is accessed via a route matching a view, it will act as if <strong>only</strong> the handlers associated with that view are present. Thus, each view acts effectively as a separate resource.</p>
+<p>The example above shows two use cases for views:</p>
+<ul>
+<li>Implementing a &quot;form&quot; resource that is related to an existing resource.</li>
+<li>A representation of the resource that resides under its own URL.</li>
+</ul>
+<p>Compared to implementing each view as a separate resource, views allow common infrastructure like <code>from_url</code> handlers to be shared between related resources.</p>
+</section>
 <section id="nesting-mappers" class="level2">
 <h2>Nesting Mappers</h2>
 <p>To build re-usable applications, or to structure larger applications into smaller parts, mappers can be nested:</p>
@@ -621,7 +671,6 @@ request.url_for(<span class="st">&#39;/red.green.hello&#39;</span>)  <span class
 
    - Unicode, default_encoding and default_content_type
    - more ways to build resources (classes, objects, non-handler functions)
-   - views
 -->
 </section>
 </section>
