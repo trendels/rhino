@@ -579,14 +579,14 @@ message.text = <span class="st">&quot;hello, world!&quot;</span>
               content_type=<span class="st">&#39;application/json&#39;</span>)
 
 <span class="co"># The &#39;edit-form&#39; view supports GET and POST and returns an HTML form</span>
-<span class="ot">@message.get</span>(<span class="st">&#39;edit-form&#39;</span>, provides=<span class="st">&#39;text/html&#39;</span>)
+<span class="ot">@message.get</span>(<span class="st">&#39;edit-form&#39;</span>)
 <span class="kw">def</span> message_edit_form(request):
-    <span class="kw">return</span> <span class="st">&#39;&#39;&#39;</span>
-<span class="st">        &lt;form method=&quot;post&quot; action=&quot;</span><span class="ot">{{</span><span class="st"> url_for(&#39;:edit-form&#39;) </span><span class="ot">}}</span><span class="st">&quot;&gt;</span>
+    <span class="kw">return</span> ok(<span class="st">&#39;&#39;&#39;</span>
+<span class="st">        &lt;form method=&quot;post&quot; action=&quot;&quot;&gt;</span>
 <span class="st">          &lt;input type=&quot;text&quot; name=&quot;text&quot;&gt;</span>
 <span class="st">          &lt;input type=&quot;submit&quot; value=&quot;Update&gt;</span>
 <span class="st">        &lt;/form&gt;</span>
-<span class="st">        &#39;&#39;&#39;</span>
+<span class="st">        &#39;&#39;&#39;</span>, content_type=<span class="st">&#39;text/html&#39;</span>)
 
 <span class="ot">@message.post</span>(<span class="st">&#39;edit-form&#39;</span>)
 <span class="kw">def</span> edit_message(request):
