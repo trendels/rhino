@@ -131,13 +131,13 @@ app.add(<span class="st">&#39;/&#39;</span>, hello)
 
 <span class="kw">if</span> <span class="ot">__name__</span> == <span class="st">&#39;__main__&#39;</span>:
     app.start_server(<span class="st">&#39;localhost&#39;</span>, <span class="dv">9000</span>)</code></pre>
-<p>Run this code and visit <a href="http://localhost:9000/" class="uri">http://localhost:9000/</a> in your browser. You should see text &quot;hello, world!&quot;.</p>
+<p>Run this code and visit <a href="http://localhost:9000/" class="uri">http://localhost:9000/</a> in your browser. You should see the text &quot;hello, world!&quot;.</p>
 </section>
 <section id="resources-and-mappers" class="level2">
 <h2>Resources and Mappers</h2>
 <section id="creating-resources" class="level3">
 <h3>Creating Resources</h3>
-<p>Resources are the building blocks or RESTful web services. In Rhino, we create resources using instances of the <a href="./modules/rhino.resource.html#Resource">Resource</a> class:</p>
+<p>Resources are the building blocks for RESTful web services. In Rhino, we create resources using instances of the <a href="./modules/rhino.resource.html#Resource">Resource</a> class:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> rhino <span class="ch">import</span> Resource, Mapper, ok
 
 TODOS = [<span class="st">&quot;Read the Rhino documentation&quot;</span>, <span class="st">&quot;???&quot;</span>, <span class="st">&quot;Profit!&quot;</span>]
@@ -152,7 +152,7 @@ todo_list = Resource()
 <span class="co"># Register a handler for HTTP POST requests</span>
 <span class="ot">@todo_list.post</span>
 <span class="kw">def</span> add_todo(request):
-    TODOS.append(request.body.read())
+    TODOS.append(request.body)
     <span class="kw">return</span> redirect(request.url_for(todo_list))
 
 app = Mapper()
@@ -166,7 +166,7 @@ app.add(<span class="st">&#39;/todos&#39;</span>, todo_list)
 </section>
 <section id="named-routes" class="level3">
 <h3>Named Routes</h3>
-<p>When building URLs, it may not always be possible or practical to refer to resources directly. For this reason, routes can be assigned a unique name in <a href="./modules/rhino.mapper.html#Mapper.add">Mapper.add()</a> by which they can be referred to later:</p>
+<p>When building URLs, it may not always be possible or practical to refer to resources directly. For this reason, routes can be assigned a name in <a href="./modules/rhino.mapper.html#Mapper.add">Mapper.add()</a> by which they can be referred to later:</p>
 <pre class="sourceCode python"><code class="sourceCode python">mapper.add(<span class="st">&#39;/todos&#39;</span>, todo_list, name=<span class="st">&#39;todos&#39;</span>)
 
 <span class="co"># Now we can refer to the route like this:</span>
@@ -422,7 +422,7 @@ app.add(<span class="st">&#39;/static/{path:any}&#39;</span>, StaticDirectory(<s
 <section id="using-a-wsgi-server" class="level2">
 <h2>Using a WSGI Server</h2>
 <p>For production uses, you should run the app using a WSGI server of your choice.</p>
-<p>The mappers <a href="./modules/rhino.mapper.html#Mapper.wsgi">Mapper.wsgi()</a> method is the WSGI entry point. For example, to run <a href="#hello-world">the &quot;hello, world&quot; example</a> using the <a href="http://gunicorn.org/">gunicorn</a> WSGI server, save the code to a file named <code>hello.py</code> and run</p>
+<p>The <a href="./modules/rhino.mapper.html#Mapper.wsgi">Mapper.wsgi()</a> method is the WSGI entry point. For example, to run <a href="#hello-world">the &quot;hello, world&quot; example</a> using the <a href="http://gunicorn.org/">gunicorn</a> WSGI server, save the code to a file named <code>hello.py</code> and run</p>
 <pre><code>$ gunicorn --bind=localhost:8000 hello:app.wsgi</code></pre>
 </section>
 </section>
@@ -458,7 +458,7 @@ app.add(<span class="st">&#39;/static/{path:any}&#39;</span>, StaticDirectory(<s
 </section>
 <section id="etags-and-lazy-response-bodies" class="level3">
 <h3>ETags and lazy response bodies</h3>
-<p>Simply adding ETags headers to outgoing responses can already save considerable bandwidth, but with the examples we've seen so far, the entire response is still generated on the server for each request. If a representation is expensive to produce, it can be beneficial to pre-compute ETags, and try to handle conditional requests on the basis of the ETag header alone, and only producing the response body when it actually needs to be sent over the wire.</p>
+<p>Simply adding ETag headers to outgoing responses can already save considerable bandwidth, but with the examples we've seen so far, the entire response is still generated on the server for each request. If a representation is expensive to produce, it can be beneficial to pre-compute ETags, and try to handle conditional requests on the basis of the ETag header alone. This way, the response body is only produced when it actually needs to be sent over the wire.</p>
 <p>For this reason, Rhino allows you to wrap any valid response body in a callable, that will be called only if needed:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ot">@get</span>
 <span class="kw">def</span> resource_with_precomputed_etag(request):
@@ -471,7 +471,7 @@ app.add(<span class="st">&#39;/static/{path:any}&#39;</span>, StaticDirectory(<s
 <section id="content-negotiation" class="level2">
 <h2>Content Negotiation</h2>
 <p>If a resource is able to produce representations in different formats, or different versions of the same format, you can use Content-Negotiation. All handler decorators (<a href="./modules/rhino.resource.html#get">get()</a>, <a href="./modules/rhino.resource.html#Resource.get">Resource.get()</a>), etc. allow you to specify <code>provides</code> and <code>accepts</code> arguments for this purpose.</p>
-<p>The value of <code>provides</code> should be a single, fully-qualified mime-type, (e.g. <code>text/plain</code>, <code>application/json</code>), that will be matched with the <code>Accept</code> headers sent by the client to find the best representation available.</p>
+<p>The value of <code>provides</code> should be a single, fully-qualified mime-type, (e.g. <code>text/plain</code>, <code>application/json</code>), that will be matched with the <code>Accept</code> header sent by the client to find the best representation available.</p>
 <p>The value of <code>accepts</code> can be a media-range, such as <code>text/*</code>, or a mime-type like <code>provides</code>.</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">import</span> json
 
@@ -487,13 +487,13 @@ greeting = Resource()
 <p>A few important things to note:</p>
 <ul>
 <li><p>Content-Negotiation on the basis of the <code>Accept</code> header is only enabled if all handlers of a resource that are taken into consideration (i.e. with the matching HTTP method) are annotated with the mime-type they provide (via <code>provides</code>). For other handlers, there is no way for the framework to predict what mime-type they might produce. In this case, the framework will only consider the handler(s) that are <em>not</em> annotated to be present.</p></li>
-<li><p>If a handler has a <code>provides</code> annotation, and no Content-Type is explicitly set on the response, the value of the <code>provides</code> header will be used by default.</p></li>
+<li><p>If a handler has a <code>provides</code> annotation, and no Content-Type is explicitly set on the response, the value of the <code>provides</code> parameter will be used by default.</p></li>
 <li><p>A handler that has no <code>accepts</code> annotation will be treated as if it accepts <code>*/*</code> (i.e. anything).</p></li>
 </ul>
 </section>
 <section id="representations" class="level2">
 <h2>Representations</h2>
-<p>Instead of choosing handlers using Content-Negotiation, you can also define &quot;Representations&quot;. In Rhino, a representation is any object that has &quot;provides&quot; and &quot;serialize&quot; attributes (if used for output), and/or &quot;accepts&quot; and &quot;deserialize&quot; (if used for input). Representations are used with the <code>produces</code> and <code>consumes</code> arguments to handler decorators. They provide Content-Negotiation, just like <code>accepts</code>/<code>provides</code>, but also methods to serialize the response body or deserialize the request body on demand.</p>
+<p>Going a step further than only selecting among handlers, Content-Negotiation can also be combined with automatic seralization/deserialization in the form of &quot;Representations&quot;. In Rhino, a representation is any object that has &quot;provides&quot; and &quot;serialize&quot; attributes (if used for output), and/or &quot;accepts&quot; and &quot;deserialize&quot; (if used for input). Representations are used with the <code>produces</code> and <code>consumes</code> arguments to handler decorators. They provide Content-Negotiation, just like <code>accepts</code>/<code>provides</code>, but also methods to serialize the response body or deserialize the request body on demand.</p>
 <p>Here is an example of a generic JSON representation:</p>
 <pre class="sourceCode python"><code class="sourceCode python"><span class="ch">import</span> json
 
@@ -514,16 +514,20 @@ greeting.message = <span class="st">&quot;hello, world!&quot;</span>
 
 <span class="ot">@greeting.get</span>(produces=json_repr)
 <span class="kw">def</span> get_json(request):
+    <span class="co"># After the handler has retruned, the response body will be serialized</span>
+    <span class="co"># using json_repr.serialize()</span>
     <span class="kw">return</span> {<span class="st">&#39;message&#39;</span>: greeting.message}
 
 <span class="ot">@greeting.put</span>(consumes=json_repr, produces=json_repr)
 <span class="kw">def</span> put_json(request):
     <span class="kw">try</span>:
+        <span class="co"># Accessing the request body will cause it to be deserialized first</span>
+        <span class="co"># using json_repr.deserialize()</span>
         greeting.message = request.body[<span class="st">&#39;text&#39;</span>]
     <span class="kw">except</span> <span class="ot">ValueError</span>:
         <span class="kw">raise</span> BadReqeust
     <span class="kw">return</span> {<span class="st">&#39;message&#39;</span>: greeting.message}</code></pre>
-<p>Representations are useful if you want to provide different versions of a custom content-type.</p>
+<p>Representations are also useful if you want to provide different versions of a custom content-type (Content-Type versioning):</p>
 <!-- TODO which handler is the default here? Also add this info to notes on
      Content-Negotiation above -->
 <pre class="sourceCode python"><code class="sourceCode python"><span class="kw">class</span> v1_repr(<span class="dt">object</span>):
@@ -533,8 +537,6 @@ greeting.message = <span class="st">&quot;hello, world!&quot;</span>
 <span class="kw">class</span> v2_repr(<span class="dt">object</span>):
     produces = <span class="st">&#39;application/vnd.myorg.document+json;v=2&#39;</span>
     <span class="co"># ...</span>
-
-<span class="co"># etc.</span>
 
 <span class="ot">@get</span>(produces=v1_repr)
 <span class="ot">@get</span>(produces=v2_repr)
@@ -550,7 +552,7 @@ greeting.message = <span class="st">&quot;hello, world!&quot;</span>
 </section>
 <section id="wrappers" class="level3">
 <h3>Wrappers</h3>
-<p>A wrapper is a kind of middleware that wraps a mapper and has full control over how request processing proceeds. It can inspect the incoming request, decide whether or not to pass it on to the mapped wrapper, and modify the response. See <a href="./modules/rhino.mapper.html#Mapper.add_wrapper">Mapper.add_wrapper()</a> for details.</p>
+<p>A wrapper is a kind of middleware that wraps a mapper and has full control over how request processing proceeds. It can inspect the incoming request, decide whether or not to pass it on to the wrapped mapper, and modify the response. See <a href="./modules/rhino.mapper.html#Mapper.add_wrapper">Mapper.add_wrapper()</a> for details.</p>
 </section>
 <section id="context-properties" class="level3">
 <h3>Context Properties</h3>
@@ -580,7 +582,7 @@ message.text = <span class="st">&quot;hello, world!&quot;</span>
 <span class="ot">@message.get</span>(<span class="st">&#39;edit-form&#39;</span>, provides=<span class="st">&#39;text/html&#39;</span>)
 <span class="kw">def</span> message_edit_form(request):
     <span class="kw">return</span> <span class="st">&#39;&#39;&#39;</span>
-<span class="st">        &lt;form method=&quot;post&quot; action=&quot;</span><span class="ot">{{</span><span class="st"> url_for(&#39;message:edit&#39;) </span><span class="ot">}}</span><span class="st">&quot;&gt;</span>
+<span class="st">        &lt;form method=&quot;post&quot; action=&quot;</span><span class="ot">{{</span><span class="st"> url_for(&#39;:edit-form&#39;) </span><span class="ot">}}</span><span class="st">&quot;&gt;</span>
 <span class="st">          &lt;input type=&quot;text&quot; name=&quot;text&quot;&gt;</span>
 <span class="st">          &lt;input type=&quot;submit&quot; value=&quot;Update&gt;</span>
 <span class="st">        &lt;/form&gt;</span>
@@ -595,9 +597,9 @@ app = Mapper()
 
 <span class="co"># Each route to the resource is associated with a different view (the part</span>
 <span class="co"># of the name after the &#39;:&#39;)</span>
-app.add(<span class="st">&#39;/message&#39;</span>, message)
-app.add(<span class="st">&#39;/message.json&#39;</span>, message, <span class="st">&#39;:json&#39;</span>)
-app.add(<span class="st">&#39;/message/edit&#39;</span>, message, name=<span class="st">&#39;message:edit-form&#39;</span>)</code></pre>
+app.add(<span class="st">&#39;/message&#39;</span>, message, <span class="st">&#39;message&#39;</span>)               <span class="co"># The default view</span>
+app.add(<span class="st">&#39;/message.json&#39;</span>, message, <span class="st">&#39;message:json&#39;</span>)     <span class="co"># The &#39;json&#39; view</span>
+app.add(<span class="st">&#39;/message/edit&#39;</span>, message, name=<span class="st">&#39;:edit-form&#39;</span>)  <span class="co"># The &#39;edit-form&#39; view</span></code></pre>
 <p>All handler decorators accept a <code>view</code> argument that associates the handler with this view. A route is associated with a view when the name includes a colon (<code>:</code>). The part after the <code>:</code> is the view name. When the resource is accessed via a route matching a view, it will act as if <strong>only</strong> the handlers associated with that view are present. Thus, each view acts effectively as a separate resource.</p>
 <p>The example above shows two use cases for views:</p>
 <ul>
