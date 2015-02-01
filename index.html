@@ -514,7 +514,7 @@ greeting.message = <span class="st">&quot;hello, world!&quot;</span>
 
 <span class="ot">@greeting.get</span>(produces=json_repr)
 <span class="kw">def</span> get_json(request):
-    <span class="co"># After the handler has retruned, the response body will be serialized</span>
+    <span class="co"># After the handler has returned, the response body will be serialized</span>
     <span class="co"># using json_repr.serialize()</span>
     <span class="kw">return</span> {<span class="st">&#39;message&#39;</span>: greeting.message}
 
