@@ -378,7 +378,7 @@ class Context(object):
         for fn in self.__callbacks[phase]:
             fn(*args)
 
-    def add_property(self, name, fn, cached=True):
+    def add_property(self, name, fn, cached=True, lazy=True):
         """Adds a lazily initialized property to the Context.
 
         See also `Mapper.add_ctx_property`, which uses this method to install
@@ -389,6 +389,8 @@ class Context(object):
         self.__properties[name] = (fn, cached)
         if not callable(fn):
             setattr(self, name, fn)
+        elif not lazy:
+            getattr(self, name)  # Initialize property now
 
     def __getattr__(self, name):
         if name not in self.__properties:
@@ -558,12 +560,14 @@ class Mapper(object):
         """
         self._wrapped = wrapper(self._wrapped)
 
-    def add_ctx_property(self, name, fn, cached=True):
+    def add_ctx_property(self, name, fn, cached=True, lazy=True):
         """Install a context property.
 
         A context property is a callable that will be called on first access
         of the property named `name` on `Context` instances passing through
         this mapper. The result will be cached unless `cached` is False.
+        When `lazy` is False, the property will be initialized at the start
+        of every request, instead of when it is first accessed.
 
         If the context property is not callable, it will be installed
         as-is, otherwise, it will be called with the context instance as
@@ -571,7 +575,7 @@ class Mapper(object):
         """
         if name in self._ctx_properties:
             raise InvalidArgumentError("A context property name '%s' already exists." % name)
-        self._ctx_properties[name] = (fn, cached)
+        self._ctx_properties[name] = (fn, cached, lazy)
 
     def path(self, target, params):
         """Build a URL path fragment for a resource or route.
@@ -657,8 +661,8 @@ class Mapper(object):
         return self._wrapped(request, ctx)
 
     def dispatch(self, request, ctx):
-        for name, (fn, cached) in self._ctx_properties.items():
-            ctx.add_property(name, fn, cached=cached)
+        for name, (fn, cached, lazy) in self._ctx_properties.items():
+            ctx.add_property(name, fn, cached=cached, lazy=lazy)
         # TODO here is were we would have to prepend self.root
         request._add_context(root=request.script_name, mapper=self, route=None)
         for route in self.routes:

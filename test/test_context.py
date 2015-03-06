@@ -9,6 +9,17 @@ def test_add_property():
     foo = Mock(return_value=1)
     ctx = Context()
     ctx.add_property('foo', foo)
+    assert foo.has_calls([])
+    assert ctx.foo == 1
+    assert ctx.foo == 1
+    foo.assert_called_once_with(ctx)
+
+
+def test_add_property_not_lazy():
+    foo = Mock(return_value=1)
+    ctx = Context()
+    ctx.add_property('foo', foo, lazy=False)
+    foo.assert_called_once_with(ctx)
     assert ctx.foo == 1
     assert ctx.foo == 1
     foo.assert_called_once_with(ctx)
