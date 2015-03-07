@@ -3,13 +3,14 @@ from pytest import raises as assert_raises
 from rhino.mapper import Context, Mapper, InvalidArgumentError
 from rhino.request import Request
 from rhino.response import ok
+from rhino.test import assert_mock_has_no_calls
 
 
 def test_add_property():
     foo = Mock(return_value=1)
     ctx = Context()
     ctx.add_property('foo', foo)
-    foo.assert_has_calls([])
+    assert_mock_has_no_calls(foo)
     assert ctx.foo == 1
     assert ctx.foo == 1
     foo.assert_called_once_with(ctx)

@@ -13,6 +13,11 @@ from wsgiref.validate import validator
 from .resource import handler_metadata
 
 
+# mock.assert_has_calls([]) is always True
+def assert_mock_has_no_calls(mock):
+    assert mock.mock_calls == []
+
+
 def make_handler_metadata(verb=None, view=None, **kw):
     return handler_metadata.create(verb=verb, view=view, **kw)
 
