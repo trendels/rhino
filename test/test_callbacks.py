@@ -42,13 +42,13 @@ def test_callbacks():
     res = client.get('/')
     assert res.code == 200
 
-    assert wrapper.cb.mock_calls == [
+    wrapper.cb.assert_has_calls([
         call('enter', wrapper.request),
         call('leave', wrapper.request, wrapper.response),
         call('finalize', wrapper.request, wrapper.response),
         call('teardown'),
         call('close'),
-    ]
+    ])
 
 
 def test_callbacks_exception():
@@ -67,9 +67,9 @@ def test_callbacks_exception():
     res = client.get('/')
     assert res.code == 404
 
-    assert wrapper.cb.mock_calls == [
+    wrapper.cb.assert_has_calls([
         call('enter', wrapper.request),
         call('finalize', wrapper.request, not_found.response),
         call('teardown'),
         call('close'),
-    ]
+    ])

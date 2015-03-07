@@ -9,7 +9,7 @@ def test_add_property():
     foo = Mock(return_value=1)
     ctx = Context()
     ctx.add_property('foo', foo)
-    assert foo.has_calls([])
+    foo.assert_has_calls([])
     assert ctx.foo == 1
     assert ctx.foo == 1
     foo.assert_called_once_with(ctx)
@@ -78,7 +78,7 @@ def test_callbacks():
     cb = Mock()
     ctx.add_callback('enter', cb)
     ctx._run_callbacks('enter', 1, 2)
-    assert cb.mock_calls == [call(1, 2)]
+    cb.assert_has_calls([call(1, 2)])
 
 
 def test_invalid_callback():
