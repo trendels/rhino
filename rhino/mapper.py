@@ -378,10 +378,10 @@ class Context(object):
         for fn in self.__callbacks[phase]:
             fn(*args)
 
-    def add_property(self, name, fn, cached=True, lazy=True):
-        """Adds a lazily initialized property to the Context.
+    def add_property(self, name, fn, cached=True, lazy=False):
+        """Adds a property to the Context.
 
-        See also `Mapper.add_ctx_property`, which uses this method to install
+        See `Mapper.add_ctx_property`, which uses this method to install
         the properties added on the Mapper level.
         """
         if name in self.__properties:
@@ -560,18 +560,17 @@ class Mapper(object):
         """
         self._wrapped = wrapper(self._wrapped)
 
-    def add_ctx_property(self, name, fn, cached=True, lazy=True):
+    def add_ctx_property(self, name, fn, cached=True, lazy=False):
         """Install a context property.
 
-        A context property is a callable that will be called on first access
-        of the property named `name` on `Context` instances passing through
-        this mapper. The result will be cached unless `cached` is False.
-        When `lazy` is False, the property will be initialized at the start
-        of every request, instead of when it is first accessed.
+        A context property is a factory function whos return value will be
+        available as a property named `name` on `Context` instances passing
+        through this mapper. The result will be cached unless `cached` is
+        False. When `lazy` is True, the property will be initialized the first
+        time it is accessed, instead of at the start of every request.
 
-        If the context property is not callable, it will be installed
-        as-is, otherwise, it will be called with the context instance as
-        first argument.
+        If the context property is not a callable, it will be taken as the
+        value of the property.
         """
         if name in self._ctx_properties:
             raise InvalidArgumentError("A context property name '%s' already exists." % name)

@@ -98,9 +98,9 @@ class BeakerSession(object):
                 if cookie:
                     response.headers.add_header('Set-Cookie', cookie)
 
-    # TODO Since context properties are lazily initialized by default, the
-    # session will not be loaded at all unless it is accessed at least once
-    # during the request.
+    # Note: This relies on the fact that context properties are not initialized
+    # lazily by default, so the finalize hook is installed even if the session
+    # was never accessed during the request.
     def __call__(self, ctx):
         session = self.session_class(ctx.request.environ, **self.options)
         ctx.add_callback('finalize', partial(self.finalize, session))

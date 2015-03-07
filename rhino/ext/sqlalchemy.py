@@ -6,7 +6,12 @@ This extension requires the SQLAlchemy module to be installed:
 
     $ pip install sqlalchemy
 
-The session is lazily initialized and closed at the end of every request.
+The session is closed at the end of every request. If you want the session to
+be lazily initialized, use the `lazy` parameter of `Mapper.add_ctx_property`.
+
+Example:
+
+    app.add_ctx_property('db', SessionProperty(db_url), lazy=True)
 
 Example usage:
 
