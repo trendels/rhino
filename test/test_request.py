@@ -152,7 +152,7 @@ def test_request_headers(environ):
     assert headers['cONTENT-tYPE'] == 'application/x-www-form-urlencoded'
     assert headers['Content-Length'] == content_length
     assert headers['cONTENT-lENGTH'] == content_length
-    assert headers['no-such-header'] is None
+    assert 'no-such-header' not in headers
     assert headers['X-Foo'] == u'Smørebrød'
     assert set(headers.keys()) == set([
         'Host', 'Content-Type', 'Content-Length', 'X-Foo', 'Cookie',
@@ -188,11 +188,15 @@ def test_querydict():
     assert q.keys() == ['a', 'a', 'b']
     assert q.values() == [1, 2, 3]
     assert q.items() == [('a', 1), ('a', 2), ('b', 3)]
+    assert list(q.iteritems()) == q.items()
+    assert list(q.iterkeys()) == q.keys()
+    assert list(q.itervalues()) == q.values()
     assert 'a' in q
     assert q['a'] == 1
     assert q.get('a') == 1
     assert q.getall('a') == [1, 2]
     assert q.getall('a') == q.getlist('a')
+    assert list(q) == ['a', 'a', 'b']
     assert len(q) == 3
 
     q = QueryDict([('foo', None)])

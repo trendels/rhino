@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import cgi
+import collections
 import urllib
 import urlparse
 from Cookie import SimpleCookie
@@ -17,15 +18,15 @@ __all__ = [
 ]
 
 
-class RequestHeaders(object):
+class RequestHeaders(collections.Mapping):
     """A dictionary-like object to access request headers.
 
-    Keys are case-insensitive. Accessing a header that is not present
-    returns None instead of raising KeyError.
+    Keys are case-insensitive.
     """
 
-    def __init__(self, environ):
+    def __init__(self, environ, encoding='latin-1'):
         self.environ = environ
+        self.encoding = encoding
 
     @staticmethod
     def _key(name):
@@ -44,48 +45,44 @@ class RequestHeaders(object):
         return [k for k in self.environ
                 if k[:5] == 'HTTP_' or k in ('CONTENT_TYPE', 'CONTENT_LENGTH')]
 
+    def __getitem__(self, key):
+        return self.environ[self._key(key)].decode(self.encoding)
+
+    def __iter__(self):
+        return (self._name(k) for k in self._keys())
+
     def __len__(self):
         return len(self._keys())
-
-    def __contains__(self, name):
-        return self._key(name) in self.environ
-
-    def get(self, name, default=None):
-        value = self.environ.get(self._key(name), default)
-        return default if value is default else value.decode('latin-1')
-
-    def __getitem__(self, name):
-        return self.get(name)
-
-    def keys(self):
-        return [self._name(k) for k in self._keys()]
-
-    def values(self):
-        return [self.environ[k].decode('latin-1') for k in self._keys()]
-
-    def items(self):
-        return [(self._name(k), self.environ[k].decode('latin-1'))
-                for k in self._keys()]
 
 
 _default = object()  # unique canary value, used by QueryDict.__getitem__
 
 
-class QueryDict(object):
+class QueryDict(collections.Mapping):
     """A dictionary-like object to access query parameters.
 
     Accessing a key returns the first value for that key.
     The keys(), values() and items() methods will return a key/value multiple
     times, if it is present multiple times in the query string.
 
-    The get_all() method can be used to return all values for a given key.
+    The getall() method can be used to return all values for a given key.
     """
 
     def __init__(self, items):
         self._items = items
 
+    def __getitem__(self, key):
+        for k, v in self._items:
+            if k == key:
+                return v
+        raise KeyError(key)
+
+    def __iter__(self):
+        return (k for k, v in self._items)
+
     def __len__(self):
         return len(self._items)
+
 
     def __contains__(self, key):
         try:
@@ -94,21 +91,10 @@ class QueryDict(object):
             return False
         return True
 
-    def __getitem__(self, key):
-        v = self.get(key, _default)
-        if v is _default:
-            raise KeyError(key)
-        return v
-
     def getall(self, key):
         """Return a list of values for the given key."""
         return [v for k, v in self._items if k == key]
 
-    def get(self, key, default=None):
-        for k, v in self._items:
-            if k == key:
-                return v
-        return default
     getlist = getall
 
     def keys(self):
@@ -119,6 +105,12 @@ class QueryDict(object):
 
     def items(self):
         return self._items[:]
+
+    def itervalues(self):
+        return (v for k, v in self._items)
+
+    def iteritems(self):
+        return ((k, v)  for k, v in self._items)
 
 
 # Implementation taken from gevent.pywsgi.Input
