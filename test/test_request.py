@@ -26,7 +26,7 @@ def environ():
         # SCRIPT_NAME and PATH_INFO are unquoted in the WSGI environment
         'SCRIPT_NAME': u'/☃'.encode('utf-8'),
         'PATH_INFO': u'/★'.encode('utf-8'),
-        'QUERY_STRING': 'a=1&a=2&b=%E2%98%83',
+        'QUERY_STRING': 'a=1&a=2&b=%E2%98%83&c',
         'HTTP_X_FOO': u'Smørebrød'.encode('latin-1'),
         'HTTP_COOKIE': 'x="\\342\\230\\203"; a=b',
         'CONTENT_TYPE': 'application/x-www-form-urlencoded',
@@ -129,14 +129,14 @@ def test_accessors(environ):
     assert req.script_name == u'/☃'
     assert req.path_info == u'/★'
     # TODO Decode url?
-    assert req.url == 'http://127.0.0.1/%E2%98%83/%E2%98%85?a=1&a=2&b=%E2%98%83'
+    assert req.url == 'http://127.0.0.1/%E2%98%83/%E2%98%85?a=1&a=2&b=%E2%98%83&c'
     assert req.content_type == 'application/x-www-form-urlencoded'
     assert req.content_length == len(body)
     assert req.server_name == '127.0.0.1'
     assert req.server_port == 80
     assert req.server_protocol == 'HTTP/1.0'
     assert req.scheme == 'http'
-    assert req.query.items() == [('a', '1'), ('a', '2'), ('b', u'☃')]
+    assert req.query.items() == [('a', '1'), ('a', '2'), ('b', u'☃'), ('c', '')]
     assert req.cookies['x'] == u'☃'
     assert req.cookies['a'] == 'b'
     assert req.remote_addr == '1.2.3.4'
@@ -191,7 +191,8 @@ def test_querydict():
     assert 'a' in q
     assert q['a'] == 1
     assert q.get('a') == 1
-    assert q.get_all('a') == [1, 2]
+    assert q.getall('a') == [1, 2]
+    assert q.getall('a') == q.getlist('a')
     assert len(q) == 3
 
     q = QueryDict([('foo', None)])

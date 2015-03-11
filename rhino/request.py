@@ -100,7 +100,7 @@ class QueryDict(object):
             raise KeyError(key)
         return v
 
-    def get_all(self, key):
+    def getall(self, key):
         """Return a list of values for the given key."""
         return [v for k, v in self._items if k == key]
 
@@ -109,6 +109,7 @@ class QueryDict(object):
             if k == key:
                 return v
         return default
+    getlist = getall
 
     def keys(self):
         return [k for k, v in self._items]
@@ -279,7 +280,8 @@ class Request(object):
             query_string = self.environ.get('QUERY_STRING')
             self._query = QueryDict([
                 (k.decode('utf-8'), v.decode('utf-8'))
-                for k, v in urlparse.parse_qsl(query_string)
+                for k, v in urlparse.parse_qsl(
+                    query_string, keep_blank_values=True)
             ])
         return self._query
 
