@@ -55,9 +55,6 @@ class RequestHeaders(collections.Mapping):
         return len(self._keys())
 
 
-_default = object()  # unique canary value, used by QueryDict.__getitem__
-
-
 class QueryDict(collections.Mapping):
     """A dictionary-like object to access query parameters.
 
