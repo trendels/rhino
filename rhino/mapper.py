@@ -496,7 +496,7 @@ class Mapper(object):
         self.routes = []
         self.named_routes = {}
         self._lookup = {}  # index of routes by object ID for faster path(obj)
-        self._ctx_properties = {}
+        self._ctx_properties = []
         self._wrapped = self.dispatch
 
     def add(self, template, resource, name=None):
@@ -572,9 +572,9 @@ class Mapper(object):
         If the context property is not a callable, it will be taken as the
         value of the property.
         """
-        if name in self._ctx_properties:
-            raise InvalidArgumentError("A context property name '%s' already exists." % name)
-        self._ctx_properties[name] = (fn, cached, lazy)
+        if name in [item[0] for item in self._ctx_properties]:
+             raise InvalidArgumentError("A context property name '%s' already exists." % name)
+        self._ctx_properties.append([name, (fn, cached, lazy)])
 
     def path(self, target, params):
         """Build a URL path fragment for a resource or route.
@@ -660,7 +660,7 @@ class Mapper(object):
         return self._wrapped(request, ctx)
 
     def dispatch(self, request, ctx):
-        for name, (fn, cached, lazy) in self._ctx_properties.items():
+        for name, (fn, cached, lazy) in self._ctx_properties:
             ctx.add_property(name, fn, cached=cached, lazy=lazy)
         # TODO here is were we would have to prepend self.root
         request._add_context(root=request.script_name, mapper=self, route=None)
