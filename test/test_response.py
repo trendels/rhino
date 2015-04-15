@@ -314,17 +314,6 @@ def test_response_etag():
     assert_raises(TypeError, response, 200, etag=123)
 
 
-def test_response_callable_etag():
-    res = response(200, etag=lambda x: 'foo')
-    assert res.headers['ETag'] == '"foo"'
-
-    res = response(200, etag=lambda x: '"foo"')
-    assert res.headers['ETag'] == '"foo"'
-
-    res = response(200, body='hi', etag=lambda x: x)
-    assert res.headers['ETag'] == '"hi"'
-
-
 def test_response_expires():
     dt = datetime.utcnow() + timedelta(seconds=60)
 

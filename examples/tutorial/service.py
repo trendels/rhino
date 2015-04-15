@@ -9,7 +9,7 @@ import model
 todo_list = Resource()
 todo_item = Resource()
 
-_md5_etag = lambda s: md5(s.encode('utf-8')).hexdigest()
+_md5 = lambda s: md5(s.encode('utf-8')).hexdigest()
 
 
 def serialize_item(request, item):
@@ -33,7 +33,8 @@ def get_item_text(request, item):
 @todo_list.get(provides='application/json')
 def list_todos_json(request):
     todos = [serialize_item(request, item) for item in model.all_items()]
-    return ok(json.dumps(todos), etag=_md5_etag)
+    data = json.dumps(todos)
+    return ok(data, etag=_md5(data))
 
 
 @todo_list.post(accepts='application/json')
@@ -56,7 +57,7 @@ def get_item_from_url(request, item_id):
 
 @todo_item.get(provides='application/json')
 def get_item_json(request, item):
-    data = serialize_item(request, item)
+    data = jsond.umps(serialize_item(request, item))
     return ok(json.dumps(data), etag=_md5_etag)
 
 
@@ -68,7 +69,7 @@ def update_item_json(request, item):
     except Exception as e:
         raise BadRequest(str(e))
     data = serialize_item(request, new_item)
-    return ok(json.dumps(data), etag=_md5_etag)
+    return ok(data, etag=_md5(data))
 
 
 @todo_item.delete

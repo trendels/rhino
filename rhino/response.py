@@ -344,9 +344,7 @@ def response(code, body='', etag=None, last_modified=None, expires=None, **kw):
      :  The response body. See `Response.__init__` for details.
     etag
      :  A value for the ETag header. Double quotes will be added unless the
-        string starts and ends with a double quote. If the value is callable,
-        it will be called with `body` as argument and should return a string
-        (quotes will be added to the returned string as described above).
+        string starts and ends with a double quote.
     last_modified
      :  A value for the Last-Modified header as a datetime.datetime instance
         or Unix timestamp.
@@ -363,8 +361,6 @@ def response(code, body='', etag=None, last_modified=None, expires=None, **kw):
 
     """
     if etag is not None:
-        if callable(etag):
-            etag = etag(body)
         if not (etag[0] == '"' and etag[-1] == '"'):
             etag = '"%s"' % etag
         kw['etag'] = etag
