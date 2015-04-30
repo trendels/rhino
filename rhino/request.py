@@ -232,10 +232,10 @@ class Request(object):
         template.
         """
         # Allow passing 'self' as named parameter
-        self, target = args
+        self, target, args = args[0], args[1], list(args[2:])
         query = kw.pop('_query', None)
         relative = kw.pop('_relative', False)
-        url = build_url(self._context, target, kw)
+        url = build_url(self._context, target, args, kw)
         if query:
             if isinstance(query, dict):
                 query = sorted(query.items())

@@ -416,7 +416,7 @@ class Route(object):
 
         regex, params = template2regex(template, ranges)
         self.regex = re.compile(regex)
-        self.params = set(params)
+        self.params = params
 
         if 'ctx' in params:
             raise InvalidArgumentError(
@@ -431,9 +431,21 @@ class Route(object):
         self.name = name
         self.is_anchored = len(template) and template[-1] != '|'
 
-    def path(self, params):
+    def path(self, args, kw):
         """Builds the URL path fragment for this route."""
+        params = self._pop_params(args, kw)
+        if args or kw:
+            raise InvalidArgumentError("Extra parameters (%s, %s) when building path for %s" % (args, kw, self.template))
         return template2path(self.template, params, self.ranges)
+
+    def _pop_params(self, args, kw):
+        params = {}
+        for name in self.params:
+            if name in kw:
+                params[name] = kw.pop(name)
+            elif args:
+                params[name] = args.pop(0)
+        return params
 
     def __call__(self, request, ctx):
         """Try to dispatch a request.
@@ -576,7 +588,7 @@ class Mapper(object):
              raise InvalidArgumentError("A context property name '%s' already exists." % name)
         self._ctx_properties.append([name, (fn, cached, lazy)])
 
-    def path(self, target, params):
+    def path(self, target, args, kw):
         """Build a URL path fragment for a resource or route.
 
         Possible values for `target`:
@@ -602,26 +614,24 @@ class Mapper(object):
                 # Build path for a dotted route name
                 prefix, rest = target.split('.', 1)
                 route = self.named_routes[prefix]
-                params_copy = params.copy()
-                prefix_params = dict((k, params_copy.pop(k))
-                                     for k in route.params if k in params_copy)
-                prefix_path = route.path(prefix_params)
+                prefix_params = route._pop_params(args, kw)
+                prefix_path = route.path([], prefix_params)
                 next_mapper = route.resource
-                return prefix_path + next_mapper.path(rest, params_copy)
+                return prefix_path + next_mapper.path(rest, args, kw)
             else:
                 # Build path for a named route
-                return self.named_routes[target].path(params)
+                return self.named_routes[target].path(args, kw)
         elif isinstance(target, Route):
             # Build path for a route instance, used by build_url('.')
             for route in self.routes:
                 if route is target:
-                    return route.path(params)
+                    return route.path(args, kw)
             raise InvalidArgumentError("Route '%s' not found in this %s instance." % (target, self.__class__.__name__))
         else:
             # Build path for resource by object id
             target_id = id(target)
             if target_id in self._lookup:
-                return self._lookup[target_id].path(params)
+                return self._lookup[target_id].path(args, kw)
             raise InvalidArgumentError("No Route found for target '%s' in this %s instance." % (target, self.__class__.__name__))
 
     def wsgi(self, environ, start_response):
