@@ -10,7 +10,7 @@ def list_users(request):
     h.h1('Users')
     ul = h.ul()
     for name in users:
-        ul.li.a(name, href=request.url_for('user', name=name))
+        ul.li.a(name, href=request.url_for('user', name))
     return unicode(h)
 
 @get
