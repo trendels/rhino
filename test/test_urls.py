@@ -78,6 +78,7 @@ def test_build_url_params_mixed():
     mapper2.add('/b/{p3}[/{p4}]', None, 'b')
 
     context = [request_context('', mapper1, mapper1.routes[0])]
+
     assert build_url(context, '/a', [22], dict(p1=11)) == '/a/11/22'
     assert build_url(context, '/a', [11], dict(p2=22)) == '/a/11/22'
     assert_raises(InvalidArgumentError,
@@ -89,3 +90,35 @@ def test_build_url_params_mixed():
             == '/a/11/22/b/33/44'
     assert build_url(context, '/a.b', [22], dict(p1=11, p3=33)) \
             == '/a/11/22/b/33'
+
+
+def test_build_url_override():
+    mapper1 = Mapper()
+    mapper2 = Mapper()
+    resource = Mapper()
+
+    def build_url_a(build_url, a):
+        p1, p2 = a
+        return build_url(p1=p1, p2=p2)
+
+    def build_url_b(build_url, b):
+        p3, p4 = b
+        return build_url(p3=p3, p4=p4)
+
+    mapper2.build_url = build_url_a
+    resource.build_url = build_url_b
+
+    # TODO we only look for the build_url method here, so it has to be
+    # already installed at this point or it won't be picked up.
+    # Should we instead make the lookup the first time we need to build
+    # a URL and cache the result?
+    mapper1.add('/a/{p1}[/{p2}]|', mapper2, 'a')
+    mapper2.add('/b/{p3}[/{p4}]', resource, 'b')
+
+    context = [request_context('', mapper1, mapper1.routes[0])]
+
+    assert build_url(context, '/a', [], dict(a=(11, 22))) == '/a/11/22'
+    assert build_url(context, '/a.b', [(11, 22)], dict(b=(33, 44))) == '/a/11/22/b/33/44'
+    assert_raises(InvalidArgumentError, build_url, context, '/a', [11, 22])
+    assert_raises(InvalidArgumentError,
+            build_url, context, '/a', [], dict(p1=11, p2=22))

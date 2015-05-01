@@ -77,7 +77,7 @@ from .errors import HTTPException, InternalServerError, NotFound
 from .request import Request
 from .response import Response
 from .resource import Resource
-from .util import call_with_ctx
+from .util import call_with_ctx, get_args
 
 __all__ = [
     'Mapper',
@@ -416,7 +416,14 @@ class Route(object):
 
         regex, params = template2regex(template, ranges)
         self.regex = re.compile(regex)
-        self.params = params
+
+        build_url = lambda **params: template2path(template, params, ranges)
+        if hasattr(resource, 'build_url'):
+            self.build_url = lambda **kw: resource.build_url(build_url, **kw)
+            self.params = get_args(resource.build_url)[1:]
+        else:
+            self.build_url = build_url
+            self.params = params
 
         if 'ctx' in params:
             raise InvalidArgumentError(
@@ -427,7 +434,6 @@ class Route(object):
 
         self.template = template
         self.resource = resource
-        self.ranges = ranges
         self.name = name
         self.is_anchored = len(template) and template[-1] != '|'
 
@@ -436,7 +442,7 @@ class Route(object):
         params = self._pop_params(args, kw)
         if args or kw:
             raise InvalidArgumentError("Extra parameters (%s, %s) when building path for %s" % (args, kw, self.template))
-        return template2path(self.template, params, self.ranges)
+        return self.build_url(**params)
 
     def _pop_params(self, args, kw):
         params = {}
