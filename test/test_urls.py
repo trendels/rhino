@@ -96,6 +96,8 @@ def test_build_url_override():
     mapper1 = Mapper()
     mapper2 = Mapper()
     resource = Mapper()
+    mapper1.add('/a/{p1}[/{p2}]|', mapper2, 'a')
+    mapper2.add('/b/{p3}[/{p4}]', resource, 'b')
 
     def build_url_a(build_url, a):
         p1, p2 = a
@@ -107,13 +109,6 @@ def test_build_url_override():
 
     mapper2.build_url = build_url_a
     resource.build_url = build_url_b
-
-    # TODO we only look for the build_url method here, so it has to be
-    # already installed at this point or it won't be picked up.
-    # Should we instead make the lookup the first time we need to build
-    # a URL and cache the result?
-    mapper1.add('/a/{p1}[/{p2}]|', mapper2, 'a')
-    mapper2.add('/b/{p3}[/{p4}]', resource, 'b')
 
     context = [request_context('', mapper1, mapper1.routes[0])]
 

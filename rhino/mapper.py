@@ -417,13 +417,9 @@ class Route(object):
         regex, params = template2regex(template, ranges)
         self.regex = re.compile(regex)
 
-        build_url = lambda **params: template2path(template, params, ranges)
-        if hasattr(resource, 'build_url'):
-            self.build_url = lambda **kw: resource.build_url(build_url, **kw)
-            self.params = get_args(resource.build_url)[1:]
-        else:
-            self.build_url = build_url
-            self.params = params
+        self._params = None
+        self._template_params = params
+        self._build_url = lambda **params: template2path(template, params, ranges)
 
         if 'ctx' in params:
             raise InvalidArgumentError(
@@ -436,6 +432,21 @@ class Route(object):
         self.resource = resource
         self.name = name
         self.is_anchored = len(template) and template[-1] != '|'
+
+    @property
+    def params(self):
+        if self._params is None:
+            if hasattr(self.resource, 'build_url'):
+                self._params = get_args(self.resource.build_url)[1:]
+            else:
+                self._params = self._template_params
+        return self._params
+
+    def build_url(self, **params):
+        if hasattr(self.resource, 'build_url'):
+            return self.resource.build_url(self._build_url, **params)
+        else:
+            return self._build_url(**params)
 
     def path(self, args, kw):
         """Builds the URL path fragment for this route."""
