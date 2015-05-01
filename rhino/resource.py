@@ -358,3 +358,8 @@ class Resource(object):
         """Install the decorated function as a filter for URL parameters."""
         self._from_url = fn
         return fn
+
+    def make_url(self, fn):
+        """Install the decorated function as the 'build_url' attribute."""
+        self.build_url = fn
+        return fn
