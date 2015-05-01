@@ -1,8 +1,11 @@
 [run]
+# Measure branch coverage
+branch = true
 # Don't profile third-party code
 omit =
     rhino/vendor/mimeparse.py
     examples/wiki/storage.py
+
 [report]
 # Regexes for lines to exclude from consideration
 exclude_lines =
