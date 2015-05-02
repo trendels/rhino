@@ -8,7 +8,7 @@ from .response import Response, Entity, \
         response, ok, created, no_content, redirect
 from .static import StaticFile, StaticDirectory
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 __all__ = [
     'Mapper',
