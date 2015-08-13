@@ -6,7 +6,7 @@ from collections import defaultdict, namedtuple
 from .errors import NotFound, MethodNotAllowed, UnsupportedMediaType, \
         NotAcceptable
 from .response import Response
-from .util import dual_use_decorator, dual_use_decorator_method, call_with_ctx
+from .util import dual_use_decorator, dual_use_decorator_method, apply_ctx
 from .vendor import mimeparse
 
 __all__ = [
@@ -283,27 +283,27 @@ class Resource(object):
 
         if handler.consumes:
             reader = handler.consumes.deserialize
-            request._body_reader = lambda f: call_with_ctx(reader, ctx, f)
+            request._body_reader = apply_ctx(reader, ctx)
 
         ctx._run_callbacks('enter', request)
 
         url_args_filter = self._from_url or getattr(resource, 'from_url', None)
         kw = request.routing_args
         if url_args_filter:
-            kw = call_with_ctx(url_args_filter, ctx, request, **kw)
+            kw = apply_ctx(url_args_filter, ctx)(request, **kw)
 
         fn = self._handler_lookup[handler]
         if resource_is_class:
-            rv = call_with_ctx(fn, ctx, resource, request, **kw)
+            rv = apply_ctx(fn, ctx)(resource, request, **kw)
         else:
-            rv = call_with_ctx(fn, ctx, request, **kw)
+            rv = apply_ctx(fn, ctx)(request, **kw)
         response = make_response(rv)
 
         ctx._run_callbacks('leave', request, response)
 
         if handler.produces:
             writer = handler.produces.serialize
-            response.body = call_with_ctx(writer, ctx, response.body)
+            response.body = apply_ctx(writer, ctx)(response.body)
 
         if handler.provides:
             response.headers.setdefault('Content-Type', handler.provides)

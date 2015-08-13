@@ -77,7 +77,7 @@ from .errors import HTTPException, InternalServerError, NotFound
 from .request import Request
 from .response import Response
 from .resource import Resource
-from .util import call_with_ctx, get_args
+from .util import apply_ctx, get_args
 
 __all__ = [
     'Mapper',
@@ -485,7 +485,7 @@ class Route(object):
                 script_name = request.script_name + path[:match.end()]
                 environ['SCRIPT_NAME'] = script_name.encode('utf-8')
                 environ['PATH_INFO'] = extra_path.encode('utf-8')
-            return call_with_ctx(self.resource, ctx, request)
+            return apply_ctx(self.resource, ctx)(request)
         return None
 
 

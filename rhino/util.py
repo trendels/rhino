@@ -4,7 +4,7 @@ import functools
 import inspect
 
 __all__ = [
-    'call_with_ctx',
+    'apply_ctx',
     'sse_event',
 ]
 
@@ -71,13 +71,13 @@ def get_args(obj):
         raise TypeError("Can't inspect signature of '%s' object." % obj)
 
 
-def call_with_ctx(fn, ctx, *args, **kw):
-    """Call fn with or without 'ctx', depending on its signature.
+def apply_ctx(fn, ctx):
+    """Return fn with ctx partially applied, if requested.
 
-    If the `fn` callable accepts an argument named "ctx", then `ctx` will be
-    passed as a keyword argument, else it will be ignored.
+    If the `fn` callable accepts an argument named "ctx", returns a
+    functools.partial object with ctx=ctx applied, else returns `fn` unchanged.
     """
     if 'ctx' in get_args(fn):
-        return fn(*args, ctx=ctx, **kw)
+        return functools.partial(fn, ctx=ctx)
     else:
-        return fn(*args, **kw)
+        return fn
