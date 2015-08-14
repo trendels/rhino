@@ -112,7 +112,13 @@ class QueryDict(collections.Mapping):
 
 # Implementation taken from gevent.pywsgi.Input
 class WsgiInput(object):
-    """Represents a WSGI input filehandle that is safe to use read() on"""
+    """Represents a WSGI input filehandle that is safe to use read() on.
+
+    Some WSGI servers (e.g. `gevent.pywsgi`) provide a safe `wsgi.input` that
+    also supports chunked encoding (a.k.a streamed uploads). To be able to
+    benefit from this functionality, you can access the original, unwrapped
+    filehandle via the `.rfile` property.
+    """
     def __init__(self, rfile, content_length=None):
         self.rfile = rfile
         self.content_length = content_length
@@ -156,24 +162,7 @@ class WsgiInput(object):
 
 
 class Request(object):
-    """Represents an HTTP request built from a WSGI environment.
-
-    Class variables:
-
-    wrap_wsgi_input
-      : When `True` (the default), `Request.input` returns
-        `environ['wsgi.input']` wrapped in `WsgiInput`, to make it safe to call
-        `read()` on it without providing the content length. This is required
-        for servers like `wsgiref.simple_server`, which is also used by
-        `Rhino.mapper.start_server()`.
-
-        Some WSGI servers (e.g. `gevent.pywsgi`) provide a safe `wsgi.input`
-        that also supports chunked encoding (a.k.a streamed uploads). To
-        be able to benefit from this functionality, `wrap_wsgi_input` needs
-        to be set to `False`. Alternatively, the original input file can
-        always be found in `Request.environ['wsgi.input']`.
-    """
-    wrap_wsgi_input = True
+    """Represents an HTTP request built from a WSGI environment."""
 
     def __init__(self, environ):
         environ.setdefault('wsgiorg.routing_args', ([], {}))
@@ -338,11 +327,8 @@ class Request(object):
         """Returns a file-like object representing the request body."""
         if self._input is None:
             input_file = self.environ['wsgi.input']
-            if self.wrap_wsgi_input:
-                content_length = self.content_length or 0
-                self._input = WsgiInput(input_file, self.content_length)
-            else:
-                self._input = input_file
+            content_length = self.content_length or 0
+            self._input = WsgiInput(input_file, self.content_length)
         return self._input
 
     @property

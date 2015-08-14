@@ -97,16 +97,6 @@ def test_request_input(environ):
     assert req.body == ''
 
 
-def test_request_input_no_wrap(environ):
-    req = Request(environ)
-    req.wrap_wsgi_input = False
-    assert isinstance(req.input, StringIO)
-    assert req.input.read() == body
-    assert req.input.read() == ''
-    assert req.form.items() == []
-    assert req.body == ''
-
-
 def test_request_body(environ):
     req = Request(environ)
     assert req.body == body
