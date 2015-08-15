@@ -378,7 +378,7 @@ class Context(object):
         for fn in self.__callbacks[phase]:
             fn(*args)
 
-    def add_property(self, name, fn, cached=True, lazy=False):
+    def add_property(self, name, fn, cached=True):
         """Adds a property to the Context.
 
         See `Mapper.add_ctx_property`, which uses this method to install
@@ -387,17 +387,13 @@ class Context(object):
         if name in self.__properties:
             raise KeyError("Trying to add a property '%s' that already exists on this %s instance." % (name, self.__class__.__name__))
         self.__properties[name] = (fn, cached)
-        if not callable(fn):
-            setattr(self, name, fn)
-        elif not lazy:
-            getattr(self, name)  # Initialize property now
 
     def __getattr__(self, name):
         if name not in self.__properties:
             raise AttributeError("'%s' object has no attribute '%s'"
                     % (self.__class__.__name__, name))
         fn, cached = self.__properties[name]
-        value = fn(self)
+        value = apply_ctx(fn, self)()
         if cached:
             setattr(self, name, value)
         return value
@@ -584,21 +580,20 @@ class Mapper(object):
         """
         self._wrapped = wrapper(self._wrapped)
 
-    def add_ctx_property(self, name, fn, cached=True, lazy=False):
+    def add_ctx_property(self, name, fn, cached=True):
         """Install a context property.
 
         A context property is a factory function whos return value will be
         available as a property named `name` on `Context` instances passing
         through this mapper. The result will be cached unless `cached` is
-        False. When `lazy` is True, the property will be initialized the first
-        time it is accessed, instead of at the start of every request.
+        False.
 
-        If the context property is not a callable, it will be taken as the
-        value of the property.
+        The factory function will be called without arguments, or with the
+        context object if it requests an argument named 'ctx'.
         """
         if name in [item[0] for item in self._ctx_properties]:
              raise InvalidArgumentError("A context property name '%s' already exists." % name)
-        self._ctx_properties.append([name, (fn, cached, lazy)])
+        self._ctx_properties.append([name, (fn, cached)])
 
     def path(self, target, args, kw):
         """Build a URL path fragment for a resource or route.
@@ -681,8 +676,8 @@ class Mapper(object):
         return self._wrapped(request, ctx)
 
     def dispatch(self, request, ctx):
-        for name, (fn, cached, lazy) in self._ctx_properties:
-            ctx.add_property(name, fn, cached=cached, lazy=lazy)
+        for name, (fn, cached) in self._ctx_properties:
+            ctx.add_property(name, fn, cached=cached)
         # TODO here is were we would have to prepend self.root
         request._add_context(root=request.script_name, mapper=self, route=None)
         for route in self.routes:

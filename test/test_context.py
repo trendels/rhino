@@ -10,20 +10,28 @@ def test_add_property():
     foo = Mock(return_value=1)
     ctx = Context()
     ctx.add_property('foo', foo)
-    foo.assert_called_once_with(ctx)
-    assert ctx.foo == 1
-    assert ctx.foo == 1
-    foo.assert_called_once_with(ctx)
-
-
-def test_add_property_lazy():
-    foo = Mock(return_value=1)
-    ctx = Context()
-    ctx.add_property('foo', foo, lazy=True)
     assert_mock_has_no_calls(foo)
     assert ctx.foo == 1
     assert ctx.foo == 1
-    foo.assert_called_once_with(ctx)
+    foo.assert_has_calls([call()])
+
+
+def test_add_property_not_cached():
+    foo = Mock(return_value=1)
+    ctx = Context()
+    ctx.add_property('foo', foo, cached=False)
+    assert ctx.foo == 1
+    assert ctx.foo == 1
+    foo.assert_has_calls([call(), call()])
+
+
+def test_add_property_with_ctx():
+    m = Mock(return_value=1)
+    foo = lambda ctx: m(ctx)
+    ctx = Context()
+    ctx.add_property('foo', foo)
+    assert ctx.foo == 1
+    m.assert_has_calls([call(ctx)])
 
 
 def test_invalid_property():
@@ -35,21 +43,6 @@ def test_add_property_duplicate():
     ctx = Context()
     ctx.add_property('foo', 1)
     assert_raises(KeyError, ctx.add_property, 'foo', 2)
-
-
-def test_add_property_static():
-    ctx = Context()
-    ctx.add_property('foo', 'bar')
-    assert ctx.foo == 'bar'
-
-
-def test_add_property_no_cache():
-    foo = Mock(return_value=1)
-    ctx = Context()
-    ctx.add_property('foo', foo, cached=False)
-    assert ctx.foo == 1
-    assert ctx.foo == 1
-    foo.assert_has_calls([call(ctx), call(ctx)])
 
 
 def test_mapper_add_ctx_property():
