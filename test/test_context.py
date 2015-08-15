@@ -67,6 +67,19 @@ def test_mapper_add_ctx_property_duplicate():
     assert_raises(InvalidArgumentError, mapper.add_ctx_property, 'foo', 2)
 
 
+def test_config():
+    mapper = Mapper()
+    mapper.config['some.value'] = 'foo'
+
+    def resource(request, ctx):
+        return ok(ctx.config['some.value'])
+
+    mapper.add('/', resource)
+    res = mapper(Request({'REQUEST_METHOD': 'GET', 'PATH_INFO': '/'}))
+    assert res.code == 200
+    assert res.body == 'foo'
+
+
 def test_callbacks():
     ctx = Context()
     cb = Mock()

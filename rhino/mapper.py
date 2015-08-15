@@ -329,6 +329,7 @@ def _callback_dict():
 
 class Context(object):
     def __init__(self, request=None):
+        self.config = {}
         self.request = request
         self.__properties = {}
         self.__callbacks = _callback_dict()
@@ -510,6 +511,7 @@ class Mapper(object):
         The `ranges` parameter can be used to override or augment the default
         ranges by passing in a dict mapping range names to regexp patterns.
         """
+        self.config = {}
         self.ranges = DEFAULT_RANGES.copy()
         if ranges is not None:
             self.ranges.update(ranges)
@@ -676,6 +678,7 @@ class Mapper(object):
         return self._wrapped(request, ctx)
 
     def dispatch(self, request, ctx):
+        ctx.config = self.config
         for name, (fn, cached) in self._ctx_properties:
             ctx.add_property(name, fn, cached=cached)
         # TODO here is were we would have to prepend self.root
