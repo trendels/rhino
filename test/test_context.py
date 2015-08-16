@@ -91,3 +91,36 @@ def test_callbacks():
 def test_invalid_callback():
     ctx = Context()
     assert_raises(KeyError, ctx.add_callback, 'invalid', lambda: None)
+
+
+def test_wrapper_access_to_ctx_properties():
+    def test_wrapper(app):
+        def wrapper(req, ctx):
+            assert ctx.foo == 1
+            return app(req, ctx)
+        return wrapper
+
+    foo = Mock(return_value=1)
+    mapper = Mapper()
+    mapper.add_ctx_property('foo', foo)
+    mapper.add_wrapper(test_wrapper)
+    mapper.add('/', lambda _: ok())
+    res = mapper(Request({'REQUEST_METHOD': 'GET', 'PATH_INFO': '/'}))
+    assert res.code == 200
+    assert foo.has_calls([call()])
+
+
+def test_wrapper_access_to_ctx_config():
+    def test_wrapper(app):
+        def wrapper(req, ctx):
+            assert ctx.config['foo'] == 1
+            return app(req, ctx)
+        return wrapper
+
+    foo = Mock(return_value=1)
+    mapper = Mapper()
+    mapper.config['foo'] = 1
+    mapper.add_wrapper(test_wrapper)
+    mapper.add('/', lambda _: ok())
+    res = mapper(Request({'REQUEST_METHOD': 'GET', 'PATH_INFO': '/'}))
+    assert res.code == 200

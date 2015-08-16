@@ -675,12 +675,13 @@ class Mapper(object):
     def __call__(self, request, ctx=None):
         if ctx is None:  # For easier testing
             ctx = Context(request=request)
-        return self._wrapped(request, ctx)
-
-    def dispatch(self, request, ctx):
+        # Set up the context
         ctx.config = self.config
         for name, (fn, cached) in self._ctx_properties:
             ctx.add_property(name, fn, cached=cached)
+        return self._wrapped(request, ctx)
+
+    def dispatch(self, request, ctx):
         # TODO here is were we would have to prepend self.root
         request._add_context(root=request.script_name, mapper=self, route=None)
         for route in self.routes:
