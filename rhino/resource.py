@@ -303,7 +303,7 @@ class Resource(object):
 
         if handler.produces:
             writer = handler.produces.serialize
-            response.body = apply_ctx(writer, ctx)(response.body)
+            response._body_writer = apply_ctx(writer, ctx)
 
         if handler.provides:
             response.headers.setdefault('Content-Type', handler.provides)

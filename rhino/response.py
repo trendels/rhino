@@ -145,7 +145,9 @@ class Response(object):
 
         self._code = code
         self._headers = headers
-        self._body = body
+        self._raw_body = body
+        self._body = None
+        self._body_writer = None
         self._callbacks = []
 
     @property
@@ -160,12 +162,21 @@ class Response(object):
 
     @property
     def body(self):
-        """The response body."""
+        """Seralizes and returns the response body.
+
+        On subsequent access, returns the cached value."""
+        if self._body is None:
+            raw_body = self._raw_body
+            if self._body_writer is None:
+                self._body = raw_body() if callable(raw_body) else raw_body
+            else:
+                self._body = self._body_writer(raw_body)
+
         return self._body
 
     @body.setter
     def body(self, value):
-        self._body = value
+        self._raw_body, self._body = value, None
 
     @property
     def status(self):
@@ -288,12 +299,8 @@ class Response(object):
         """
         code = self._code
         headers = self._headers
-        body = self._body
+        body = self.body
         request_method = environ.get('REQUEST_METHOD', '').upper()
-
-        # Resolve lazy response body
-        if callable(body):
-            body = body()
 
         # Validate response body
         if isinstance(body, unicode):

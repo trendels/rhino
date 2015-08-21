@@ -383,3 +383,23 @@ def test_conditional_lazy_body():
     assert status == "200 OK"
     assert body == 'ok'
     assert mock_body.called
+
+
+def test_lazy_serialization():
+    res = response(200, body='1', etag='1')
+    res._body_writer = mock.create_autospec(lambda x: None, return_value='ok')
+
+    req = Request({'HTTP_IF_NONE_MATCH': '"1"'})
+    status, _, body = wsgi_response(res.conditional_to(req), req.environ)
+    assert status == "304 Not Modified"
+    assert body == ''
+    assert not res._body_writer.called
+
+    res = response(200, body='1', etag='1')
+    res._body_writer = mock.create_autospec(lambda x: None, return_value='ok')
+
+    req = Request({'HTTP_IF_NONE_MATCH': '"2"'})
+    status, _, body = wsgi_response(res.conditional_to(req), req.environ)
+    assert status == "200 OK"
+    assert body == 'ok'
+    assert res._body_writer.called
