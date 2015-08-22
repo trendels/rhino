@@ -29,11 +29,19 @@ def wsgi_response(response, environ=None):
 
 
 def test_defaults():
+    res = Response("200 OK")
+    assert res.code == 200
+    assert res.status == "200 OK"
+    assert res.status_code == 200
+    assert res.headers.items() == []
+    assert res.body == ''
+
+
+def test_status_int():
     res = Response(200)
     assert res.code == 200
     assert res.status == "200 OK"
-    assert res.headers.items() == []
-    assert res.body == ''
+    assert res.status_code == 200
 
 
 def test_finalize():

@@ -93,13 +93,13 @@ class Response(object):
     default_encoding = 'utf-8'
     default_content_type = 'text/plain; charset=utf-8'
 
-    def __init__(self, code, headers=None, body=''):
+    def __init__(self, status, headers=None, body=''):
         """Create a new HTTP response.
 
         Parameters:
 
-        code
-          : an integer status code.
+        status
+          : the status code as an integer or string, e.g. 200, or "200 OK"
 
         headers
           : a list of response headers as (name, value) tuples.
@@ -134,6 +134,12 @@ class Response(object):
                 headers will be added to the response headers, with existing
                 headers of the same name taking precedence.
         """
+        if isinstance(status, int):
+            reason = status_codes.get(status, "Unknown")
+            status_code, status = status, "%s %s" % (status, reason)
+        else:
+            status_code = int(status.split(None, 1)[0])
+
         headers = ResponseHeaders(headers or [])
 
         if isinstance(body, Entity):
@@ -143,7 +149,8 @@ class Response(object):
             for k, v in entity.headers.items():
                 headers.setdefault(k, v)
 
-        self._code = code
+        self._status = status
+        self._status_code = status_code
         self._headers = headers
         self._raw_body = body
         self._body = None
@@ -151,9 +158,16 @@ class Response(object):
         self._callbacks = []
 
     @property
-    def code(self):
+    def status(self):
+        """The HTTP status as a string."""
+        return self._status
+
+    @property
+    def status_code(self):
         """The HTTP status code as an integer."""
-        return self._code
+        return self._status_code
+
+    code = status_code
 
     @property
     def headers(self):
@@ -177,12 +191,6 @@ class Response(object):
     @body.setter
     def body(self, value):
         self._raw_body, self._body = value, None
-
-    @property
-    def status(self):
-        """The status line as a string (status code + reason)"""
-        reason = status_codes.get(self.code, "Unknown")
-        return "%s %s" % (self._code, reason)
 
     def add_callback(self, fn):
         """Add a callback to be executed when the response is closed."""
@@ -288,7 +296,7 @@ class Response(object):
             headers = filter_304_headers(self.headers.items())
             if 'Date' not in self.headers:
                 headers.append(('Date', datetime_to_httpdate(time.time())))
-            return Response(code=304, headers=headers, body='')
+            return Response(status=304, headers=headers, body='')
         return self
 
     def __call__(self, environ, start_response):
@@ -297,7 +305,7 @@ class Response(object):
         Finalizes the response body, calls `start_response` and returns a
         response iterator.
         """
-        code = self._code
+        code = self._status_code
         headers = self._headers
         body = self.body
         request_method = environ.get('REQUEST_METHOD', '').upper()
