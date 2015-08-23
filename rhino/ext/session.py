@@ -96,7 +96,7 @@ class BeakerSession(object):
             if session.__dict__['_headers']['set_cookie']:
                 cookie = session.__dict__['_headers']['cookie_out']
                 if cookie:
-                    response.headers.add_header('Set-Cookie', cookie)
+                    response.headers.add('Set-Cookie', cookie)
 
     # Note: This relies on the fact that context properties are not initialized
     # lazily by default, so the finalize hook is installed even if the session

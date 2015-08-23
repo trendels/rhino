@@ -411,3 +411,15 @@ def test_lazy_serialization():
     assert status == "200 OK"
     assert body == 'ok'
     assert res._body_writer.called
+
+
+def test_set_header():
+    res = Response(200, headers=[('X-Foo', 'bar')])
+    res.headers['X-Foo'] = 'baz'
+    assert res.headers.items() == [('X-Foo', 'baz')]
+
+
+def test_add_header():
+    res = Response(200, headers=[('X-Foo', 'bar')])
+    res.headers.add('X-Foo', 'baz')
+    assert res.headers.items() == [('X-Foo', 'bar'), ('X-Foo', 'baz')]

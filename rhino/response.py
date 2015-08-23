@@ -4,9 +4,9 @@ import collections
 import urllib
 import urlparse
 import time
+import wsgiref.headers
 from Cookie import SimpleCookie
 from datetime import datetime, timedelta
-from wsgiref.headers import Headers as ResponseHeaders
 from wsgiref.util import application_uri
 
 from .http import httpdate_to_timestamp, datetime_to_httpdate, \
@@ -48,6 +48,11 @@ class Entity(object):
     def __init__(self, body, **kw):
         self.body = body
         self.headers = response(200, **kw).headers
+
+
+# Support 'add' as an alias for 'add_header'
+class ResponseHeaders(wsgiref.headers.Headers):
+    add = wsgiref.headers.Headers.add_header
 
 
 class ResponseBody(object):
