@@ -17,7 +17,7 @@ __all__ = [
 
 class_types = (type, types.ClassType)  # new-style and old-style classes
 
-VIEW_SEPARATOR = ':'
+VIEW_SEPARATOR = ';'
 MIMEPARSE_NO_MATCH = (-1, 0)
 
 

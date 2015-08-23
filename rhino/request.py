@@ -200,10 +200,10 @@ class Request(object):
         '/'
           : Builds the URL for the root (top-most) mapper instance.
 
-        '/a', '/a.b', etc.
+        '/a', '/a:b', etc.
           : Builds the URL for a named route relative to the root mapper.
 
-        '.a', '..a', '..a.b', etc.
+        '.a', '..a', '..a:b', etc.
           : Builds a URL for a named route relative to the current mapper.
             Each additional leading '.' after the first one starts one
             level higher in the hierarchy of nested mappers (i.e. '.a' is

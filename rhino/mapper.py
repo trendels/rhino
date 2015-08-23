@@ -408,8 +408,14 @@ class Route(object):
     def __init__(self, template, resource, ranges=None, name=None):
         if ranges is None:
             ranges = DEFAULT_RANGES
-        if name is not None and any(c in name for c in './'):
-            raise InvalidArgumentError("Route name '%s' contains invalid characters ('./')" % name)
+        if name is not None:
+            for c in ':/':
+                if c in name:
+                    raise InvalidArgumentError(
+                        "Route name cannot contain '%s': %s'" % (c, name))
+            if name[0] == '.':
+                raise InvalidArgumentError(
+                        "Route name cannot start with '.': %s" % name)
 
         regex, params = template2regex(template, ranges)
         self.regex = re.compile(regex)
@@ -602,11 +608,11 @@ class Mapper(object):
 
         Possible values for `target`:
 
-        A string that does not contain a '.'
-          : If the string does not contain a dot, it will be used to look up
-            a named route of this mapper instance and return it's path.
+        A string that does not start with a '.' and does not contain ':'.
+          : Looks up the route of the same name on this mapper and returns it's
+            path.
 
-        A string of the form 'a.b', 'a.b.c', etc.
+        A string of the form 'a:b', 'a:b:c', etc.
           : Follows the route to nested mappers by splitting off consecutive
             segments. Returns the path of the route found by looking up the
             final segment on the last mapper.
@@ -619,9 +625,9 @@ class Mapper(object):
             returns its path.
         """
         if type(target) in string_types:
-            if '.' in target:
-                # Build path for a dotted route name
-                prefix, rest = target.split('.', 1)
+            if ':' in target:
+                # Build path a nested route name
+                prefix, rest = target.split(':', 1)
                 route = self.named_routes[prefix]
                 prefix_params = route._pop_params(args, kw)
                 prefix_path = route.path([], prefix_params)

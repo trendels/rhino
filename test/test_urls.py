@@ -28,12 +28,12 @@ def test_build_url_nested():
 
     assert build_url(context, '/')         == '/'
     assert build_url(context, '/foo')      == '/foo'
-    assert build_url(context, '/foo.bar')  == '/foo/bar'
+    assert build_url(context, '/foo:bar')  == '/foo/bar'
     assert build_url(context, '.')         == '/foo/bar'
     assert build_url(context, 'bar')       == '/foo/bar'
     assert build_url(context, '.bar')      == '/foo/bar'
     assert build_url(context, '..foo')     == '/foo'
-    assert build_url(context, '..foo.bar') == '/foo/bar'
+    assert build_url(context, '..foo:bar') == '/foo/bar'
 
 
 def test_build_url_params_named():
@@ -45,10 +45,10 @@ def test_build_url_params_named():
     context = [request_context('', mapper1, mapper1.routes[0])]
 
     assert build_url(context, '/a', [], dict(p1=11, p2=22)) == '/a/11/22'
-    assert build_url(context, '/a.b', [], dict(p1=11, p3=33)) == '/a/11/b/33'
-    assert build_url(context, '/a.b',
+    assert build_url(context, '/a:b', [], dict(p1=11, p3=33)) == '/a/11/b/33'
+    assert build_url(context, '/a:b',
             [], dict(p1=11, p2=22, p3=33)) == '/a/11/22/b/33'
-    assert build_url(context, '/a.b',
+    assert build_url(context, '/a:b',
             [], dict(p1=11, p2=22, p3=33, p4=44)) == '/a/11/22/b/33/44'
 
 
@@ -65,10 +65,10 @@ def test_build_url_params_positional():
     assert_raises(InvalidArgumentError,
             build_url, context, '/a', [11, 22, 33])
 
-    assert build_url(context, '/a.b', [11, 22, 33, 44]) == '/a/11/22/b/33/44'
-    assert build_url(context, '/a.b', [11, 22, 33]) == '/a/11/22/b/33'
+    assert build_url(context, '/a:b', [11, 22, 33, 44]) == '/a/11/22/b/33/44'
+    assert build_url(context, '/a:b', [11, 22, 33]) == '/a/11/22/b/33'
     assert_raises(InvalidArgumentError,
-            build_url, context, '/a.b', [11, 22])
+            build_url, context, '/a:b', [11, 22])
 
 
 def test_build_url_params_mixed():
@@ -86,9 +86,9 @@ def test_build_url_params_mixed():
     assert_raises(InvalidArgumentError,
             build_url, context, '/a', [11], dict(p1=11, p2=22))
 
-    assert build_url(context, '/a.b', [22, 44], dict(p1=11, p3=33)) \
+    assert build_url(context, '/a:b', [22, 44], dict(p1=11, p3=33)) \
             == '/a/11/22/b/33/44'
-    assert build_url(context, '/a.b', [22], dict(p1=11, p3=33)) \
+    assert build_url(context, '/a:b', [22], dict(p1=11, p3=33)) \
             == '/a/11/22/b/33'
 
 
@@ -113,7 +113,7 @@ def test_build_url_override():
     context = [request_context('', mapper1, mapper1.routes[0])]
 
     assert build_url(context, '/a', [], dict(a=(11, 22))) == '/a/11/22'
-    assert build_url(context, '/a.b', [(11, 22)], dict(b=(33, 44))) == '/a/11/22/b/33/44'
+    assert build_url(context, '/a:b', [(11, 22)], dict(b=(33, 44))) == '/a/11/22/b/33/44'
     assert_raises(InvalidArgumentError, build_url, context, '/a', [11, 22])
     assert_raises(InvalidArgumentError,
             build_url, context, '/a', [], dict(p1=11, p2=22))

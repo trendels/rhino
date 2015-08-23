@@ -6,6 +6,7 @@ def test_default():
 
 def test_invalid_route_name():
     assert_raises(InvalidArgumentError, Route, '/', None, name='.')
+    assert_raises(InvalidArgumentError, Route, '/', None, name=':')
     assert_raises(InvalidArgumentError, Route, '/', None, name='/')
 
 def test_invalid_param_name():
