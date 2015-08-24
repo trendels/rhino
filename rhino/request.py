@@ -88,9 +88,40 @@ class QueryDict(collections.Mapping):
             return False
         return True
 
-    def getall(self, key):
-        """Return a list of values for the given key."""
-        return [v for k, v in self._items if k == key]
+    def get(self, key, default=None, type=None):
+        """Returns the first value for a key.
+
+        If `type` is not None, the value will be converted by calling
+        `type` with the value as argument. If type() raises `ValueError`, it
+        will be treated as if the value didn't exist, and `default` will be
+        returned instead.
+        """
+        try:
+            value = self[key]
+            if type is not None:
+                return type(value)
+            return value
+        except (KeyError, ValueError):
+            return default
+
+    def getall(self, key, type=None):
+        """Return a list of values for the given key.
+
+        If `type` is not None, all values will be converted by calling `type`
+        with the value as argujent. if type() raises `ValueError`, the value
+        will not appear in the result list.
+        """
+        values = []
+        for k, v in self._items:
+            if k == key:
+                if type is not None:
+                    try:
+                        values.append(type(v))
+                    except ValueError:
+                        pass
+                else:
+                    values.append(v)
+        return values
 
     getlist = getall
 

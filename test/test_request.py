@@ -194,6 +194,18 @@ def test_querydict():
     assert q['foo'] is None
 
 
+def test_querydict_type():
+    q = QueryDict([('a', 1), ('a', 2), ('a', 'x'), ('b', 'y')])
+    assert q.get('a', type=int) == 1
+    assert q.getall('a', type=int) == [1, 2]
+    assert q.getall('a', type=str) == ['1', '2', 'x']
+    assert q.getall('b', type=int) == []
+    assert q.getall('b', type=str) == ['y']
+    assert q.get('b', type=int) is None
+    assert q.get('b', 0, type=int) == 0
+    assert q.get('b', default='x', type=int) == 'x'
+
+
 def test_file_upload(environ_multipart):
     req = Request(environ_multipart)
     assert set(req.form.keys()) == set([u'★', u'★★'])
