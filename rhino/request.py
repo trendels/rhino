@@ -384,6 +384,7 @@ class Request(object):
                 self._body = self._body_reader(self.input)
         return self._body
 
+    # TODO Allow overriding the FieldStorage class, to disallow file uploads.
     @property
     def form(self):
         """Reads the request body and tries to parse it as a web form.
@@ -394,8 +395,11 @@ class Request(object):
         are represented as form fields with a 'filename' attribute.
         """
         if self._form is None:
+            # Make sure FieldStorage always parses the form content,
+            # and never the query string.
             environ = self.environ.copy()
             environ['QUERY_STRING'] = ''
+            environ['REQUEST_METHOD'] = 'POST'
             fs = cgi.FieldStorage(
                 fp=self.environ['wsgi.input'],
                 environ=environ,

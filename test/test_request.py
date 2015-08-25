@@ -113,6 +113,12 @@ def test_request_form(environ):
     assert req.input.read() == ''
 
 
+def test_request_form_get(environ):
+    environ['REQUEST_METHOD'] = 'GET'
+    req = Request(environ)
+    assert req.form.items() == [('x', '1'), ('x', '2'), (u'★', u'☃')]
+
+
 def test_accessors(environ):
     req = Request(environ)
     assert req.method == 'POST'
