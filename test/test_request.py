@@ -223,3 +223,11 @@ def test_url_for(environ):
         assert req.url_for('/', _query={'foo': 'bar'}) == 'http://127.0.0.1/?foo=bar'
         assert req.url_for('/', _query=[('foo', 1), ('foo', 2)]) == 'http://127.0.0.1/?foo=1&foo=2'
         assert req.url_for('/', _relative=True) == '/'
+
+
+def test_url_for_append_query(environ):
+    req = Request(environ)
+    with patch.object(rhino.request, 'build_url') as mock_url:
+        mock_url.return_value = 'a?b=c'
+        assert req.url_for('/') == 'http://127.0.0.1/a?b=c'
+        assert req.url_for('/', _query={'d': 'e'}) == 'http://127.0.0.1/a?b=c&d=e'

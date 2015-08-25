@@ -259,7 +259,9 @@ class Request(object):
         if query:
             if isinstance(query, dict):
                 query = sorted(query.items())
-            url = url + '?' + urllib.urlencode(query)
+            query_part = urllib.urlencode(query)
+            query_sep = '&' if '?' in url else '?'
+            url = url + query_sep + query_part
         if relative:
             return url
         else:
