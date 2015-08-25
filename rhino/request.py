@@ -222,14 +222,14 @@ class Request(object):
 
         The target is the first positional argument, and can be any valid
         target for `Mapper.path`, which will be looked up on the current
-        mapper instance and used to build the URL for that route.
+        mapper object and used to build the URL for that route.
         Additionally, it can be one of:
 
         '.'
           : Builds the URL for the current route.
 
         '/'
-          : Builds the URL for the root (top-most) mapper instance.
+          : Builds the URL for the root (top-most) mapper object.
 
         '/a', '/a:b', etc.
           : Builds the URL for a named route relative to the root mapper.
@@ -284,7 +284,7 @@ class Request(object):
 
     @property
     def query(self):
-        """A QueryDict instance holding the query parameters (QUERY_STRING)."""
+        """A QueryDict object holding the query parameters (QUERY_STRING)."""
         if self._query is None:
             query_string = self.environ.get('QUERY_STRING')
             self._query = QueryDict([
@@ -367,7 +367,7 @@ class Request(object):
         """Reads and returns the entire request body.
 
         On first access, reads `content_length` bytes from `input` and stores
-        the result on the request instance. On subsequent access, returns the
+        the result on the request object. On subsequent access, returns the
         cached value.
         """
         if self._body is None:
@@ -383,7 +383,7 @@ class Request(object):
 
         Parsing is done using the stdlib's `cgi.FieldStorage` class
         which supports multipart forms (file uploads).
-        Returns a `QueryDict` instance holding the form fields. Uploaded files
+        Returns a `QueryDict` object holding the form fields. Uploaded files
         are represented as form fields with a 'filename' attribute.
         """
         if self._form is None:

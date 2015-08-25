@@ -386,7 +386,7 @@ class Context(object):
         the properties added on the Mapper level.
         """
         if name in self.__properties:
-            raise KeyError("Trying to add a property '%s' that already exists on this %s instance." % (name, self.__class__.__name__))
+            raise KeyError("Trying to add a property '%s' that already exists on this %s object." % (name, self.__class__.__name__))
         self.__properties[name] = (fn, cached)
 
     def __getattr__(self, name):
@@ -531,7 +531,7 @@ class Mapper(object):
         """Add a route to a resource.
 
         The optional `name` assigns a name to this route that can be used when
-        building URLs. The name must be unique within this Mapper instance.
+        building URLs. The name must be unique within this Mapper object.
         """
         # Special case for standalone handler functions
         if hasattr(resource, '_rhino_meta'):
@@ -547,7 +547,7 @@ class Mapper(object):
             self._lookup[obj_id] = route
         if name is not None:
             if name in self.named_routes:
-                raise InvalidArgumentError("A route named '%s' already exists in this %s instance."
+                raise InvalidArgumentError("A route named '%s' already exists in this %s object."
                         % (name, self.__class__.__name__))
             self.named_routes[name] = route
         self.routes.append(route)
@@ -559,7 +559,7 @@ class Mapper(object):
         working with Request and Response objects instead. The argument to
         add_wrapper must be a callable that is called with the wrapped app as
         argument and should return another callable that accepts a Request and
-        Context instance as arguments and returns a Response. The wrapper has
+        Context object as arguments and returns a Response. The wrapper has
         full control over the execution. It can call the wrapped app to pass on
         the request, modify the response, etc.
 
@@ -592,7 +592,7 @@ class Mapper(object):
         """Install a context property.
 
         A context property is a factory function whos return value will be
-        available as a property named `name` on `Context` instances passing
+        available as a property named `name` on `Context` objects passing
         through this mapper. The result will be cached unless `cached` is
         False.
 
@@ -617,7 +617,7 @@ class Mapper(object):
             segments. Returns the path of the route found by looking up the
             final segment on the last mapper.
 
-        A `Route` instance
+        A `Route` object
           : Returns the path for the route.
 
         A resource that was added previously
@@ -641,13 +641,13 @@ class Mapper(object):
             for route in self.routes:
                 if route is target:
                     return route.path(args, kw)
-            raise InvalidArgumentError("Route '%s' not found in this %s instance." % (target, self.__class__.__name__))
+            raise InvalidArgumentError("Route '%s' not found in this %s object." % (target, self.__class__.__name__))
         else:
             # Build path for resource by object id
             target_id = id(target)
             if target_id in self._lookup:
                 return self._lookup[target_id].path(args, kw)
-            raise InvalidArgumentError("No Route found for target '%s' in this %s instance." % (target, self.__class__.__name__))
+            raise InvalidArgumentError("No Route found for target '%s' in this %s object." % (target, self.__class__.__name__))
 
     def wsgi(self, environ, start_response):
         """Implements the mapper's WSGI interface."""
@@ -694,7 +694,7 @@ class Mapper(object):
             response = route(request, ctx)
             if response is not None:
                 if not isinstance(response, Response):
-                    raise TypeError("Not a rhino.Response instance: %s." % response)
+                    raise TypeError("Not a rhino.Response object: %s." % response)
                 if self.default_encoding is not None:
                     response.default_encoding = self.default_encoding
                 if self.default_content_type is not None:

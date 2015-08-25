@@ -88,7 +88,7 @@ def options(*args, **kw):
 
 
 def make_response(obj):
-    """Try to coerce an object into a Response instance."""
+    """Try to coerce an object into a Response object."""
     if obj is None:
         raise TypeError("Handler return value cannot be None.")
     if isinstance(obj, Response):
@@ -234,15 +234,15 @@ class Resource(object):
         my_resource = Resource(MyClass())
 
     When used as a wrapper or class decorator, handlers will be picked up from
-    methods of the wrapped instance or class that have been decorated with one
+    methods of the wrapped object or class that have been decorated with one
     of the decorator functions provided by this module (`get`, `post`, etc.)
 
     Additionally, if the wrapped object implements `from_url`, that method will
     be called before any handler to filter the URL parameters that will be
     passed to the handler as keyword arguments.
 
-    When used as a standalone instance, functions can be registered as handlers
-    using the instance's methods, as shown above. The `from_url` method can be
+    When used as a standalone object, functions can be registered as handlers
+    using the object's methods, as shown above. The `from_url` method can be
     used in the same way to register a filter for URL parameters.
     """
 

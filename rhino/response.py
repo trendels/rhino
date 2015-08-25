@@ -133,9 +133,9 @@ class Response(object):
                 has taken place, and no "304 Not Modified" response has
                 been sent.
 
-            An Entity instance
+            An Entity object
               : The response body (which must be of one of the types listed
-                above) will be taken from the entity instance, and any entity
+                above) will be taken from the entity object, and any entity
                 headers will be added to the response headers, with existing
                 headers of the same name taking precedence.
         """
@@ -176,7 +176,7 @@ class Response(object):
 
     @property
     def headers(self):
-        """A `wsgiref.headers.Headers` instance."""
+        """A `ResponseHeaders` object."""
         return self._headers
 
     @property
@@ -213,7 +213,7 @@ class Response(object):
           : The cookie value.
         max_age
           : The maximum age of the cookie in seconds, or as a
-            datetime.timedelta instance.
+            datetime.timedelta object.
         path
           : Restrict the cookie to this path (default: '/').
         domain
@@ -226,7 +226,7 @@ class Response(object):
         expires
           : Another way of specifying the maximum age of the cookie. Accepts
             the same values as max_age (number of seconds, datetime.timedelta).
-            Additionaly accepts a datetime.datetime instance.
+            Additionaly accepts a datetime.datetime object.
             Note: a value of type int or float is interpreted as a number of
             seconds in the future, *not* as Unix timestamp.
         """
@@ -263,7 +263,7 @@ class Response(object):
     def conditional_to(self, request):
         """Return a response that is conditional to a given request.
 
-        Returns the Response instance unchanged, or a new Response instance
+        Returns the Response object unchanged, or a new Response object
         with a "304 Not Modified" status code.
         """
         if not self.code == 200:
@@ -366,11 +366,11 @@ def response(code, body='', etag=None, last_modified=None, expires=None, **kw):
      :  A value for the ETag header. Double quotes will be added unless the
         string starts and ends with a double quote.
     last_modified
-     :  A value for the Last-Modified header as a datetime.datetime instance
+     :  A value for the Last-Modified header as a datetime.datetime object
         or Unix timestamp.
     expires
      :  A value for the Expires header as number of seconds, datetime.timedelta
-        or datetime.datetime instance.
+        or datetime.datetime object.
         Note: a value of type int or float is interpreted as a number of
         seconds in the future, *not* as Unix timestamp.
     **kw

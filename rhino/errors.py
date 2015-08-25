@@ -62,7 +62,7 @@ class HTTPException(Exception):
     Instance properties:
 
     response
-      : The `rhino.Response` instance that will be sent to the client.
+      : The `rhino.Response` object that will be sent to the client.
 
     The constructor takes one argument, an optional message that will replace
     the default message. Subclasses can override the constructor to require
