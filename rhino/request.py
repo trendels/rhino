@@ -401,7 +401,7 @@ class Request(object):
             environ['QUERY_STRING'] = ''
             environ['REQUEST_METHOD'] = 'POST'
             fs = cgi.FieldStorage(
-                fp=self.environ['wsgi.input'],
+                fp=self.input,
                 environ=environ,
                 keep_blank_values=True)
             # File upload field handling copied from WebOb
@@ -415,10 +415,6 @@ class Request(object):
                         (f.name.decode('utf-8'), f.value.decode('utf-8'))
                     )
             self._form = QueryDict(fields)
-            # Make sure calling input.read() or accessing .body
-            # doesn't read from 'wsgi.input' anymore, as it's been depleted
-            # already.
-            self._input = StringIO('')
         return self._form
 
     @property
