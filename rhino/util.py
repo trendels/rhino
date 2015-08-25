@@ -76,6 +76,12 @@ def apply_ctx(fn, ctx):
 
     If the `fn` callable accepts an argument named "ctx", returns a
     functools.partial object with ctx=ctx applied, else returns `fn` unchanged.
+
+    For this to work, the 'ctx' argument must come after any arguments that are
+    passed as positional arguments. For example, 'ctx' must be the 2nd argument
+    for request handlers, serializers and deserializers, that are always called
+    with one positional argument (the request, object to serialize, and input
+    filehandle, respectively).
     """
     if 'ctx' in get_args(fn):
         return functools.partial(fn, ctx=ctx)
