@@ -156,8 +156,20 @@ data: foo
 
 '''
 
+
+def test_sse_event_newlines():
+    assert sse_event(comment='a\rb\nc\r\nd') == ': a\n: b\n: c\n: d\n\n'
+    assert sse_event(comment='a\n\n') == ': a\n: \n: \n\n'
+    assert sse_event(comment='a\r') == ': a\n: \n\n'
+
+
 def test_sse_event_minimal():
     assert sse_event(comment='') == ': \n\n'
+
+
+def test_sse_event_invalid_newlines():
+    assert_raises(ValueError, sse_event, event='a\n')
+    assert_raises(ValueError, sse_event, id='a\r')
 
 
 def test_sse_event_empty():
