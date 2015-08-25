@@ -265,9 +265,7 @@ class Request(object):
         if relative:
             return url
         else:
-            if self._application_uri is None:
-                self._application_uri = application_uri(self.environ)
-            return urlparse.urljoin(self._application_uri, url)
+            return urlparse.urljoin(self.application_uri, url)
 
     @property
     def method(self):
@@ -302,6 +300,13 @@ class Request(object):
         if self._url is None:
             self._url = request_uri(self.environ, include_query=1)
         return self._url
+
+    @property
+    def application_uri(self):
+        """The base URI of the application (wsgiref.application_uri)."""
+        if self._application_uri is None:
+            self._application_uri = application_uri(self.environ)
+        return self._application_uri
 
     @property
     def content_type(self):

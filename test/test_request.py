@@ -120,6 +120,7 @@ def test_accessors(environ):
     assert req.path_info == u'/★'
     # TODO Decode url?
     assert req.url == 'http://127.0.0.1/%E2%98%83/%E2%98%85?a=1&a=2&b=%E2%98%83&c'
+    assert req.application_uri == 'http://127.0.0.1/%E2%98%83'
     assert req.content_type == 'application/x-www-form-urlencoded'
     assert req.content_length == len(body)
     assert req.server_name == '127.0.0.1'
