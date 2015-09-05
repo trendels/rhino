@@ -285,7 +285,7 @@ class Resource(object):
             reader = handler.consumes.deserialize
             request._body_reader = apply_ctx(reader, ctx)
 
-        ctx._run_callbacks('enter', request)
+        ctx._run_callbacks('enter', (request,))
 
         url_args_filter = self._from_url or getattr(resource, 'from_url', None)
         kw = request.routing_args
@@ -299,7 +299,7 @@ class Resource(object):
             rv = apply_ctx(fn, ctx)(request, **kw)
         response = make_response(rv)
 
-        ctx._run_callbacks('leave', request, response)
+        ctx._run_callbacks('leave', (request, response))
 
         if handler.produces:
             writer = handler.produces.serialize

@@ -69,6 +69,7 @@ on to `bar_resource`.
 
 from __future__ import absolute_import
 
+import functools
 import re
 import sys
 import urllib
@@ -375,9 +376,17 @@ class Context(object):
         except KeyError:
             raise KeyError("Invalid callback phase '%s'. Must be one of %s" % (phase, _callback_phases))
 
-    def _run_callbacks(self, phase, *args):
+    def _run_callbacks(self, phase, args=None, error_handler=None):
+        if args is None:
+            args = tuple()
         for fn in self.__callbacks[phase]:
-            fn(*args)
+            try:
+                fn(*args)
+            except Exception:
+                if error_handler:
+                    error_handler(sys.exc_info())
+                else:
+                    raise
 
     def add_property(self, name, fn, cached=True):
         """Adds a property to the Context.
@@ -656,15 +665,16 @@ class Mapper(object):
         try:
             response = self(request, ctx)
             response = response.conditional_to(request)
+            ctx._run_callbacks('finalize', (request, response))
         except HTTPException as e:
             response = e.response
         except Exception:
             self.handle_error(request, sys.exc_info())
             response = InternalServerError().response
         response.add_callback(lambda: ctx._run_callbacks('close'))
-        ctx._run_callbacks('finalize', request, response)
         wsgi_response = response(environ, start_response)
-        ctx._run_callbacks('teardown')
+        ctx._run_callbacks('teardown',
+                error_handler=functools.partial(self.handle_error, request))
         return wsgi_response
 
     # taken and adapted from wsgiref.handlers.BaseHandler

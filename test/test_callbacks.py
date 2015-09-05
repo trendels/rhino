@@ -9,21 +9,29 @@ from rhino.resource import Resource, get
 from rhino.response import ok
 from rhino.test import TestClient
 
+class CallbackError(Exception): pass
+
 
 class Wrapper(object):
-    def __init__(self, wrapped):
+    def __init__(self, wrapped, exceptions=None):
         self.wrapped = wrapped
         self.request = None
         self.response = None
+        self.exceptions = exceptions or []
         self.cb = mock.create_autospec(lambda *args, **kw: 1)
+
+    def error(self, msg, *args, **kw):
+        raise CallbackError(msg)
 
     def __call__(self, request, ctx):
         self.request = request
-        ctx.add_callback('enter', partial(self.cb, 'enter'))
-        ctx.add_callback('leave', partial(self.cb, 'leave'))
-        ctx.add_callback('finalize', partial(self.cb, 'finalize'))
-        ctx.add_callback('teardown', partial(self.cb, 'teardown'))
-        ctx.add_callback('close', partial(self.cb, 'close'))
+        for cb_phase in ('enter leave finalize teardown close'.split()):
+            if cb_phase in self.exceptions:
+                ctx.add_callback(cb_phase, partial(self.cb, cb_phase + '-pre'))
+                ctx.add_callback(cb_phase, partial(self.error, cb_phase))
+                ctx.add_callback(cb_phase, partial(self.cb, cb_phase + '-post'))
+            else:
+                ctx.add_callback(cb_phase, partial(self.cb, cb_phase))
         self.response = self.wrapped(request, ctx)
         return self.response
 
@@ -69,7 +77,30 @@ def test_callbacks_exception():
 
     wrapper.cb.assert_has_calls([
         call('enter', wrapper.request),
-        call('finalize', wrapper.request, not_found.response),
         call('teardown'),
+        call('close'),
+    ])
+
+
+def test_teardown_callbacks_swallow_exceptions():
+    @get
+    def handler(request):
+        return ok('test')
+
+    wrapper = Wrapper(Resource(handler), exceptions=('teardown,'))
+
+    app = Mapper()
+    app.add('/', wrapper)
+
+    client = TestClient(app.wsgi)
+    res = client.get('/')
+    assert res.code == 200
+
+    wrapper.cb.assert_has_calls([
+        call('enter', wrapper.request),
+        call('leave', wrapper.request, wrapper.response),
+        call('finalize', wrapper.request, wrapper.response),
+        call('teardown-pre'),
+        call('teardown-post'),
         call('close'),
     ])

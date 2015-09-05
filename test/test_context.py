@@ -84,7 +84,7 @@ def test_callbacks():
     ctx = Context()
     cb = Mock()
     ctx.add_callback('enter', cb)
-    ctx._run_callbacks('enter', 1, 2)
+    ctx._run_callbacks('enter', (1, 2))
     cb.assert_has_calls([call(1, 2)])
 
 
