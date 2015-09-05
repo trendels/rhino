@@ -167,6 +167,12 @@ def test_sse_event_minimal():
     assert sse_event(comment='') == ': \n\n'
 
 
+def test_sse_event_retry():
+    assert sse_event(retry=1) == 'retry: 1\n\n'
+    assert sse_event(retry='1') == 'retry: 1\n\n'
+    assert_raises(ValueError, sse_event, retry='a')
+
+
 def test_sse_event_invalid_newlines():
     assert_raises(ValueError, sse_event, event='a\n')
     assert_raises(ValueError, sse_event, id='a\r')
