@@ -670,10 +670,11 @@ class Mapper(object):
         except Exception:
             self.handle_error(request, error_handler)
             response = InternalServerError().response
-        response.add_callback(lambda: ctx._run_callbacks('close'))
-        wsgi_response = response(environ, start_response)
-        ctx._run_callbacks('teardown', log_errors=True)
-        return wsgi_response
+        try:
+            response.add_callback(lambda: ctx._run_callbacks('close'))
+            return response(environ, start_response)
+        finally:
+            ctx._run_callbacks('teardown', log_errors=True)
 
     def handle_error(self, request):
         """Called when an exception occurs.

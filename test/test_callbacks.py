@@ -2,6 +2,7 @@ from functools import partial
 
 import mock
 from mock import call
+from pytest import raises as assert_raises
 
 from rhino.errors import NotFound
 from rhino.mapper import Mapper
@@ -103,4 +104,25 @@ def test_teardown_callbacks_swallow_exceptions():
         call('teardown-pre'),
         call('teardown-post'),
         call('close'),
+    ])
+
+
+def test_teardown_callbacks_run_after_wsgi_response_error():
+    @get
+    def handler(request):
+        return 1  # Not a valid response
+
+    wrapper = Wrapper(Resource(handler))
+
+    app = Mapper()
+    app.add('/', wrapper)
+
+    client = TestClient(app.wsgi)
+    assert_raises(TypeError, client.get, '/')
+
+    wrapper.cb.assert_has_calls([
+        call('enter', wrapper.request),
+        call('leave', wrapper.request, wrapper.response),
+        call('finalize', wrapper.request, wrapper.response),
+        call('teardown'),
     ])
