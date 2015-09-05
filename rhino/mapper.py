@@ -662,21 +662,22 @@ class Mapper(object):
         request = Request(environ)
         ctx = Context(request)
         try:
-            response = self(request, ctx)
-            ctx._run_callbacks('finalize', (request, response))
-            response = response.conditional_to(request)
-        except HTTPException as e:
-            response = e.response
-        except Exception:
-            self.handle_error(request, error_handler)
-            response = InternalServerError().response
-        try:
+            try:
+                response = self(request, ctx)
+                ctx._run_callbacks('finalize', (request, response))
+                response = response.conditional_to(request)
+            except HTTPException as e:
+                response = e.response
+            except Exception:
+                self.handle_error(request, ctx)
+                response = InternalServerError().response
+
             response.add_callback(lambda: ctx._run_callbacks('close'))
             return response(environ, start_response)
         finally:
             ctx._run_callbacks('teardown', log_errors=True)
 
-    def handle_error(self, request):
+    def handle_error(self, request, ctx):
         """Called when an exception occurs.
 
         By default, prints a traceback to the server log.

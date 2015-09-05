@@ -11,7 +11,8 @@ from rhino.response import ok
 from rhino.test import TestClient
 
 class CallbackError(Exception): pass
-
+class HandlerError(Exception): pass
+class MapperError(Exception): pass
 
 class Wrapper(object):
     def __init__(self, wrapped, exceptions=None):
@@ -124,6 +125,29 @@ def test_teardown_callbacks_run_after_wsgi_response_error():
         call('enter', wrapper.request),
         call('leave', wrapper.request, wrapper.response),
         call('finalize', wrapper.request, wrapper.response),
+        call('teardown'),
+    ])
+
+
+def test_teardown_callbacks_run_after_handle_error_exception():
+    class TestMapper(Mapper):
+        def handle_error(self, request, ctx):
+            raise MapperError
+
+    @get
+    def handler(request):
+        raise HandlerError
+
+    wrapper = Wrapper(Resource(handler))
+
+    app = TestMapper()
+    app.add('/', wrapper)
+
+    client = TestClient(app.wsgi)
+    assert_raises(MapperError, client.get, '/')
+
+    wrapper.cb.assert_has_calls([
+        call('enter', wrapper.request),
         call('teardown'),
     ])
 
