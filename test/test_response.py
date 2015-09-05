@@ -12,6 +12,9 @@ from rhino.response import Entity, Response, \
 from rhino.request import Request
 
 
+class CallbackError(Exception): pass
+
+
 def wsgi_response(response, environ=None):
     if environ is None:
         environ = {}
@@ -155,21 +158,28 @@ def test_location_is_absolute():
 
 def test_close_callbacks():
     class callback(object):
-        def __init__(self):
+        def __init__(self, error=False):
+            self.error = error
             self.called = False
 
         def __call__(self):
             self.called = True
+            if self.error:
+                raise CallbackError
 
     environ = {}
     setup_testing_defaults(environ)
 
-    cb = callback()
+    cb1, cb2, cb3 = callback(), callback(error=True), callback()
     res = response(200, body='test')
-    res.add_callback(cb)
+    res.add_callback(cb1)
+    res.add_callback(cb2)
+    res.add_callback(cb3)
     status, headers, body = wsgi_response(res, environ)
     assert body == 'test'
-    assert cb.called
+    assert cb1.called
+    assert cb2.called
+    assert cb3.called
 
 
 def test_set_cookie_defaults():

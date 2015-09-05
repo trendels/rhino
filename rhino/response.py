@@ -9,6 +9,7 @@ from Cookie import SimpleCookie
 from datetime import datetime, timedelta
 from wsgiref.util import application_uri
 
+from .util import log_exception
 from .http import httpdate_to_timestamp, datetime_to_httpdate, \
         timedelta_to_httpdate, total_seconds, match_etag, status_codes
 
@@ -62,13 +63,14 @@ class ResponseBody(object):
     response is closed by the WSGI server.
     """
 
-    def __init__(self, body, callbacks=None):
+    def __init__(self, body, environ, callbacks=None):
         if callbacks is None:
             callbacks = []
         if not hasattr(body, '__iter__'):
             body = iter([body])
-        self.callbacks = callbacks
         self.body = body
+        self.environ = environ
+        self.callbacks = callbacks
 
     def __iter__(self):
         return self
@@ -78,7 +80,11 @@ class ResponseBody(object):
 
     def close(self):
         for fn in self.callbacks:
-            fn()
+            try:
+                fn()
+            except Exception:
+                stream = self.environ.get('wsgi.error')
+                log_exception(stream)
 
 
 class Response(object):
@@ -350,7 +356,7 @@ class Response(object):
             body = ''
 
         start_response(self.status, header_list)
-        return ResponseBody(body, self._callbacks)
+        return ResponseBody(body, environ, self._callbacks)
 
 
 def response(code, body='', etag=None, last_modified=None, expires=None, **kw):
