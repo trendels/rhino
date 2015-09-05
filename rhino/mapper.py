@@ -663,8 +663,8 @@ class Mapper(object):
         ctx = Context(request)
         try:
             response = self(request, ctx)
-            response = response.conditional_to(request)
             ctx._run_callbacks('finalize', (request, response))
+            response = response.conditional_to(request)
         except HTTPException as e:
             response = e.response
         except Exception:

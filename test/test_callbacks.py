@@ -126,3 +126,20 @@ def test_teardown_callbacks_run_after_wsgi_response_error():
         call('finalize', wrapper.request, wrapper.response),
         call('teardown'),
     ])
+
+
+def test_finalize_callbacks_before_conditional_response():
+    def finalize_cb(req, res):
+        res.headers.add('ETag', '"1"')
+
+    @get
+    def handler(request, ctx):
+        ctx.add_callback('finalize', finalize_cb)
+        return ok('test')
+
+    app = Mapper()
+    app.add('/', handler)
+
+    client = TestClient(app.wsgi)
+    res = client.get('/', if_none_match='"1"')
+    assert res.code == 304
