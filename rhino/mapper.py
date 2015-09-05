@@ -368,6 +368,21 @@ class Context(object):
 
             Arguments: -
 
+        'teardown' callbacks are guaranteed to be called at the end of every
+        request, and are suitable for cleanup tasks like closing database
+        handles, etc. If a teardown callback raises an exception, it is
+        logged to the server log but does not cause other teardown callbacks
+        to be skipped.
+
+        'enter', 'leave' and 'finalize' callbacks are only called if no
+        exception occured before they are reached, including exceptions raised
+        in other callbacks.
+
+        Whether or not 'close' callbacks are called depends on whether
+        a WSGI response could be generated successfully, and if the WSGI
+        server calls '.close()' on the returned iterator, as required by the
+        spec. If that happens, all 'close' callbacks are called regardless
+        of exceptions, like 'teardown' callbacks.
         """
         try:
             self.__callbacks[phase].append(fn)
