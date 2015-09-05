@@ -69,16 +69,14 @@ on to `bar_resource`.
 
 from __future__ import absolute_import
 
-import functools
 import re
-import sys
 import urllib
 
 from .errors import HTTPException, InternalServerError, NotFound
 from .request import Request
 from .response import Response
 from .resource import Resource
-from .util import apply_ctx, get_args
+from .util import apply_ctx, get_args, log_exception
 
 __all__ = [
     'Mapper',
@@ -376,15 +374,16 @@ class Context(object):
         except KeyError:
             raise KeyError("Invalid callback phase '%s'. Must be one of %s" % (phase, _callback_phases))
 
-    def _run_callbacks(self, phase, args=None, error_handler=None):
+    def _run_callbacks(self, phase, args=None, log_errors=False):
         if args is None:
             args = tuple()
         for fn in self.__callbacks[phase]:
             try:
                 fn(*args)
             except Exception:
-                if error_handler:
-                    error_handler(sys.exc_info())
+                if log_errors:
+                    stream = self.request.environ.get('wsgi.error')
+                    log_exception(stream=stream)
                 else:
                     raise
 
@@ -669,24 +668,19 @@ class Mapper(object):
         except HTTPException as e:
             response = e.response
         except Exception:
-            self.handle_error(request, sys.exc_info())
+            self.handle_error(request, error_handler)
             response = InternalServerError().response
         response.add_callback(lambda: ctx._run_callbacks('close'))
         wsgi_response = response(environ, start_response)
-        ctx._run_callbacks('teardown',
-                error_handler=functools.partial(self.handle_error, request))
+        ctx._run_callbacks('teardown', log_errors=True)
         return wsgi_response
 
-    # taken and adapted from wsgiref.handlers.BaseHandler
-    def handle_error(self, request, exc_info):
-        """Log the 'exc_info' tuple in the server log."""
-        try:
-            from traceback import print_exception
-            stream = request.environ.get('wsgi.error', sys.stderr)
-            print_exception(exc_info[0], exc_info[1], exc_info[2], None, stream)
-            stream.flush()
-        finally:
-            exc_info = None  # Clear traceback to avoid circular reference
+    def handle_error(self, request):
+        """Called when an exception occurs.
+
+        By default, prints a traceback to the server log.
+        """
+        log_exception(stream=request.environ.get('wsgi.error'))
 
     def __call__(self, request, ctx=None):
         if ctx is None:  # For easier testing

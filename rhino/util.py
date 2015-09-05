@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import functools
 import inspect
+import sys
 
 __all__ = [
     'apply_ctx',
@@ -96,3 +97,15 @@ def apply_ctx(fn, ctx):
         return functools.partial(fn, ctx=ctx)
     else:
         return fn
+
+
+def log_exception(exc_info=None, stream=None):
+    """Log the 'exc_info' tuple in the server log."""
+    exc_info = exc_info or sys.exc_info()
+    stream = stream or sys.stderr
+    try:
+        from traceback import print_exception
+        print_exception(exc_info[0], exc_info[1], exc_info[2], None, stream)
+        stream.flush()
+    finally:
+        exc_info = None  # Clear traceback to avoid circular reference
