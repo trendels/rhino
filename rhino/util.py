@@ -19,7 +19,6 @@ def _sse_encode(k, v):
     return ''.join('%s: %s\n' % (k, line) for line in v.splitlines())
 
 
-# FIXME only comment and data may contain newlines!
 def sse_event(event=None, data=None, id=None, retry=None, comment=None,
         encoding='utf-8'):
     """Encode a Server-Sent Event (SSE).

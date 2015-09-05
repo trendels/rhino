@@ -291,7 +291,7 @@ class Response(object):
                     if modified_ts <= last_valid_ts:
                         date_ok = True
                 except:
-                    pass
+                    pass  # Ignore invalid dates
 
         if if_none_match and not etag_ok:
             return self

@@ -108,7 +108,7 @@ class QueryDict(collections.Mapping):
         """Return a list of values for the given key.
 
         If `type` is not None, all values will be converted by calling `type`
-        with the value as argujent. if type() raises `ValueError`, the value
+        with the value as argument. if type() raises `ValueError`, the value
         will not appear in the result list.
         """
         values = []
@@ -303,7 +303,7 @@ class Request(object):
 
     @property
     def application_uri(self):
-        """The base URI of the application (wsgiref.application_uri)."""
+        """The base URI of the application (wsgiref.util.application_uri)."""
         if self._application_uri is None:
             self._application_uri = application_uri(self.environ)
         return self._application_uri
